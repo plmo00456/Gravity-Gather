@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <!-- Appenders -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>%d %5p [%c] %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console-infolog" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>%d %5p %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger -->
+    <logger name="com.wooreal" level="INFO" appender-ref="console" />
+    <logger name="log4jdbc.sqlonly" level="INFO" appender-ref="console-infolog"/>
+    <logger name="log4jdbc.sqltiming" level="OFF"/>
+    <logger name="log4jdbc.audit" level="OFF"/>
+    <logger name="log4jdbc.connection" level="OFF"/>
+
+    <!-- Root Logger -->
+    <root level="info">
+        <appender-ref ref="console" />
+    </root>
+</configuration>
