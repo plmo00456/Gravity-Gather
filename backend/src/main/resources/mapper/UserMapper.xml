@@ -22,4 +22,21 @@
     <select id="getFailedLoginAttempt" resultType="com.wooreal.gravitygather.dto.user.FailedLoginAttempt">
     </select>
 
+    <select id="getUserByEmail" resultType="com.wooreal.gravitygather.dto.user.User">
+        SELECT
+            seq,
+            id,
+            password,
+            name,
+            email,
+            status,
+            fail_login_cnt as failLoginCnt,
+            created_at,
+            updated_at
+        FROM
+            users
+        WHERE
+            email = #{email}
+    </select>
+
 </mapper>
