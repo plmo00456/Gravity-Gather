@@ -4,7 +4,6 @@ import { createPinia } from "pinia";
 import {router} from "@/router";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import Vue from 'vue'
 import Swal from 'sweetalert2'
 
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -55,6 +54,7 @@ async function init(){
     app.config.globalProperties.msg = msg;
     app.config.globalProperties.msgSuccess = msgSuccess;
     app.config.globalProperties.msgError = msgError;
+    app.config.globalProperties.normalErrorMsg = "오류가 발생하였습니다. 관리자에게 문의해주세요.";
 
 
     app.use(createPinia())

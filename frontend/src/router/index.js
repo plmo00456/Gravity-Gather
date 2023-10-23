@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import userLogin from "@/components/UserLogin.vue";
+import userEmailVerify from "@/components/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
 
 const routes = [
@@ -13,6 +14,22 @@ const routes = [
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
 
+            if (userStore.isLoggedIn) {
+                next({ name: "HelloWorld" });
+            } else {
+                next();
+            }
+        },
+    },
+    {
+        path: '/user/email-verify',
+        name: 'emailVerify',
+        meta: {
+            title: '이메일 검증'
+        },
+        component: userEmailVerify,
+        beforeEnter(to, from, next) {
+            const userStore = useUserStore();
             if (userStore.isLoggedIn) {
                 next({ name: "HelloWorld" });
             } else {

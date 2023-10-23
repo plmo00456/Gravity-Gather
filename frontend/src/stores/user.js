@@ -7,40 +7,45 @@ export const useUserStore = defineStore({
     state: () => ({
         isLoggedIn: false,
         info: null,
+        dataResponse: null,
     }),
     getters: {
         username() {
             return this.info ? this.info.username : '';
+        },
+        getDataResponse: (state) => {
+            state.dataResponse;
         }
     },
     actions: {
         async login(credentials) {
-            try {
-                const response = await http.post('/user/login', credentials)
-                if (response.status === 200) {
-                    this.isLoggedIn = true;
-                    this.info = response.data.user;
-                } else {
-                    throw new Error('Login failed')
+            return http.post('/user/login', credentials, {
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            } catch (error) {
-                console.error(error)
-                throw error
-            }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
         },
 
         async logout() {
-            try{
+            try {
                 const response = await axios.post('/api/v1/logout')
 
-                if(response.status === 200){
+                if (response.status === 200) {
                     this.isLoggedIn = false;
                     this.info = null;
-                } else{
+                } else {
                     throw new Error('Logout failed')
                 }
 
-            } catch(error){
+            } catch (error) {
                 console.error(error)
                 throw error
             }
