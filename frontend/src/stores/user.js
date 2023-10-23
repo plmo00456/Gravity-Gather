@@ -17,7 +17,6 @@ export const useUserStore = defineStore({
         async login(credentials) {
             try {
                 const response = await http.post('/user/login', credentials)
-
                 if (response.status === 200) {
                     this.isLoggedIn = true;
                     this.info = response.data.user;
