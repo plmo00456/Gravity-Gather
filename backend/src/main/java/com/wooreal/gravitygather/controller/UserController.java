@@ -26,12 +26,10 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation(value = "로그인 액션 Api", notes = "아이디, 비밀번호를 이용하여 로그인 합니다.")
     public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest) {
-        System.out.println(userRequest.getId());
-        System.out.println(userRequest.getPassword());
         User user = userService.login(userRequest);
-        System.out.println(user);
-        userService.test();
-        Integer.parseInt("asd");
+        if (user == null) {
+            return new ResponseEntity<>("아이디와 비밀번호를 확인해 주세요.", HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }

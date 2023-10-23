@@ -15,11 +15,11 @@ public class UserService {
     }
 
     public User login(UserRequest userRequest){
+        User user = userMapper.login(userRequest);
+        if (user == null || !user.getPassword().equals(userRequest.getPassword())) {
+            return null;
+        }
         return userMapper.login(userRequest);
-    }
-
-    public int test(){
-        return userMapper.test();
     }
 
 }

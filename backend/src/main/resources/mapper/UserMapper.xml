@@ -13,7 +13,7 @@
             status,
             fail_login_cnt as failLoginCnt,
             created_at,
-            update_at
+            updated_at
         FROM Users
         WHERE id = #{id}
         AND password = #{password}
@@ -21,9 +21,5 @@
 
     <select id="getFailedLoginAttempt" resultType="com.wooreal.gravitygather.dto.user.FailedLoginAttempt">
     </select>
-
-    <insert id="test">
-        INSERT INTO test () VALUES ()
-    </insert>
 
 </mapper>
