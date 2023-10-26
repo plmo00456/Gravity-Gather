@@ -6,12 +6,12 @@ export const useUserStore = defineStore({
     id: 'user',
     state: () => ({
         isLoggedIn: false,
-        info: null,
+        userInfo: null,
         dataResponse: null,
     }),
     getters: {
         username() {
-            return this.info ? this.info.username : '';
+            return this.userInfo ? this.userInfo.username : '';
         },
         getDataResponse: (state) => {
             state.dataResponse;
@@ -27,6 +27,8 @@ export const useUserStore = defineStore({
                 .then(response => {
                     if (response.status === 200) {
                         this.dataResponse = response;
+                        this.isLoggedIn = true;
+                        this.userInfo = response.data;
                     }
                 })
                 .catch(error => {
@@ -50,6 +52,38 @@ export const useUserStore = defineStore({
                 throw error
             }
 
+        },
+
+        async sendMail(email) {
+            return http.post('/user/emails/verification-requests', email, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
+        },
+
+        async emailVerify(emailAndCode) {
+            return http.post('/user/emails/verifications', emailAndCode, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
         }
     }
 })

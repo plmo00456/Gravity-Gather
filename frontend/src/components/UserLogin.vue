@@ -94,7 +94,7 @@ export default {
                             return;
                         }
 
-                        this.msgSuccess("성공!");
+                      this.$router.push({name : 'mainView'});
                     }else{
                         this.msgError(this.dataResponse.data || this.normalErrorMsg);
                     }

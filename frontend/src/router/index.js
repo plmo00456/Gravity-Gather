@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import homeView from "@/components/HomeView.vue";
 import userLogin from "@/components/UserLogin.vue";
 import userEmailVerify from "@/components/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
@@ -6,7 +7,24 @@ import {useUserStore} from "@/stores/user";
 const routes = [
     {
         path: '/',
-        name: 'login',
+        name: 'mainView',
+        meta: {
+            title: '끌림'
+        },
+        component: homeView,
+        beforeEnter(to, from, next) {
+            const userStore = useUserStore();
+
+            if (userStore.isLoggedIn) {
+                next();
+            } else {
+                next({ name: "loginView" });
+            }
+        },
+    },
+    {
+        path: '/user/login',
+        name: 'loginView',
         meta: {
           title: '로그인'
         },
