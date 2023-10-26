@@ -8,4 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     User login(UserRequest userRequest);
     User getUserByEmail(String email);
+
+    int setUserActive(String email);
 }

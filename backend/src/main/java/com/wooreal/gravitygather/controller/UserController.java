@@ -3,6 +3,7 @@ package com.wooreal.gravitygather.controller;
 import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.service.MailService;
 import com.wooreal.gravitygather.service.RedisService;
 import com.wooreal.gravitygather.service.UserService;
@@ -16,7 +17,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
 @Api(tags = "Test Controller", description = "테스트 API")
-@CrossOrigin(origins = { "*" })
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
@@ -30,21 +31,21 @@ public class UserController {
     @ApiOperation(value = "로그인 액션 Api", notes = "아이디, 비밀번호를 이용하여 로그인 합니다.")
     public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest) {
         User user = userService.login(userRequest);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
     }
 
     @PostMapping("/emails/verification-requests")
     @ApiOperation(value = "메일 인증 요청")
-    public ResponseEntity<?> sendMessage(@RequestParam("email") @Valid @Email String email) {
-        userService.sendCodeToEmail(email);
+    public ResponseEntity<?> sendMessage(@RequestBody UserRequest userRequest) {
+        System.out.println(userRequest.getEmail());
+        userService.sendCodeToEmail(userRequest.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/emails/verifications")
+    @PostMapping("/emails/verifications")
     @ApiOperation(value = "메일 인증 검증")
-    public ResponseEntity<?> verificationEmail(@RequestParam("email") @Valid @Email String email,
-                                            @RequestParam("code") String authCode) {
-        EmailVerificationResult response = userService.verifiedCode(email, authCode);
+    public ResponseEntity<?> verificationEmail(@RequestBody UserRequest userRequest) {
+        EmailVerificationResult response = userService.verifiedCode(userRequest);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -39,4 +39,10 @@
             email = #{email}
     </select>
 
+    <update id="setUserActive">
+        UPDATE users SET
+            status = 'ACTIVE'
+        WHERE
+            email = #{email};
+    </update>
 </mapper>

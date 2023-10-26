@@ -3,6 +3,7 @@ package com.wooreal.gravitygather.service;
 import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
@@ -41,7 +42,6 @@ public class UserService {
 
         if (user.getStatus().equals("LOCK"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "정지된 계정입니다. 관리자에게 문의해 주세요.");
-
         return userMapper.login(userRequest);
     }
 
@@ -56,7 +56,7 @@ public class UserService {
 
     private void checkDuplicatedEmail(String email) {
         User user = userMapper.getUserByEmail(email);
-        if (user != null) {
+        if (user != null && !user.getStatus().equals("UNVERIFIED")) {
             System.out.println("userMapper.checkDuplicatedEmail exception occur email: " + email);
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "중복된 이메일 입니다.");
         }
@@ -77,12 +77,21 @@ public class UserService {
         }
     }
 
-    public EmailVerificationResult verifiedCode(String email, String authCode) {
+    public EmailVerificationResult verifiedCode(UserRequest userRequest) {
+        String email = userRequest.getEmail();
+        String code = userRequest.getCode();
         this.checkDuplicatedEmail(email);
         String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
-        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
+        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(code);
 
+        if(authResult)
+            setUserActive(userRequest);
         return EmailVerificationResult.of(authResult);
+    }
+
+    public int setUserActive(UserRequest userRequest) {
+        String email = userRequest.getEmail();
+        return userMapper.setUserActive(email);
     }
 
 }
