@@ -149,7 +149,7 @@ export default {
               this.showError = true;
               return;
             }
-            this.$router.push('mainView');
+            this.$router.push('loginView');
           }else{
             this.msgError(this.dataResponse.data || this.normalErrorMsg);
           }

@@ -26,8 +26,10 @@ export const useUserStore = defineStore({
             })
                 .then(response => {
                     if (response.status === 200) {
+                        if(response.data.status !== 'UNVERIFIED')
+                            this.isLoggedIn = true;
+
                         this.dataResponse = response;
-                        this.isLoggedIn = true;
                         this.userInfo = response.data;
                     }
                 })

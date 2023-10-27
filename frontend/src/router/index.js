@@ -33,7 +33,7 @@ const routes = [
             const userStore = useUserStore();
 
             if (userStore.isLoggedIn) {
-                next({ name: "HelloWorld" });
+                next({ name: "mainView" });
             } else {
                 next();
             }
@@ -49,7 +49,7 @@ const routes = [
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
             if (userStore.isLoggedIn) {
-                next({ name: "HelloWorld" });
+                next({ name: "mainView" });
             } else {
                 next();
             }
