@@ -5,19 +5,14 @@
                 <router-link to="/">
                     <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
                 </router-link>
-                <ul class="flex text-gray-100 font-bold">
-                    <li class="mr-5 hover:text-gray-200"><router-link to="/user/login">메뉴1</router-link></li>
-                    <li class="mr-5 hover:text-gray-200">메뉴2</li>
-                    <li class="hover:text-gray-200">메뉴3</li>
+                <ul class="flex text-gray-200">
+                    <li class="mr-5 hover:text-white"><router-link to="/user/login">Login</router-link></li>
+                    <li class="mr-5 hover:text-white">메뉴2</li>
+                    <li class="hover:text-white">메뉴3</li>
                 </ul>
             </div>
-            <div class="flex w-1/6 text-white items-center">
-                <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2">
-                    <img class="w-full h-full object-cover" src="https://health.chosun.com/site/data/img_dir/2023/07/17/2023071701753_0.jpg" alt="프로필 사진">
-                </div>
-                <div class="flex">
-                    티이모
-                </div>
+            <div class="w-1/6 text-white">
+                {{user.email}}
             </div>
         </div>
     </div>

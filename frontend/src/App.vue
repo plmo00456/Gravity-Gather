@@ -1,24 +1,16 @@
 <template>
-  <div id="app" class="h-screen">
-      <navView v-if="!$route.meta.hideMenu" />
+  <div id="app">
       <router-view/>
   </div>
 </template>
 
 <script>
-import NavView from "@/components/NavView.vue";
 export default {
   name: 'App',
-    components: {NavView},
 }
 </script>
 
 <style>
-*{
-    font-family: 'Noto Sans CJK KR Regular', sans-serif;
-    margin: 0;
-    padding: 0;
-}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

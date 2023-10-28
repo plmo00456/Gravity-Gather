@@ -94,13 +94,13 @@ export default {
                             return;
                         }
 
-                      this.$router.push({name : 'MainView'});
+                      this.$router.push({name : 'mainView'});
                     }else{
-                        this.utils.msgError(this.dataResponse.data || this.normalErrorMsg);
+                        this.msgError(this.dataResponse.data || this.normalErrorMsg);
                     }
                 } catch (error) {
                     console.error(error);
-                    this.utils.msgError((error?.response?.data) || this.normalErrorMsg);
+                    this.msgError((error?.response?.data) || this.normalErrorMsg);
                 }
             } else {
                 this.showError = true;

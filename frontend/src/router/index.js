@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import homeView from "@/components/HomeView.vue";
 import userLogin from "@/components/UserLogin.vue";
 import userEmailVerify from "@/components/UserEmailVerify.vue";
@@ -7,7 +7,7 @@ import {useUserStore} from "@/stores/user";
 const routes = [
     {
         path: '/',
-        name: 'MainView',
+        name: 'mainView',
         meta: {
             title: '끌림'
         },
@@ -18,23 +18,22 @@ const routes = [
             if (userStore.isLoggedIn) {
                 next();
             } else {
-                next({name: "LoginView"});
+                next({ name: "loginView" });
             }
         },
     },
     {
         path: '/user/login',
-        name: 'LoginView',
+        name: 'loginView',
         meta: {
-            title: '로그인',
-            hideMenu: true,
+          title: '로그인'
         },
         component: userLogin,
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
 
             if (userStore.isLoggedIn) {
-                next({name: "MainView"});
+                next({ name: "mainView" });
             } else {
                 next();
             }
@@ -44,14 +43,13 @@ const routes = [
         path: '/user/email-verify',
         name: 'emailVerify',
         meta: {
-            title: '이메일 검증',
-            hideMenu: true,
+            title: '이메일 검증'
         },
         component: userEmailVerify,
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
             if (userStore.isLoggedIn) {
-                next({name: "MainView"});
+                next({ name: "mainView" });
             } else {
                 next();
             }
@@ -69,11 +67,11 @@ router.beforeEach((to, from, next) => {
     // 이동할 경로가 메타 타이틀을 가지고 있다면,
     if (to.meta && to.meta.title) {
         document.title = to.meta.title;
-    } else {
+    }else{
         document.title = '끌림';
     }
 
     next();
 })
 
-export {router}
+export { router }
