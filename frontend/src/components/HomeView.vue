@@ -9,7 +9,7 @@
             </div>
             <div class="flex">
                 <div class="flex relative">
-                    <input type="text" placeholder=""
+                    <input type="text" placeholder="" v-model="search"
                            class="text-sm pl-10 pr-4 py-2 rounded-l w-full focus:outline-none text-gray-400" maxlength="20">
                     <span class="flex justify-center absolute left-3 top-1/2 transform -translate-y-1/2">
                           <font-awesome-icon class="fa-sm text-gray-400" icon="magnifying-glass"></font-awesome-icon>
@@ -20,18 +20,22 @@
                 </button>
             </div>
         </div>
-        <div class="rooms-wrap flex flex-wrap content-start w-4/6 mt-10 h-4/6 overflow-auto py-5">
+        <div class="rooms-wrap flex flex-wrap content-start w-4/6 mt-10 h-4/6 overflow-auto py-5" v-if="rooms">
 
-            <div v-for="(room, index) in meetingRooms" :key="index" class="flex room bg-white h-1/4 mb-10 rounded mx-5 shadow-2xl flex-col px-3 py-4 relative" :data-lock="room.isLocked">
-                <div class="w-10 h-10 rounded-3xl overflow-hidden absolute -left-5 -top-5 tooltip" :data-tooltip="room.manager.nickname">
-                    <img class="w-full h-full object-cover" :src="room.manager.photo" alt="프로필 사진">
+            <div v-for="(room, index) in filteredRoom" :key="index" class="flex room h-1/4 mb-10 rounded mx-5 flex-col px-3 py-4 relative" :data-lock="room.isLocked">
+                <div class="w-10 h-10 rounded-3xl overflow-hidden absolute -left-5 -top-5 tooltip bg-white border border-gray-500" :data-tooltip="room.user.nickname">
+                    <img class="w-full h-full object-cover" :src="room.user.photo" alt="프로필 사진" v-if="room.user.photo">
+                    <div v-if="!room.user.photo" class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
+                        <span v-if="room.user.nickname">{{room.user.nickname[0]}}</span>
+                        <span v-if="!room.user.nickname">{{room.user.name[0]}}</span>
+                    </div>
                 </div>
                 <div class="flex justify-center items-center font-bold">
                     <font-awesome-icon v-if="room.isLocked" class="fa-md font-bold text-orange-400" icon="fa-lock"></font-awesome-icon>
-                    <p class="title truncate max-w-sm mx-1 tooltip" data-tooltip="">
-                        <span class="w-full">{{room.title}}</span>
+                    <p class="title text-white truncate max-w-sm mx-1 tooltip" data-tooltip="">
+                        <span class="w-full" v-html="highlightKeyword(room.title)"></span>
                     </p>
-                    <span class="text-sm" :class="{'text-red-300':room.isFull, 'text-blue-300':!room.isFull}">( {{room.currentCapacity}} / {{room.maxCapacity}} )</span>
+                    <span class="text-sm" :class="{'text-red-300':room.isFull, 'text-blue-300':!room.isFull}">( {{room.currentParticipant}} / {{room.maxParticipant}} )</span>
                 </div>
                 <div>
                     <p class="truncate tooltip">
@@ -51,49 +55,13 @@
 
 <script>
 import {useUserStore} from "@/stores/user";
-import {onBeforeUnmount, getCurrentInstance} from "vue";
+import {useRoomStore} from "@/stores/room";
+import {onBeforeUnmount, getCurrentInstance, ref, watch, computed, onMounted, watchEffect, nextTick} from "vue";
 
 export default {
     name: 'MainView',
     data() {
         return {
-            meetingRooms: [
-                {
-                    title: "테스트테스트테스트테스트테스트테스트테스트테스트테스트",
-                    topic: "무엇을 무엇을 해볼까요?",
-                    isLocked: true,
-                    maxCapacity: 5,
-                    currentCapacity: 1,
-                    isFull: false,
-                    manager: {
-                        photo: "https://health.chosun.com/site/data/img_dir/2023/07/17/2023071701753_0.jpg",
-                        nickname: "티이모"
-                    }
-                },{
-                    title: "타이틀",
-                    topic: "토픽",
-                    isLocked: true,
-                    maxCapacity: 5,
-                    currentCapacity: 1,
-                    isFull: false,
-                    manager: {
-                        photo: "https://i.namu.wiki/i/pRQPYLHlam-IJBOTdkfmOTLBQWoUa2n8wEM1qj-arz3nV9yiq3xb4KT1FCbc1jgjrnDjvHwohfYxmY6YLjEbUA.webp",
-                        nickname: "ㅁㅁㅁ"
-                    }
-                }
-                ,{
-                    title: "멋진사람들의 모임",
-                    topic: "내가 제일 잘나가",
-                    isLocked: true,
-                    maxCapacity: 1,
-                    currentCapacity: 1,
-                    isFull: true,
-                    manager: {
-                        photo: "https://ichef.bbci.co.uk/news/640/cpsprodpb/E172/production/_126241775_getty_cats.png",
-                        nickname: "티이모"
-                    }
-                }
-            ]
         };
     },
     setup() {
@@ -101,12 +69,25 @@ export default {
         const user = userStore.userInfo;
         const socket = new WebSocket('ws://' + process.env.VUE_APP_SERVER_IP + ':8080/gg');
         const instance = getCurrentInstance();
+        const roomStore = useRoomStore();
+        let rooms = ref([]);
+        let search = ref('');
 
-
-        socket.onopen = () => {
-            console.log('웹소켓 연결 성공');
+        socket.onopen = async () => {
             const tooltips = instance.appContext.config.globalProperties.utils.tooltips;
-            tooltips('tooltip', "테스트");
+            tooltips('tooltip');
+
+            try {
+                await roomStore.getRoom();
+                if (roomStore?.dataResponse.status === 200) {
+                    rooms.value = roomStore.rooms;
+                } else {
+                    instance.appContext.config.globalProperties.utils.msgError(this.dataResponse.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                }
+            } catch (error) {
+                console.error(error);
+                instance.appContext.config.globalProperties.utils.msgError((error?.response?.data) || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+            }
         };
 
         socket.onmessage = (event) => {
@@ -121,12 +102,36 @@ export default {
 
         socket.onerror = (error) => {
             console.error(`WebSocket Error : ${error}`);
-            this.utils.msgError("오류가 발생했습니다. 관리자에게 문의해주세요.");
+            instance.appContext.config.globalProperties.utils.msgError("오류가 발생했습니다. 관리자에게 문의해주세요.");
         };
 
         socket.onclose = () => {
             console.log('웹소켓 연결 종료');
         };
+
+        const filteredRoom = computed(() => {
+            return rooms.value.filter(r => {
+                return r.title.toLowerCase().includes(search.value) || r.topic.toLowerCase().includes(search.value);
+            });
+        });
+
+        watchEffect(() => {
+            if (rooms.value.length > 0) {
+                nextTick(() => {
+                    const tooltips = instance.appContext.config.globalProperties.utils.tooltips;
+                    tooltips('tooltip');
+                });
+            }
+        });
+
+        watch(filteredRoom, () => {
+            if (rooms.value.length > 0) {
+                nextTick(() => {
+                    const tooltips = instance.appContext.config.globalProperties.utils.tooltips;
+                    tooltips('tooltip');
+                });
+            }
+        });
 
         onBeforeUnmount(() => {
             if (socket) {
@@ -134,10 +139,26 @@ export default {
             }
         });
 
+        onMounted(() => {
+            console.log(1);
+            console.log(document.querySelectorAll(".tooltip"));
+            instance.appContext.config.globalProperties.utils.tooltips('tooltip');
+            console.log(2);
+        });
+
         return {
-            userStore, user, socket
+            userStore, user, socket, rooms, search, filteredRoom
         };
-    }
+    },
+    methods: {
+        highlightKeyword(text) {
+            if (this.search) {
+                const re = new RegExp(this.search, 'gi')
+                return text.replace(re, (matchedText) => `<mark>${matchedText}</mark>`)
+            }
+            return text
+        }
+    },
 }
 </script>
 
@@ -148,6 +169,12 @@ export default {
 
 .room{
     width: 15rem;
+    background: rgb(255 255 255 / 25%);
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 9.5px );
+    -webkit-backdrop-filter: blur( 9.5px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
 }
 
 .rooms-wrap {

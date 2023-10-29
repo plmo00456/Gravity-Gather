@@ -54,7 +54,6 @@ function tooltips(cls){
 
     clsEle.forEach(ele => {
         const dataAtr = ele.dataset.tooltip;
-        console.log(dataAtr);
         tippy(ele, {
             content: dataAtr ? dataAtr : ele.innerText,
         });

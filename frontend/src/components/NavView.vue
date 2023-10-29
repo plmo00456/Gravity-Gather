@@ -1,5 +1,5 @@
 <template>
-    <div id="nav-view" class="nav-wrap flex justify-center z-10">
+    <div id="nav-view" class="nav-wrap flex justify-center z-10" v-if="user">
         <div class="flex justify-start w-4/6 items-center">
             <div class="flex w-5/6 items-center">
                 <router-link to="/">
@@ -12,11 +12,15 @@
                 </ul>
             </div>
             <div class="flex w-1/6 text-white items-center">
-                <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2">
-                    <img class="w-full h-full object-cover" src="https://health.chosun.com/site/data/img_dir/2023/07/17/2023071701753_0.jpg" alt="프로필 사진">
+                <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
+                    <img class="w-full h-full object-cover bg-white" :src="user.photo" alt="프로필 사진" v-if="user.photo">
+                    <div v-if="!user.photo" class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
+                        <span v-if="user.nickname">{{user.nickname[0]}}</span>
+                        <span v-if="!user.nickname">{{user.name[0]}}</span>
+                    </div>
                 </div>
                 <div class="flex">
-                    티이모
+                    {{user.nickname}}
                 </div>
             </div>
         </div>
