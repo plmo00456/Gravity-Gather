@@ -4,8 +4,6 @@ import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
 import com.wooreal.gravitygather.dto.user.UserResponse;
-import com.wooreal.gravitygather.service.MailService;
-import com.wooreal.gravitygather.service.RedisService;
 import com.wooreal.gravitygather.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-
-@Api(tags = "Test Controller", description = "테스트 API")
+@Api(tags = "User Controller", description = "사용자 관련 API")
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/v1/user")
