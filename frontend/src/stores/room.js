@@ -6,6 +6,7 @@ export const useRoomStore = defineStore({
     state: () => ({
         rooms: [],
         dataResponse: null,
+        currentRoom: [],
     }),
     getters: {
         getDataResponse: (state) => {
@@ -35,14 +36,14 @@ export const useRoomStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         },
     }
 })

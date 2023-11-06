@@ -72,7 +72,7 @@
           <div class="flex w-1/2 border border-gray-400 items-center h-3/5 rounded">
             <ul class="flex justify-between w-full items-center">
               <li></li>
-              <li class="text-white text-xs pl-5">404 No Found Content!</li>
+              <li class="text-white text-xs pl-5">404 No Results Found!</li>
               <li><font-awesome-icon class="fa-sm text-gray-400 mt-1.5 mr-1" icon="arrow-rotate-right"/></li>
             </ul>
           </div>
@@ -82,9 +82,8 @@
             <font-awesome-icon class="fa-sm text-gray-400" icon="fa-regular fa-copy"/>
           </div>
         </div>
-        <div class="content flex flex-col justify-center items-center w-full bg-gray-200 rounded-b-md">
-          <img class="h-4/6" src="@/assets/image/not-found-data.png" alt="not content">
-          <span class="h-1/6 text-5xl text-orange-500 font-semibold">No Found Content!</span>
+        <div class="content flex flex-col justify-center items-center w-full bg-gray-100 rounded-b-md">
+          <img class="h-5/6" src="@/assets/image/not-found-data.png" alt="not content">
         </div>
       </div>
       <div v-for="(room, index) in filteredRoom" :key="index"
@@ -113,8 +112,8 @@
         </div>
         <div class="mt-2">
           <button class="font-bold text-white px-2.5 py-1.5 bg-gray-600 rounded text-sm hover:bg-gray-500"
-                  type="button">
-            <span class="mx-1">입장 하기</span>
+                  type="button" @click="enterRoom(room.seq)">
+              <span class="mx-1">입장 하기</span>
           </button>
         </div>
       </div>
@@ -309,6 +308,9 @@ export default {
       } else {
         this.showError = true;
       }
+    },
+    enterRoom(roomId) {
+        this.$router.push({ name: 'room', params: { id: roomId } });
     }
   },
 }

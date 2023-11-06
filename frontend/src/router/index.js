@@ -3,6 +3,7 @@ import homeView from "@/components/HomeView.vue";
 import userLogin from "@/components/UserLogin.vue";
 import userEmailVerify from "@/components/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
+import meetRoomView from "@/components/MeetRoomView.vue";
 
 const routes = [
     {
@@ -57,6 +58,15 @@ const routes = [
             }
         },
     },
+    {
+        path: '/room/:id',
+        name: 'room',
+        meta: {
+            title: '미팅 방',
+            hideMenu: false,
+        },
+        component: meetRoomView,
+    }
 ]
 
 
