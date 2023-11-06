@@ -1,49 +1,102 @@
 <template>
-    <div id="nav-view" class="nav-wrap flex justify-center z-10" v-if="user">
-        <div class="flex justify-start w-4/6 items-center">
-            <div class="flex w-5/6 items-center">
-                <router-link to="/">
-                    <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
-                </router-link>
-                <ul class="flex text-gray-100 font-bold">
-                    <li class="mr-5 hover:text-gray-200"><router-link to="/user/login">메뉴1</router-link></li>
-                    <li class="mr-5 hover:text-gray-200">메뉴2</li>
-                    <li class="hover:text-gray-200">메뉴3</li>
-                </ul>
-            </div>
-            <div class="flex w-1/6 text-white items-center">
-                <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
-                    <img class="w-full h-full object-cover bg-white" :src="user.photo" alt="프로필 사진" v-if="user.photo">
-                    <div v-if="!user.photo" class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
-                        <span v-if="user.nickname">{{user.nickname[0]}}</span>
-                        <span v-if="!user.nickname">{{user.name[0]}}</span>
-                    </div>
-                </div>
-                <div class="flex">
-                    {{user.nickname}}
-                </div>
-            </div>
+  <div id="nav-view" class="nav-wrap flex justify-center z-10" v-if="user">
+    <div class="flex justify-start w-4/6 items-center">
+      <div class="flex w-5/6 items-center">
+        <router-link to="/">
+          <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
+        </router-link>
+        <ul class="flex text-gray-100 font-bold">
+          <li class="mr-5 hover:text-gray-200">
+            <router-link to="/user/login">메뉴1</router-link>
+          </li>
+          <li class="mr-5 hover:text-gray-200">메뉴2</li>
+          <li class="hover:text-gray-200">메뉴3</li>
+        </ul>
+      </div>
+      <div class="flex w-1/6 text-white items-center cursor-pointer" @click="profileClick" id="profile-wrap">
+        <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
+          <img class="w-full h-full object-cover bg-white" :src="user.photo" alt="프로필 사진" v-if="user.photo">
+          <div v-if="!user.photo"
+               class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
+            <span v-if="user.nickname">{{ user.nickname[0] }}</span>
+            <span v-if="!user.nickname">{{ user.name[0] }}</span>
+          </div>
         </div>
+        <div class="flex">
+          {{ user.nickname }}
+        </div>
+        <context-menu
+            v-model:show="isProfileClick"
+            :options="profileContextOption"
+        >
+          <context-menu-item label="내정보" @click="onMenuClick(1)" class="cursor-pointer">
+            <template #icon>
+              <font-awesome-icon class="fa-md font-bold text-gray-600" icon="fa-user"></font-awesome-icon>
+            </template>
+          </context-menu-item>
+          <context-menu-separator/>
+          <context-menu-item label="로그아웃" @click="logout()" class="cursor-pointer">
+            <template #icon>
+              <font-awesome-icon class="fa-md font-bold text-gray-600" icon="arrow-right-from-bracket"></font-awesome-icon>
+            </template>
+          </context-menu-item>
+<!--          <context-menu-group label="Menu with child">-->
+<!--            <context-menu-item label="Item1" @click="onMenuClick(2)">-->
+<!--            </context-menu-item>-->
+<!--            <context-menu-item label="Item2" @click="onMenuClick(3)"/>-->
+<!--            <context-menu-group label="Child with v-for 50">-->
+<!--              <context-menu-item v-for="index of 50" :key="index" :label="'Item3-'+index"-->
+<!--                                 @click="onLoopMenuClick(index)"/>-->
+<!--            </context-menu-group>-->
+<!--          </context-menu-group>-->
+        </context-menu>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import {useUserStore} from "@/stores/user";
+import { ContextMenuItem, ContextMenu, ContextMenuSeparator} from "@imengyu/vue3-context-menu";
+
 export default {
-    name: "NavView",
-    setup() {
-        const userStore = useUserStore();
-        const user = userStore.userInfo;
-        return {
-            userStore, user
-        };
+  name: "NavView",
+  components: {ContextMenuSeparator, ContextMenuItem, ContextMenu},
+  data() {
+    return {
+      isProfileClick: false,
+      profileContextOption: {
+        zIndex: 3,
+        minWidth: 230,
+      },
     }
+  },
+  setup() {
+    const userStore = useUserStore();
+    const user = userStore.userInfo;
+    return {
+      userStore, user
+    };
+  },
+  methods: {
+    profileClick(e) {
+      const rect = e.target.closest("#profile-wrap").getBoundingClientRect();
+      console.log(e);
+      this.isProfileClick = !this.isProfileClick;
+      this.profileContextOption.x = rect.left;
+      this.profileContextOption.y = rect.top + rect.height + 10;
+    },
+    logout() {
+      const userStore = useUserStore();
+      userStore.logout();
+    }
+  }
 }
 </script>
 
 <style scoped>
-    #nav-view{
-        background: #132043;
-        height: 7%;
-    }
+#nav-view {
+  background: #132043;
+  height: 7%;
+}
 </style>

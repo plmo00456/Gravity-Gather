@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Swal from 'sweetalert2'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import { Eggy } from '@s-r0/eggy-js';
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import ContextMenu from '@imengyu/vue3-context-menu'
 
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
@@ -14,6 +17,9 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 import '@/styles.css';
 import "@/assets/css/font.css";
+// import '@s-r0/eggy-js/build/css/eggy.css';
+// import '@s-r0/eggy-js/build/css/progressbar.css';
+// import '@s-r0/eggy-js/build/css/theme.css';
 
 const app = createApp(App);
 
@@ -77,10 +83,57 @@ async function init(){
     app.config.globalProperties.utils.msgError = msgError;
     app.config.globalProperties.utils.normalErrorMsg = "오류가 발생하였습니다. 관리자에게 문의해주세요.";
 
+
+    // notify
+    app.config.globalProperties.utils.notify = {};
+    app.config.globalProperties.utils.notify.success = async (message, title) => {
+        const option = {
+            message: message,
+            type: 'success'
+        };
+        if(title){
+            option.title = title;
+        }
+        await Eggy(option);
+    }
+    app.config.globalProperties.utils.notify.error = async (message, title) => {
+        const option = {
+            message: message,
+            type: 'error'
+        };
+        if(title){
+            option.title = title;
+        }
+        await Eggy(option);
+    }
+
+    app.config.globalProperties.utils.notify.info = async (message, title) => {
+        const option = {
+            message: message,
+            type: 'info'
+        };
+        if(title){
+            option.title = title;
+        }
+        await Eggy(option);
+    }
+
+    app.config.globalProperties.utils.notify.warning = async (message, title) => {
+        const option = {
+            message: message,
+            type: 'warning'
+        };
+        if(title){
+            option.title = title;
+        }
+        await Eggy(option);
+    }
+
     app.config.globalProperties.utils.tooltips = tooltips;
 
     app.use(createPinia())
         .use(router)
+        .use(ContextMenu)
         .component('font-awesome-icon', FontAwesomeIcon)
         .mount('#app');
 }

@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
-import axios from "axios";
 import http from "@/api/http";
+import {router} from "@/router/index.js"
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -40,15 +40,13 @@ export const useUserStore = defineStore({
 
         async logout() {
             try {
-                const response = await axios.post('/api/v1/logout')
-
-                if (response.status === 200) {
-                    this.isLoggedIn = false;
-                    this.info = null;
+                this.isLoggedIn = false;
+                this.userInfo = null;
+                if (router.currentRoute.value.path === '/') {
+                    await router.go();
                 } else {
-                    throw new Error('Logout failed')
+                    await router.push({ path: '/' });
                 }
-
             } catch (error) {
                 console.error(error)
                 throw error

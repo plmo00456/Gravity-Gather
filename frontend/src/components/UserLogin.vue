@@ -96,11 +96,11 @@ export default {
 
                       this.$router.push({name : 'MainView'});
                     }else{
-                        this.utils.msgError(this.dataResponse.data || this.normalErrorMsg);
+                        this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
                     }
                 } catch (error) {
                     console.error(error);
-                    this.utils.msgError((error?.response?.data) || this.normalErrorMsg);
+                    this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
                 }
             } else {
                 this.showError = true;

@@ -29,5 +29,20 @@ export const useRoomStore = defineStore({
                     this.dataResponse = error.response;
                 });
         },
+        async createRoom(roomInfo) {
+            return http.post('/room/create', roomInfo, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
+        },
     }
 })
