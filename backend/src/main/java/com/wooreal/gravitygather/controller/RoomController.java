@@ -1,6 +1,8 @@
 package com.wooreal.gravitygather.controller;
 
+import com.wooreal.gravitygather.config.WebSocketHandler;
 import com.wooreal.gravitygather.dto.room.Room;
+import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.service.RoomService;
 import io.swagger.annotations.Api;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,9 +22,11 @@ import java.util.stream.Collectors;
 public class RoomController {
 
     private final RoomService roomService;
+    private final WebSocketHandler webSocketHandler;
 
-    public RoomController(RoomService roomService) {
+    public RoomController(RoomService roomService, WebSocketHandler webSocketHandler) {
         this.roomService = roomService;
+        this.webSocketHandler = webSocketHandler;
     }
 
     @PostMapping("/get")
@@ -34,4 +39,16 @@ public class RoomController {
         return new ResponseEntity<>(roomResponses, HttpStatus.OK);
     }
 
+    @PostMapping("/create")
+    @ApiOperation(value = "룸 생성 api")
+    public ResponseEntity<?> createRoom(@RequestBody RoomRequest roomRequest) {
+        roomService.createRoom(roomRequest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/test")
+    public void test(@RequestParam String test) throws IOException {
+        webSocketHandler.sendMessageToAll(test);
+    }
 }

@@ -37,6 +37,55 @@
         FROM rooms A
         inner join users B
             on A.owner_seq = B.seq
-        WHERE A.is_delete = false;
+        WHERE A.is_delete = false
+        ORDER BY A.created_at DESC
     </select>
+
+    <select id="getRoomBySeq" resultMap="RoomResultMap">
+        SELECT A.seq,
+               A.title,
+               A.topic,
+               A.is_locked,
+               A.is_delete,
+               A.password,
+               A.max_participant,
+               A.current_participant,
+               A.owner_seq,
+               A.created_at,
+               IF(A.current_participant = A.max_participant, true, false) as is_full,
+               B.nickname,
+               B.photo
+        FROM rooms A
+        inner join users B
+        on A.owner_seq = B.seq
+        WHERE A.is_delete = false
+        AND A.SEQ = ${seq}
+    </select>
+
+    <insert id="createRoom">
+        INSERT INTO rooms(
+            title,
+            topic,
+            is_locked,
+            is_delete,
+            password,
+            max_participant,
+            current_participant,
+            owner_seq,
+            created_at
+        ) VALUES (
+            #{title},
+            #{topic},
+            ${isLocked},
+            0,
+            #{password},
+            #{maxParticipant},
+            0,
+            ${ownerSeq},
+            now()
+        )
+        <selectKey keyProperty="seq" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 </mapper>

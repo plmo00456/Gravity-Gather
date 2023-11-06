@@ -37,6 +37,5 @@ public class RoomResponse {
         this.isFull = room.getIs_full();
         this.createdAt = room.getCreated_at();
         this.user = new UserResponse(room.getUser());
-        System.out.println(room.getUser());
     }
 }

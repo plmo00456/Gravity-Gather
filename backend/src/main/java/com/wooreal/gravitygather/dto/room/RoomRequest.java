@@ -10,19 +10,14 @@ import java.sql.Timestamp;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Room {
+public class RoomRequest {
 
     private int seq;
     private String title;
     private String topic;
-    private Boolean is_locked;
-    private Boolean is_delete;
     private String password;
-    private int max_participant;
-    private int current_participant;
-    private int owner_seq;
-    private Boolean is_full;
-    private Timestamp created_at;
-    private User user;
+    private Boolean isLocked;
+    private int maxParticipant;
+    private int ownerSeq;
 
 }

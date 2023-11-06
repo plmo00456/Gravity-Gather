@@ -26,6 +26,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        System.out.println("------------------------------");
+        System.out.println(message);
+        System.out.println("------------------------------");
         String id = session.getId();  //메시지를 보낸 아이디
         CLIENTS.entrySet().forEach( arg->{
             if(!arg.getKey().equals(id)) {  //같은 아이디가 아니면 메시지를 전달합니다.
@@ -36,5 +39,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 }
             }
         });
+    }
+
+    public void sendMessageToAll(String message) throws IOException {
+        TextMessage textMessage = new TextMessage(message);
+        for (WebSocketSession session : CLIENTS.values()) {
+            System.out.println("===============================");
+            System.out.println(session);
+            System.out.println(session.isOpen());
+            System.out.println("===============================");
+            if (session.isOpen()) {
+                session.sendMessage(textMessage);
+            }
+        }
     }
 }
