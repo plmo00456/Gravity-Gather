@@ -38,6 +38,9 @@
         inner join users B
             on A.owner_seq = B.seq
         WHERE A.is_delete = false
+        <if test="ownerSeq != null">
+            AND A.owner_seq = ${ownerSeq}
+        </if>
         ORDER BY A.created_at DESC
     </select>
 
@@ -69,6 +72,7 @@
             is_locked,
             is_delete,
             password,
+            password_salt,
             max_participant,
             current_participant,
             owner_seq,
@@ -79,6 +83,7 @@
             ${isLocked},
             0,
             #{password},
+            #{passwordSalt},
             #{maxParticipant},
             0,
             ${ownerSeq},
@@ -88,4 +93,46 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
+
+    <update id="enterRoom">
+        UPDATE rooms SET
+            current_participant = current_participant + 1
+        WHERE
+            seq = ${seq}
+    </update>
+
+    <update id="leaveRoom">
+        UPDATE rooms SET
+            current_participant = current_participant - 1
+        WHERE
+            seq = ${seq}
+    </update>
+
+    <update id="updateRoom">
+        UPDATE rooms
+        <set>
+            <if test="seq != null">
+                seq = #{seq},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="topic != null">
+                topic = #{topic},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="isLocked != null">
+                is_locked = #{isLocked},
+            </if>
+            <if test="maxParticipant != null">
+                max_participant = #{maxParticipant},
+            </if>
+            <if test="ownerSeq != null">
+                owner_seq = #{ownerSeq},
+            </if>
+        </set>
+        WHERE seq = #{seq}
+    </update>
 </mapper>

@@ -3,21 +3,25 @@ package com.wooreal.gravitygather.dto.room;
 import com.wooreal.gravitygather.dto.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
 
 @Getter
+@Setter
 @ToString
 @NoArgsConstructor
 public class RoomRequest {
 
-    private int seq;
+    private Integer seq;
     private String title;
     private String topic;
     private String password;
+    private String passwordSalt;
     private Boolean isLocked;
-    private int maxParticipant;
-    private int ownerSeq;
+    private Integer currentParticipant;
+    private Integer maxParticipant;
+    private Integer ownerSeq;
 
 }

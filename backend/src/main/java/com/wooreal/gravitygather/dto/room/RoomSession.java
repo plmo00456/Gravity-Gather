@@ -9,9 +9,13 @@ import org.springframework.web.socket.WebSocketSession;
 public class RoomSession {
     private WebSocketSession session;
     private String sender;
+    private Integer senderSeq;
+    private String roomId;
 
-    public RoomSession(WebSocketSession session, String sender) {
+    public RoomSession(WebSocketSession session, String sender,Integer senderSeq, String roomId) {
         this.session = session;
         this.sender = sender;
+        this.senderSeq = senderSeq;
+        this.roomId = roomId;
     }
 }

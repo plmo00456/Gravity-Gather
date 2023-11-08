@@ -10,7 +10,15 @@ import java.util.List;
 public interface RoomMapper {
     List<Room> getRooms();
 
+    List<Room> getRooms(RoomRequest roomRequest);
+
     Room getRoomBySeq(int seq);
 
     int createRoom(RoomRequest roomRequest);
+
+    int enterRoom(RoomRequest roomRequest);
+
+    int leaveRoom(RoomRequest roomRequest);
+
+    int updateRoom(RoomRequest roomRequest);
 }

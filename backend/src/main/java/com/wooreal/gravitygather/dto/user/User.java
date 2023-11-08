@@ -14,6 +14,7 @@ public class User {
     private int seq;
     private String id;
     private String password;
+    private String password_salt;
     private String photo;
     private String name;
     private String nickname;

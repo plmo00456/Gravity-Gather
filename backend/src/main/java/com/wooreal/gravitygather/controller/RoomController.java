@@ -5,6 +5,7 @@ import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.service.RoomService;
+import com.wooreal.gravitygather.utils.SHA256Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,8 @@ public class RoomController {
 
     @GetMapping("/test")
     public void test(@RequestParam String test) throws IOException {
-        webSocketHandler.sendMessageToAll(test);
+        String salt = SHA256Util.generateSalt();
+        String hashed = SHA256Util.generateHashWithSalt(test, salt);
+        System.out.println(hashed);
     }
 }

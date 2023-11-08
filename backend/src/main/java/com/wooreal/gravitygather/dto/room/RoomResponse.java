@@ -13,14 +13,14 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class RoomResponse {
 
-    private int seq;
+    private Integer seq;
     private String title;
     private String topic;
     private Boolean isLocked;
     private Boolean isDelete;
-    private int maxParticipant;
-    private int currentParticipant;
-    private int ownerSeq;
+    private Integer maxParticipant;
+    private Integer currentParticipant;
+    private Integer ownerSeq;
     private Boolean isFull;
     private Timestamp createdAt;
     private UserResponse user;

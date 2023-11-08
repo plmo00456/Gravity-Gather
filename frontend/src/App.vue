@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="h-screen w-screen">
+  <div id="app" class="h-screen w-screen overflow-hidden">
     <navView v-if="!$route.meta.hideMenu"/>
     <router-view/>
   </div>

@@ -58,6 +58,7 @@
 <script>
 import {useUserStore} from "@/stores/user";
 import { ContextMenuItem, ContextMenu, ContextMenuSeparator} from "@imengyu/vue3-context-menu";
+import {router} from "@/router";
 
 export default {
   name: "NavView",
@@ -74,6 +75,13 @@ export default {
   setup() {
     const userStore = useUserStore();
     const user = userStore.userInfo;
+
+    if(user == null){
+        router.push({
+            name: 'LoginView',
+        });
+    }
+
     return {
       userStore, user
     };
@@ -81,7 +89,6 @@ export default {
   methods: {
     profileClick(e) {
       const rect = e.target.closest("#profile-wrap").getBoundingClientRect();
-      console.log(e);
       this.isProfileClick = !this.isProfileClick;
       this.profileContextOption.x = rect.left;
       this.profileContextOption.y = rect.top + rect.height + 10;

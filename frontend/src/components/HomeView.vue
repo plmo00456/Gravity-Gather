@@ -112,13 +112,14 @@
         </div>
         <div class="mt-2">
           <button class="font-bold text-white px-2.5 py-1.5 bg-gray-600 rounded text-sm hover:bg-gray-500"
-                  type="button" @click="enterRoom(room.seq)">
+                  type="button" @click="enterRoom(room, room.seq)">
               <span class="mx-1">입장 하기</span>
           </button>
         </div>
       </div>
 
     </div>
+      <div @click="test" class="text-white cursor-pointer">테스트</div>
   </div>
 </template>
 
@@ -188,12 +189,15 @@ export default {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type1 === 'room') {
-        if (data.type2 === 'create') {
-          rooms.value.unshift(data.roomInfo);
-          instance.data.slideShow = false;
-          instance.appContext.config.globalProperties.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
-        }else if (data.type2 === 'delete') {
+        if (data.type2 === 'delete') {
           this.chatRooms = this.chatRooms.filter(room => room.id !== data.chatRoomId);
+        } else if (data.type2 === 'createMsg') {
+          rooms.value.unshift(data.roomInfo);
+        } else if (data.type2 === 'updateMsg') {
+          const index = rooms.value.findIndex(room => room.seq === data.roomInfo.seq);
+          if (index !== -1) {
+              rooms.value.splice(index, 1, data.roomInfo);
+          }
         }
       }
     };
@@ -297,10 +301,11 @@ export default {
           this.dataResponse = roomStore.dataResponse;
           console.log(this.dataResponse);
           if(this?.dataResponse?.status === 200){
-            console.log("------------------------------");
+            this.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
           }else{
             this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
           }
+          this.slideShow = false;
         } catch (error) {
           console.error(error);
           this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -309,8 +314,15 @@ export default {
         this.showError = true;
       }
     },
-    enterRoom(roomId) {
-        this.$router.push({ name: 'room', params: { id: roomId } });
+    enterRoom(roomInfo, roomId) {
+        this.$router.push({
+            name: 'room',
+            state: { roomInfo: JSON.stringify(roomInfo)},
+            params: { id: roomId }
+        });
+    },
+    test(){
+        console.log("TEST");
     }
   },
 }
