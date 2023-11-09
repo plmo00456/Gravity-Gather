@@ -135,4 +135,21 @@
         </set>
         WHERE seq = #{seq}
     </update>
+
+    <insert id="insChatLog">
+        INSERT INTO chatlog
+        (
+            type,
+            room_seq,
+            msg,
+            sender_seq,
+            created_at
+        ) VALUES (
+            #{type},
+            #{room_seq},
+            #{msg},
+            #{sender_seq},
+            now()
+        )
+    </insert>
 </mapper>

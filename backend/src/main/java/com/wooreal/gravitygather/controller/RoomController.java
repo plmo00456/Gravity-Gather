@@ -4,6 +4,7 @@ import com.wooreal.gravitygather.config.WebSocketHandler;
 import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.service.RoomService;
 import com.wooreal.gravitygather.utils.SHA256Util;
 import io.swagger.annotations.Api;
@@ -46,6 +47,13 @@ public class RoomController {
         roomService.createRoom(roomRequest);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{roomId}/participants")
+    @ApiOperation(value = "룸 생성 api")
+    public ResponseEntity<?> getRoomParticipants(@PathVariable("roomId") int roomId) {
+        List<UserResponse> participants = roomService.getRoomParticipants(roomId);
+        return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 
     @GetMapping("/test")

@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.mapper;
 
+import com.wooreal.gravitygather.dto.room.ChatLog;
 import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,4 +22,6 @@ public interface RoomMapper {
     int leaveRoom(RoomRequest roomRequest);
 
     int updateRoom(RoomRequest roomRequest);
+
+    void insChatLog(ChatLog cl);
 }

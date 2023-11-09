@@ -32,7 +32,6 @@ public class UserController {
     @PostMapping("/emails/verification-requests")
     @ApiOperation(value = "메일 인증 요청")
     public ResponseEntity<?> sendMessage(@RequestBody UserRequest userRequest) {
-        System.out.println(userRequest.getEmail());
         userService.sendCodeToEmail(userRequest.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }

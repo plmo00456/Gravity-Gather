@@ -1,15 +1,14 @@
 package com.wooreal.gravitygather.config;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.dto.room.RoomSession;
 import com.wooreal.gravitygather.service.RoomService;
 import com.wooreal.gravitygather.utils.comUtil;
+import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -22,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Getter
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final RoomService roomService;
@@ -68,12 +68,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         JsonObject jsonObject = JsonParser.parseString(payload).getAsJsonObject();
-        String type1 = Optional.ofNullable(jsonObject.get("type1")).map(com.google.gson.JsonElement::getAsString).orElse(null);
-        String type2 = Optional.ofNullable(jsonObject.get("type2")).map(com.google.gson.JsonElement::getAsString).orElse(null);
-        String roomId = Optional.ofNullable(jsonObject.get("roomId")).map(com.google.gson.JsonElement::getAsString).orElse(null);
-        String sender = Optional.ofNullable(jsonObject.get("sender")).map(com.google.gson.JsonElement::getAsString).orElse(null);
-        String senderSeq = Optional.ofNullable(jsonObject.get("senderSeq")).map(com.google.gson.JsonElement::getAsString).orElse(null);
-        String content = Optional.ofNullable(jsonObject.get("content")).map(com.google.gson.JsonElement::getAsString).orElse(null);
+        String type1 = comUtil.hasIsNullChk(jsonObject, "type1", null);
+        String type2 = comUtil.hasIsNullChk(jsonObject, "type2", null);
+        String roomId = comUtil.hasIsNullChk(jsonObject, "roomId", null);
+        String sender = comUtil.hasIsNullChk(jsonObject, "sender", null);
+        String senderPhoto = comUtil.hasIsNullChk(jsonObject, "senderPhoto", null);
+        String senderSeq = comUtil.hasIsNullChk(jsonObject, "senderSeq", null);
+        String content = comUtil.hasIsNullChk(jsonObject, "content", null);
 
         System.out.println(type1 + " " + type2);
         if (type1.equals("room")) {
@@ -111,12 +112,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
             jo.addProperty("content", content);
             jo.addProperty("sender", sender);
             jo.addProperty("senderSeq", senderSeq);
+            jo.addProperty("senderPhoto", senderPhoto);
             jo.addProperty("datetime", new Date().getTime());
-
+            roomService.insChatLog(type2, Integer.parseInt(roomId), content, Integer.parseInt(senderSeq));
             for (RoomSession s : meetrooms.get(roomId)) {
                 if(s.getSession().isOpen()){
-                    System.out.println(s.getSender() + " " + s.getSession());
-                    System.out.println(jo.toString());
                     s.getSession().sendMessage(new TextMessage(jo.toString()));
                 }
             }
@@ -129,6 +129,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         RoomSession userSession = new RoomSession(session, sender, senderSeq, roomId);
         room.add(userSession);
         meetrooms.put(roomId, room);
+
+        Set<RoomSession> roomSession = meetrooms.get(roomId);
+        System.out.println("roomId2 : " + roomId);
+        System.out.println("size2 : " + roomSession.size());
     }
 
     private void leaveRoom(String roomId, WebSocketSession session) {

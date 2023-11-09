@@ -4,26 +4,34 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wooreal.gravitygather.config.WebSocketHandler;
-import com.wooreal.gravitygather.dto.room.Room;
-import com.wooreal.gravitygather.dto.room.RoomRequest;
-import com.wooreal.gravitygather.dto.room.RoomResponse;
+import com.wooreal.gravitygather.dto.room.*;
+import com.wooreal.gravitygather.dto.user.User;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.RoomMapper;
+import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.SHA256Util;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
 
     private final RoomMapper roomMapper;
+    private final UserMapper userMapper;
+
     private final WebSocketHandler webSocketHandler;
 
-    public RoomService(RoomMapper roomMapper, WebSocketHandler webSocketHandler) {
+    public RoomService(RoomMapper roomMapper, UserMapper userMapper, WebSocketHandler webSocketHandler) {
         this.roomMapper = roomMapper;
+        this.userMapper = userMapper;
         this.webSocketHandler = webSocketHandler;
     }
 
@@ -57,6 +65,7 @@ public class RoomService {
         if(seq == 0) {
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+        insChatLog("create", seq, null, roomRequest.getOwnerSeq());
 
         try {
             webSocketHandler.createRoomMsg(seq);
@@ -74,6 +83,28 @@ public class RoomService {
         return roomMapper.leaveRoom(roomRequest);
     }
 
+    public List<UserResponse> getRoomParticipants(int roomId){
+        Map<String, Set<RoomSession>> rooms = webSocketHandler.getMeetrooms();
+        Set<RoomSession> roomSession = rooms.get(roomId+"");
+        List<Integer> seqs = new ArrayList<>();
+        for (RoomSession session : roomSession) {
+            seqs.add(session.getSenderSeq());
+        }
+
+        List<User> participant = userMapper.getUserBySeqs(seqs);
+        List<UserResponse> participants = participant.stream()
+                .map(UserResponse::new)
+                .map(user -> {
+                    UserResponse ur = new UserResponse();
+                    ur.setSeq(user.getSeq());
+                    ur.setNickname(user.getNickname());
+                    ur.setPhoto(user.getPhoto());
+                    return ur;
+                })
+                .collect(Collectors.toList());
+        return participants;
+    }
+
     public int updateRooms(List<RoomRequest> list){
         int successCnt = 0;
         for (RoomRequest roomRequest : list) {
@@ -81,6 +112,11 @@ public class RoomService {
             successCnt += res > 0 ? 1 : 0;
         }
         return successCnt;
+    }
+
+    public void insChatLog(String type, Integer room_seq, String msg, Integer sender_seq){
+        ChatLog cl = new ChatLog(type, room_seq, msg, sender_seq);
+        roomMapper.insChatLog(cl);
     }
 
 
