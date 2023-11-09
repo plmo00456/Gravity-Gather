@@ -7,6 +7,7 @@ export const useRoomStore = defineStore({
         rooms: [],
         dataResponse: null,
         currentRoom: [],
+        currentRoomParticipants: [],
     }),
     getters: {
         getDataResponse: (state) => {
@@ -20,15 +21,31 @@ export const useRoomStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                        this.rooms = response.data;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.rooms = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async getRoomParticipants(roomId) {
+            return http.post('/room/'+roomId+'/participants', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.currentRoomParticipants = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         },
         async createRoom(roomInfo) {
             return http.post('/room/create', roomInfo, {
