@@ -94,4 +94,21 @@ public class UserService {
         return userMapper.setUserActive(email);
     }
 
+    public User getUserBySeq(int seq){
+        return userMapper.getUserBySeq(seq);
+    }
+
+    public UserResponse getPublicUserInfo(int seq) {
+        User ur = getUserBySeq(seq);
+        UserResponse result = new UserResponse();
+
+        result.setSeq(ur.getSeq());
+        result.setPhoto(ur.getPhoto());
+        result.setNickname(ur.getNickname());
+        result.setRoomCharacter(ur.getRoom_character());
+        result.setRoomMap(ur.getRoom_map());
+
+        return result;
+    }
+
 }

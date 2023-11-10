@@ -19,6 +19,8 @@ public class UserResponse {
     private String nickname;
     private String email;
     private String status;
+    private int roomCharacter;
+    private int roomMap;
 
     public UserResponse(User user){
         if (user != null) {
@@ -29,6 +31,8 @@ public class UserResponse {
             this.nickname = user.getNickname() != null ? user.getNickname() : this.nickname;
             this.email = user.getEmail() != null ? user.getEmail() : this.email;
             this.status = user.getStatus() != null ? user.getStatus() : this.status;
+            this.roomCharacter = user.getRoom_character() != 0 ? user.getRoom_character() : this.roomCharacter;
+            this.roomMap = user.getRoom_map() != 0 ? user.getRoom_map() : this.roomMap;
         }
     }
 

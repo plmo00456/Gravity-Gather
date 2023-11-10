@@ -322,7 +322,8 @@ export default {
         });
     },
     test(){
-        console.log("TEST");
+        const userStore = useUserStore();
+        userStore.userInfoStateUpdate(this.user.seq);
     }
   },
 }
@@ -353,6 +354,7 @@ export default {
   -webkit-backdrop-filter: blur(9.5px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 .rooms-wrap {

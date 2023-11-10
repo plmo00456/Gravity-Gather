@@ -99,6 +99,8 @@ public class RoomService {
                     ur.setSeq(user.getSeq());
                     ur.setNickname(user.getNickname());
                     ur.setPhoto(user.getPhoto());
+                    ur.setRoomMap(user.getRoomMap());
+                    ur.setRoomCharacter(user.getRoomCharacter());
                     return ur;
                 })
                 .collect(Collectors.toList());

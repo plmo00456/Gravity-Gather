@@ -13,6 +13,8 @@
             nickname,
             email,
             status,
+            room_character,
+            room_map,
             fail_login_cnt as failLoginCnt,
             created_at,
             updated_at
@@ -34,6 +36,8 @@
             nickname,
             email,
             status,
+            room_character,
+            room_map,
             fail_login_cnt as failLoginCnt,
             created_at,
             updated_at
@@ -49,6 +53,12 @@
         WHERE
             email = #{email};
     </update>
+
+    <select id="getUserBySeq">
+        SELECT *
+        FROM users
+        WHERE seq = ${seq}
+    </select>
 
     <select id="getUserBySeqs">
         SELECT *

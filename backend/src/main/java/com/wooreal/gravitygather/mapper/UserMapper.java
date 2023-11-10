@@ -11,6 +11,8 @@ public interface UserMapper {
     User login(UserRequest userRequest);
     User getUserByEmail(String email);
 
+    User getUserBySeq(Integer seq);
+
     List<User> getUserBySeqs(List<Integer> seqs);
 
     int setUserActive(String email);

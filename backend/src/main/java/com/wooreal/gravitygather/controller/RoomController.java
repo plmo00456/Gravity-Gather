@@ -62,4 +62,5 @@ public class RoomController {
         String hashed = SHA256Util.generateHashWithSalt(test, salt);
         System.out.println(hashed);
     }
+
 }

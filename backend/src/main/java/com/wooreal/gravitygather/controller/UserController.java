@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "User Controller", description = "사용자 관련 API")
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -41,5 +43,12 @@ public class UserController {
     public ResponseEntity<?> verificationEmail(@RequestBody UserRequest userRequest) {
         EmailVerificationResult response = userService.verifiedCode(userRequest);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{seq}/info")
+    @ApiOperation(value = "공개 가능한 유저 정보")
+    public ResponseEntity<?> getPublicUserInfo(@PathVariable("seq") int seq) {
+        UserResponse userInfo = userService.getPublicUserInfo(seq);
+        return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 }

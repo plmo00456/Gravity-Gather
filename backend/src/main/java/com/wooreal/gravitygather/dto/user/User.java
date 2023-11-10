@@ -19,6 +19,8 @@ public class User {
     private String name;
     private String nickname;
     private String email;
+    private int room_character;
+    private int room_map;
     private String status;
     private int failLoginCnt;
     private Timestamp createdAt;

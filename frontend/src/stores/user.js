@@ -24,18 +24,18 @@ export const useUserStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        if(response.data.status !== 'UNVERIFIED')
-                            this.isLoggedIn = true;
+            .then(response => {
+                if (response.status === 200) {
+                    if(response.data.status !== 'UNVERIFIED')
+                        this.isLoggedIn = true;
 
-                        this.dataResponse = response;
-                        this.userInfo = response.data;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+                    this.dataResponse = response;
+                    this.userInfo = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         },
 
         async logout() {
@@ -60,14 +60,14 @@ export const useUserStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         },
 
         async emailVerify(emailAndCode) {
@@ -76,14 +76,35 @@ export const useUserStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+
+        async userInfoStateUpdate(seq) {
+            return http.get(`/user/${seq}/info`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    for (let key of Object.keys(response.data)) {
+                        if (response.data[key] !== null && response.data[key] !== undefined) {
+                            this.userInfo[key] = response.data[key];
+                        }
                     }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
-        }
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
     }
 })
