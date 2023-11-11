@@ -25,5 +25,4 @@ public class Room {
     private Boolean is_full;
     private Timestamp created_at;
     private User user;
-
 }

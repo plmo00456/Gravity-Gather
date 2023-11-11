@@ -57,6 +57,10 @@ public class RoomService {
             String oriPassword = roomRequest.getPassword();
             String salt = SHA256Util.generateSalt();
             String encPassword = SHA256Util.generateHashWithSalt(oriPassword, salt);
+            System.out.println("salt : " + salt);
+            System.out.println("encPassword : " + encPassword);
+            System.out.println("oriPassword : " + oriPassword);
+
             roomRequest.setPassword(encPassword);
             roomRequest.setPasswordSalt(salt);
         }
@@ -119,6 +123,31 @@ public class RoomService {
     public void insChatLog(String type, Integer room_seq, String msg, Integer sender_seq){
         ChatLog cl = new ChatLog(type, room_seq, msg, sender_seq);
         roomMapper.insChatLog(cl);
+    }
+
+    public Room canEnterRoom(RoomRequest roomRequest){
+        if(roomRequest == null || roomRequest.getSeq() == null || roomRequest.getSeq() == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
+        Room currentRoom = getRoomBySeq(roomRequest.getSeq());
+        if(currentRoom == null || currentRoom.getSeq() == null || currentRoom.getSeq() == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
+        if(currentRoom.getIs_locked()){
+            String passwordSalt = currentRoom.getPassword_salt();
+            String password = SHA256Util.generateHashWithSalt(roomRequest.getPassword(), passwordSalt);
+            System.out.println("===================================");
+            System.out.println(currentRoom);
+            System.out.println(roomRequest.getPassword());
+            System.out.println(passwordSalt);
+            System.out.println(password);
+            System.out.println(currentRoom.getPassword());
+            System.out.println("===================================");
+            if(!password.equals(currentRoom.getPassword())){
+                throw new BusinessLogicException(HttpStatus.valueOf(401), "비밀번호가 틀렸습니다.");
+            }
+        }
+        return currentRoom;
     }
 
 

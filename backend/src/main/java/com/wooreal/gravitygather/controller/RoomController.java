@@ -32,7 +32,7 @@ public class RoomController {
     }
 
     @PostMapping("/get")
-    @ApiOperation(value = "룸 가져오는 api")
+    @ApiOperation(value = "방 가져오는 api")
     public ResponseEntity<?> getRoom() {
         List<Room> rooms = roomService.getRooms();
         List<RoomResponse> roomResponses = rooms.stream()
@@ -41,8 +41,15 @@ public class RoomController {
         return new ResponseEntity<>(roomResponses, HttpStatus.OK);
     }
 
+    @PostMapping("/enter")
+    @ApiOperation(value = "방 입장 api")
+    public ResponseEntity<?> canEnterRoom( @RequestBody RoomRequest roomRequest) {
+        RoomResponse room = new RoomResponse(roomService.canEnterRoom(roomRequest));
+        return new ResponseEntity<>(room, HttpStatus.OK);
+    }
+
     @PostMapping("/create")
-    @ApiOperation(value = "룸 생성 api")
+    @ApiOperation(value = "방 생성 api")
     public ResponseEntity<?> createRoom(@RequestBody RoomRequest roomRequest) {
         roomService.createRoom(roomRequest);
 
@@ -50,7 +57,7 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/participants")
-    @ApiOperation(value = "룸 생성 api")
+    @ApiOperation(value = "방 참여자 가져오는 api")
     public ResponseEntity<?> getRoomParticipants(@PathVariable("roomId") int roomId) {
         List<UserResponse> participants = roomService.getRoomParticipants(roomId);
         return new ResponseEntity<>(participants, HttpStatus.OK);

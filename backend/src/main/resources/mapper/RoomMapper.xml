@@ -9,6 +9,7 @@
         <result property="is_locked" column="is_locked"/>
         <result property="is_delete" column="is_delete"/>
         <result property="password" column="password"/>
+        <result property="password_salt" column="password_salt"/>
         <result property="max_participant" column="max_participant"/>
         <result property="current_participant" column="current_participant"/>
         <result property="is_full" column="is_full"/>
@@ -22,21 +23,22 @@
 
     <select id="getRooms" resultMap="RoomResultMap">
         SELECT A.seq,
-               A.title,
-               A.topic,
-               A.is_locked,
-               A.is_delete,
-               A.password,
-               A.max_participant,
-               A.current_participant,
-               A.owner_seq,
-               A.created_at,
-               IF(A.current_participant = A.max_participant, true, false) as is_full,
-               B.nickname,
-               B.photo
+        A.title,
+        A.topic,
+        A.is_locked,
+        A.is_delete,
+        A.password,
+        A.password_salt,
+        A.max_participant,
+        A.current_participant,
+        A.owner_seq,
+        A.created_at,
+        IF(A.current_participant = A.max_participant, true, false) as is_full,
+        B.nickname,
+        B.photo
         FROM rooms A
         inner join users B
-            on A.owner_seq = B.seq
+        on A.owner_seq = B.seq
         WHERE A.is_delete = false
         <if test="ownerSeq != null">
             AND A.owner_seq = ${ownerSeq}
@@ -51,6 +53,7 @@
                A.is_locked,
                A.is_delete,
                A.password,
+               A.password_salt,
                A.max_participant,
                A.current_participant,
                A.owner_seq,
