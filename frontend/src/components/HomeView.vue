@@ -5,11 +5,15 @@
         <form @submit.prevent="createRoom">
           <p class="flex flex-col text-left mb-5">
             <span>미팅 제목</span>
-            <input type="text" v-model.lazy.trim="createRoomTitle" class="border border-gray-300 py-2 px-3" :class="{'border-red-500':isCreateRoomTitle}" @focus="isCreateRoomTitle = false" placeholder="미팅 제목" maxlength="30">
+            <input type="text" v-model.lazy.trim="createRoomTitle" class="border border-gray-300 py-2 px-3"
+                   :class="{'border-red-500':isCreateRoomTitle}" @focus="isCreateRoomTitle = false" placeholder="미팅 제목"
+                   maxlength="30">
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>미팅 내용</span>
-            <input type="text" v-model.lazy.trim="createRoomTopic" class="border border-gray-300 py-2 px-3" :class="{'border-red-500':isCreateRoomTopic}" @focus="isCreateRoomTopic = false" placeholder="미팅 내용" maxlength="30">
+            <input type="text" v-model.lazy.trim="createRoomTopic" class="border border-gray-300 py-2 px-3"
+                   :class="{'border-red-500':isCreateRoomTopic}" @focus="isCreateRoomTopic = false" placeholder="미팅 내용"
+                   maxlength="30">
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>최대 인원수</span>
@@ -27,22 +31,27 @@
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>비밀번호 여부</span>
-            <ToggleSwitch v-model:check="toggleState" :check="false" :isLocked="true" on-str="잠금" off-str="잠금 해제" :readOnly="true"></ToggleSwitch>
+            <ToggleSwitch v-model:check="toggleState" :check="false" :isLocked="true" on-str="잠금" off-str="잠금 해제"
+                          :readOnly="true"></ToggleSwitch>
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>비밀번호</span>
-            <input type="password" v-model.lazy.trim="createRoomPassword" @input="updateCreateRoomPassword"  class="border border-gray-300 py-2 px-3" placeholder="비밀번호">
+            <input type="password" v-model.lazy.trim="createRoomPassword" @input="updateCreateRoomPassword"
+                   class="border border-gray-300 py-2 px-3" placeholder="비밀번호">
           </p>
           <p class="flex justify-center text-white mt-10">
             <button class="px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-2" type="submit">확인</button>
-            <button class="px-5 py-2 bg-gray-500 rounded text-sm hover:bg-gray-400 ml-2" type="button" @click="slideShow = false">취소</button>
+            <button class="px-5 py-2 bg-gray-500 rounded text-sm hover:bg-gray-400 ml-2" type="button"
+                    @click="slideShow = false">취소
+            </button>
           </p>
         </form>
       </div>
     </slideWindow>
     <div class="flex w-4/6 text-white py-10 justify-between">
       <div>
-        <button class="px-3 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500" type="button" @click="openSlide('createRoom')">
+        <button class="px-3 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500" type="button"
+                @click="openSlide('createRoom')">
           <span class="mr-4">미팅 생성하기</span>
           <font-awesome-icon class="fa-md font-bold" icon="fa-plus"></font-awesome-icon>
         </button>
@@ -61,9 +70,12 @@
       </div>
     </div>
     <div class="rooms-wrap flex flex-wrap w-5/6 mt-10 h-4/6 overflow-auto pl-10 py-5 items-center"
-         :class="{'justify-center': filteredRoom.length === 0, 'content-center': filteredRoom.length === 0, 'content-start': filteredRoom.length !== 0}" v-if="rooms">
-      <div v-if="filteredRoom.length === 0" class="non-room flex flex-col w-1/2 h-5/6 rounded select-none cursor-default">
-        <div class="header flex justify-between w-full px-5 bg-gray-700 rounded-t-md text-center content-center items-center">
+         :class="{'justify-center': filteredRoom.length === 0, 'content-center': filteredRoom.length === 0, 'content-start': filteredRoom.length !== 0}"
+         v-if="rooms">
+      <div v-if="filteredRoom.length === 0"
+           class="non-room flex flex-col w-1/2 h-5/6 rounded select-none cursor-default">
+        <div
+            class="header flex justify-between w-full px-5 bg-gray-700 rounded-t-md text-center content-center items-center">
           <ul class="flex h-full items-center">
             <li class="w-3 h-3 rounded-3xl bg-red-400 mr-2"></li>
             <li class="w-3 h-3 rounded-3xl bg-yellow-300 mr-2"></li>
@@ -73,7 +85,9 @@
             <ul class="flex justify-between w-full items-center">
               <li></li>
               <li class="text-white text-xs pl-5">404 No Results Found!</li>
-              <li><font-awesome-icon class="fa-sm text-gray-400 mt-1.5 mr-1" icon="arrow-rotate-right"/></li>
+              <li>
+                <font-awesome-icon class="fa-sm text-gray-400 mt-1.5 mr-1" icon="arrow-rotate-right"/>
+              </li>
             </ul>
           </div>
           <div class="flex text-center h-full items-center">
@@ -88,7 +102,8 @@
       </div>
       <div v-for="(room, index) in filteredRoom" :key="index"
            class="flex room min-h-2/5 mb-10 rounded mx-5 flex-col px-3 py-4 relative" :data-lock="room.isLocked">
-        <div class="w-10 h-10 rounded-3xl overflow-hidden absolute -left-5 -top-5 tooltip bg-white border border-gray-500"
+        <div
+            class="w-10 h-10 rounded-3xl overflow-hidden absolute -left-5 -top-5 tooltip bg-white border border-gray-500"
             :data-tooltip="room.user.nickname">
           <img class="w-full h-full object-cover" :src="room.user.photo" alt="프로필 사진" v-if="room.user.photo">
           <div v-if="!room.user.photo"
@@ -103,7 +118,10 @@
           <p class="title text-white truncate max-w-sm mx-1 tooltip" data-tooltip="">
             <span class="w-full" v-html="highlightKeyword(room.title)"></span>
           </p>
-          <span class="text-sm" :class="{'text-red-300':room.isFull, 'text-blue-300':!room.isFull}">( {{room.currentParticipant}} / {{ room.maxParticipant }} )</span>
+          <span class="text-sm"
+                :class="{'text-red-300':room.isFull, 'text-blue-300':!room.isFull}">( {{ room.currentParticipant }} / {{
+              room.maxParticipant
+            }} )</span>
         </div>
         <div>
           <p class="truncate tooltip">
@@ -111,15 +129,55 @@
           </p>
         </div>
         <div class="mt-2">
-          <button class="font-bold text-white px-2.5 py-1.5 bg-gray-600 rounded text-sm hover:bg-gray-500"
-                  type="button" @click="enterRoom(room, room.seq)">
-              <span class="mx-1">입장 하기</span>
+          <button v-if="!room.isLocked"
+                  class="font-bold text-white px-2.5 py-1.5 bg-gray-600 rounded text-sm hover:bg-gray-500"
+                  type="button" @click="enterRoom(room)">
+            <span class="mx-1">입장 하기</span>
+          </button>
+          <button v-if="room.isLocked"
+                  class="font-bold text-white px-2.5 py-1.5 bg-gray-600 rounded text-sm hover:bg-gray-500"
+                  type="button" @click="showPasswordRoom(room)">
+            <span class="mx-1">입장 하기</span>
           </button>
         </div>
       </div>
 
     </div>
-      <div @click="test" class="text-white cursor-pointer">테스트</div>
+    <div @click="test" class="text-white cursor-pointer">테스트</div>
+    <div v-if="currentPasswordRoom.show" @click.self="noEnterPasswordRoom"
+         class="w-full h-full absolute left-0 top-0 bg-black bg-opacity-40 cursor-pointer">
+      <div
+          class="cursor-default absolute items-center justify-center p-5 flex-col rounded-2xl shadow-hard w-1/3 h-1/2 bg-white self-center left-[50%] top-[50%] flex translate-x-[-50%] translate-y-[-50%]">
+        <div class="flex justify-center">
+          <span v-if="!currentPasswordRoom.fail"
+                class="w-fit h-fit rounded-full bg-blue-500 bg-opacity-40 text-blue-600 px-5 py-4 animate-bounce">
+            <font-awesome-icon class="text-4xl" icon="lock"></font-awesome-icon>
+          </span>
+          <span v-if="currentPasswordRoom.fail"
+                  class="w-fit h-fit rounded-full bg-red-500 bg-opacity-40 text-red-600 px-5 py-4 animate-shake">
+            <font-awesome-icon class="text-4xl" icon="lock"></font-awesome-icon>
+          </span>
+        </div>
+        <div class="mt-5">
+          <span class="text-2xl ">{{ currentPasswordRoom.title }}</span>
+        </div>
+        <form @submit.prevent="enterPasswordRoom" class="w-full">
+          <div class="mt-8 w-full">
+            <input class="text-xl border-b-2 border-b-gray-300 w-4/5 focus:outline-none focus:border-b-blue-700"
+                   :class="{'border-b-red-500' : currentPasswordRoom.fail, 'focus:border-b-red-500' : currentPasswordRoom.fail}"
+                   type="password"
+                   v-model.trim="currentPasswordRoom.password"
+                   autofocus>
+          </div>
+          <div class="mt-10">
+            <button class="text-white px-5 py-2 bg-blue-600 rounded text-xl font-semibold hover:bg-blue-500"
+                    type="submit">입장하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -144,19 +202,26 @@ export default {
     return {
       slideShow: false,
       currentWindow: null,
-      maxParticipantValue: { name: '5명', maxParticipant: 5 },
+      maxParticipantValue: {name: '5명', maxParticipant: 5},
       maxParticipant: [
-        { name: '1명', maxParticipant: 1 , $isDisabled: true },
-        { name: '2명', maxParticipant: 2 },
-        { name: '3명', maxParticipant: 3 },
-        { name: '4명', maxParticipant: 4 },
-        { name: '5명', maxParticipant: 5 },
+        {name: '1명', maxParticipant: 1, $isDisabled: true},
+        {name: '2명', maxParticipant: 2},
+        {name: '3명', maxParticipant: 3},
+        {name: '4명', maxParticipant: 4},
+        {name: '5명', maxParticipant: 5},
       ],
       createRoomTitle: null,
       createRoomTopic: null,
       createRoomIsPassword: false,
       isCreateRoomTitle: false,
       isCreateRoomTopic: false,
+      currentPasswordRoom: {
+        show: false,
+        roomId: null,
+        title: null,
+        fail: false,
+        password: null,
+      }
     };
   },
   setup() {
@@ -196,7 +261,7 @@ export default {
         } else if (data.type2 === 'updateMsg') {
           const index = rooms.value.findIndex(room => room.seq === data.roomInfo.seq);
           if (index !== -1) {
-              rooms.value.splice(index, 1, data.roomInfo);
+            rooms.value.splice(index, 1, data.roomInfo);
           }
         }
       }
@@ -230,9 +295,9 @@ export default {
           tooltips('tooltip');
         });
       }
-      if (createRoomPassword.value.length > 0){
+      if (createRoomPassword.value.length > 0) {
         toggleState.value = true;
-      }else{
+      } else {
         toggleState.value = false;
       }
     });
@@ -271,16 +336,16 @@ export default {
       }
       return text
     },
-    openSlide (window) {
+    openSlide(window) {
       this.slideShow = true;
       this.currentWindow = window;
     },
-    async createRoom () {
+    async createRoom() {
       const roomStore = useRoomStore();
       const userStore = useUserStore();
       const user = userStore.userInfo;
-      if(!this.createRoomTitle) this.isCreateRoomTitle = true;
-      if(!this.createRoomTopic) this.isCreateRoomTopic = true;
+      if (!this.createRoomTitle) this.isCreateRoomTitle = true;
+      if (!this.createRoomTopic) this.isCreateRoomTopic = true;
       if (this.createRoomTitle && this.createRoomTopic) {
         const roomInfo = {
           title: this.createRoomTitle,
@@ -292,7 +357,7 @@ export default {
         }
 
         try {
-          if(roomInfo.password.length === 0){
+          if (roomInfo.password.length === 0) {
             roomInfo.isLocked = false;
             roomInfo.password = null;
             this.toggleState = false;
@@ -300,9 +365,9 @@ export default {
           await roomStore.createRoom(roomInfo);
           this.dataResponse = roomStore.dataResponse;
           console.log(this.dataResponse);
-          if(this?.dataResponse?.status === 200){
+          if (this?.dataResponse?.status === 200) {
             this.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
-          }else{
+          } else {
             this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
           }
           this.slideShow = false;
@@ -314,16 +379,76 @@ export default {
         this.showError = true;
       }
     },
-    enterRoom(roomInfo, roomId) {
-        this.$router.push({
+    async enterRoom(roomInfo) {
+      const roomStore = useRoomStore();
+      try {
+        await roomStore.enterRoom(roomInfo);
+        this.dataResponse = roomStore.dataResponse;
+
+        if (this?.dataResponse?.status !== 200) {
+          this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
+        } else {
+          const roomInfo = this.dataResponse.data;
+          this.$router.push({
             name: 'room',
-            state: { roomInfo: JSON.stringify(roomInfo)},
-            params: { id: roomId }
-        });
+            state: {test: 1, roomInfo: JSON.stringify(roomInfo)},
+            params: {id: roomInfo.seq}
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+      }
     },
-    test(){
-        const userStore = useUserStore();
-        userStore.userInfoStateUpdate(this.user.seq);
+    async enterPasswordRoom() {
+      const roomInfo = {
+        seq: this.currentPasswordRoom.roomId,
+        password: this.currentPasswordRoom.password,
+      }
+      const roomStore = useRoomStore();
+      try {
+        await roomStore.enterRoom(roomInfo);
+        this.dataResponse = roomStore.dataResponse;
+
+        if (this?.dataResponse?.status !== 200) {
+          this.currentPasswordRoom.fail = false;
+          nextTick(() => {
+            this.currentPasswordRoom.fail = true;
+          })
+
+        } else {
+          const roomInfo = this.dataResponse.data;
+          this.$router.push({
+            name: 'room',
+            state: {test: 1, roomInfo: JSON.stringify(roomInfo)},
+            params: {id: roomInfo.seq}
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+      }
+    },
+    showPasswordRoom(roomInfo) {
+      this.currentPasswordRoom.roomId = roomInfo.seq;
+      this.currentPasswordRoom.title = roomInfo.title;
+      this.currentPasswordRoom.show = true;
+    },
+    noEnterPasswordRoom(event) {
+      if (event.target.tagName !== 'DIV') {
+        return;
+      }
+      this.currentPasswordRoom = {
+        show: false,
+        roomId: null,
+        title: null,
+        fail: false,
+        password: null,
+      }
+    },
+    test() {
+      const userStore = useUserStore();
+      userStore.userInfoStateUpdate(this.user.seq);
     }
   },
 }
@@ -334,11 +459,11 @@ export default {
   height: 93%;
 }
 
-.non-room{
+.non-room {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
-.non-room .header{
+.non-room .header {
   height: 40px;
 }
 
@@ -354,12 +479,11 @@ export default {
   -webkit-backdrop-filter: blur(9.5px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 .rooms-wrap {
-  //height: 500px;
-  overflow-y: scroll; /*  */
+//height: 500px; overflow-y: scroll; /*  */
 }
 
 /* 스크롤바의 폭 너비 */

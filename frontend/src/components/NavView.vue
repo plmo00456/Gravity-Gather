@@ -2,7 +2,7 @@
   <div id="nav-view" class="nav-wrap flex justify-center z-10" v-if="user">
     <div class="flex justify-start w-4/6 items-center">
       <div class="flex w-5/6 items-center">
-        <router-link to="/">
+        <router-link to="/" class="cursor-pointer">
           <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
         </router-link>
         <ul class="flex text-gray-100 font-bold">
