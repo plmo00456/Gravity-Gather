@@ -133,16 +133,12 @@ public class RoomService {
         if(currentRoom == null || currentRoom.getSeq() == null || currentRoom.getSeq() == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+        if(currentRoom.getCurrent_participant().equals(currentRoom.getMax_participant())){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "방 인원이 가득 찼습니다.");
+        }
         if(currentRoom.getIs_locked()){
             String passwordSalt = currentRoom.getPassword_salt();
             String password = SHA256Util.generateHashWithSalt(roomRequest.getPassword(), passwordSalt);
-            System.out.println("===================================");
-            System.out.println(currentRoom);
-            System.out.println(roomRequest.getPassword());
-            System.out.println(passwordSalt);
-            System.out.println(password);
-            System.out.println(currentRoom.getPassword());
-            System.out.println("===================================");
             if(!password.equals(currentRoom.getPassword())){
                 throw new BusinessLogicException(HttpStatus.valueOf(401), "비밀번호가 틀렸습니다.");
             }
