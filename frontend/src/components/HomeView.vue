@@ -411,10 +411,15 @@ export default {
         this.dataResponse = roomStore.dataResponse;
 
         if (this?.dataResponse?.status !== 200) {
-          this.currentPasswordRoom.fail = false;
-          nextTick(() => {
-            this.currentPasswordRoom.fail = true;
-          })
+            // 비밀번호 오류
+            if (this?.dataResponse?.status === 401) {
+                this.currentPasswordRoom.fail = false;
+                nextTick(() => {
+                    this.currentPasswordRoom.fail = true;
+                })
+            }else{
+                this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
+            }
 
         } else {
           const roomInfo = this.dataResponse.data;

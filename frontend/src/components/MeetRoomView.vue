@@ -7,16 +7,21 @@
       <div class="flex shadow-hard justify-center w-5/6 py-1 self-center border glass mb-5">
         {{ roomInfo.title }}
       </div>
-      <div id="main-window" class="main-window w-full relative">
+      <div id="main-window" class="main-window w-5/6 relative">
         <div v-bind:style="{'left': `${participant.x}px`, 'bottom' : `${participant.y}px`}"
-             class="absolute flex flex-col justify-center items-center w-[30rem]"
+             class="character select-none  absolute flex flex-col justify-center items-center w-[30rem]"
+             v-bind:class="`animation-move-astronaut${characterRandomNum1}`"
              v-for="participant in participants" :key="participant.seq">
           <div :id="`character-chat-${participant.seq}`"
                class="shadow-hard w-fit absolute bottom-[100%] hidden chat-text break-words  bg-gray-100 text-black px-3 py-1 rounded-xl mb-3 border border-gray-500">
             <span class="w-full max-w-[30rem]"></span>
           </div>
-          <img class="w-36" :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
-          <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-2 text-sm">
+          <div class="character-img">
+            <img class="w-36"
+                 v-bind:class="`animation-rotate-astronaut${characterRandomNum2}`"
+                 :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
+          </div>
+          <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-3 text-sm">
             <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
                                icon="fa-solid fa-crown"/>
             {{ participant.nickname }}
@@ -56,7 +61,7 @@
                 <img class="w-full h-full object-cover bg-white rounded-3xl" :src="chat.senderPhoto"
                      alt="프로필 사진" v-if="chat.senderPhoto">
                 <div v-if="!chat.senderPhoto"
-                     class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-lg shadow-2xl text-white">
+                     class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-lg shadow-2xl text-white bg-green-700">
                   <span>{{ chat.sender[0] }}</span>
                 </div>
               </div>
@@ -151,6 +156,8 @@ export default {
       isRightSlide: true,
       rightCurrentTab: 'chat',
       chatMsg: '',
+      characterRandomNum1: 1,
+      characterRandomNum2: 1,
     }
   },
   setup() {
@@ -365,7 +372,12 @@ export default {
       participants,
       randomCharacterLocation
     };
-  }, methods: {
+  },
+  created() {
+      this.characterRandomNum1 = this.randomNumber(1, 4);
+      this.characterRandomNum2 = this.randomNumber(1, 2);
+  },
+  methods: {
     chatSend() {
       if (this.chatMsg !== '') {
         this.chatSocketSend('chat', this.chatMsg);
@@ -389,6 +401,9 @@ export default {
       const images = require.context('@/assets/image/character', false, /\.png$/);
       return images(`./c${roomCharacter}.png`);
     },
+    randomNumber: function (st, ed) {
+        return Math.floor((Math.random() * (ed-st+1)) + st);
+    }
   },
 
 }
@@ -534,6 +549,111 @@ export default {
   border-right: 10px solid transparent;
   border-top: 10px solid rgb(243, 244, 246);
 }
+
+@-moz-keyframes move-astronaut1 {
+    100% { -moz-transform: translate(-160px, -160px);}
+}
+@-webkit-keyframes move-astronaut1 {
+    100% { -webkit-transform: translate(-160px, -160px);}
+}
+@keyframes move-astronaut1{
+    100% { -webkit-transform: translate(-160px, -160px); transform:translate(-160px, -160px); }
+}
+
+@-moz-keyframes move-astronaut2 {
+    100% { -moz-transform: translate(160px, 160px);}
+}
+@-webkit-keyframes move-astronaut2 {
+    100% { -webkit-transform: translate(160px, 160px);}
+}
+@keyframes move-astronaut2{
+    100% { -webkit-transform: translate(160px, 160px); transform:translate(160px, 160px); }
+}
+
+@-moz-keyframes move-astronaut3 {
+    100% { -moz-transform: translate(160px, -160px);}
+}
+@-webkit-keyframes move-astronaut3 {
+    100% { -webkit-transform: translate(160px, -160px);}
+}
+@keyframes move-astronaut3{
+    100% { -webkit-transform: translate(160px, -160px); transform:translate(160px, -160px); }
+}
+
+@-moz-keyframes move-astronaut4 {
+    100% { -moz-transform: translate(-160px, 160px);}
+}
+@-webkit-keyframes move-astronaut4 {
+    100% { -webkit-transform: translate(-160px, 160px);}
+}
+@keyframes move-astronaut4{
+    100% { -webkit-transform: translate(-160px, 160px); transform:translate(-160px, 160px); }
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(50px, 100px);
+    }
+    50% {
+        transform: translate(75px, 125px);
+    }
+    75% {
+        transform: translate(50px, 100px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@-moz-keyframes rotate-astronaut1 {
+    100% { -moz-transform: rotate(-720deg);}
+}
+@-webkit-keyframes rotate-astronaut1 {
+    100% { -webkit-transform: rotate(-720deg);}
+}
+@keyframes rotate-astronaut1{
+    100% { -webkit-transform: rotate(-720deg); transform:rotate(-720deg); }
+}
+
+@-moz-keyframes rotate-astronaut2 {
+    100% { -moz-transform: rotate(720deg);}
+}
+@-webkit-keyframes rotate-astronaut2 {
+    100% { -webkit-transform: rotate(720deg);}
+}
+@keyframes rotate-astronaut2{
+    100% { -webkit-transform: rotate(720deg); transform:rotate(720deg); }
+}
+
+.animation-move-astronaut1 {
+    animation: move-astronaut1 50s infinite linear both alternate;
+}
+
+.animation-move-astronaut2 {
+    animation: move-astronaut2 50s infinite linear both alternate;
+}
+
+.animation-move-astronaut3 {
+    animation: move-astronaut3 50s infinite linear both alternate;
+}
+
+.animation-move-astronaut4 {
+    animation: move-astronaut4 50s infinite linear both alternate;
+}
+
+.animation-rotate-astronaut1{
+    animation: rotate-astronaut1 200s infinite linear both alternate;
+    will-change: transform;
+}
+
+.animation-rotate-astronaut2{
+    animation: rotate-astronaut2 200s infinite linear both alternate;
+    will-change: transform;
+}
+
 
 
 </style>
