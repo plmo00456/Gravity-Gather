@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.mapper;
 
+import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,5 +18,5 @@ public interface UserMapper {
 
     int setUserActive(String email);
 
-    int userUpdate(UserRequest userRequest);
+    int userUpdate(User user);
 }

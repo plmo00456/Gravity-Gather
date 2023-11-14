@@ -81,8 +81,8 @@
             <if test="password != null">
                 password = #{password},
             </if>
-            <if test="passwordSalt != null">
-                password_salt = #{passwordSalt},
+            <if test="password_salt != null">
+                password_salt = #{password_salt},
             </if>
             <if test="photo != null">
                 photo = #{photo},
@@ -99,14 +99,14 @@
             <if test="status != null">
                 status = #{status},
             </if>
-            <if test="roomCharacter != null">
-                room_character = #{roomCharacter},
+            <if test="room_character != null and room_character != 0">
+                room_character = #{room_character},
             </if>
-            <if test="roomMap != null">
-                room_map = #{roomMap},
+            <if test="room_map != null and room_map != 0">
+                room_map = #{room_map},
             </if>
-            <if test="failLoginCnt != null">
-                fail_login_cnt = #{failLoginCnt},
+            <if test="fail_login_cnt != null and fail_login_cnt != 0">
+                fail_login_cnt = #{fail_login_cnt},
             </if>
             updated_at = now()
         </set>

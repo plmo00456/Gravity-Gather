@@ -6,7 +6,9 @@ import com.google.gson.JsonParser;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.dto.room.RoomSession;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.service.RoomService;
+import com.wooreal.gravitygather.service.UserService;
 import com.wooreal.gravitygather.utils.comUtil;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
@@ -25,9 +27,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final RoomService roomService;
+    private final UserService userService;
 
-    public WebSocketHandler(@Lazy RoomService roomService) {
+    public WebSocketHandler(@Lazy RoomService roomService, @Lazy UserService userService) {
         this.roomService = roomService;
+        this.userService = userService;
     }
 
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<String, WebSocketSession>();
@@ -76,7 +80,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String senderSeq = comUtil.hasIsNullChk(jsonObject, "senderSeq", null);
         String content = comUtil.hasIsNullChk(jsonObject, "content", null);
 
-        System.out.println(type1 + " " + type2);
         if (type1.equals("room")) {
             JsonObject jo = new JsonObject();
             switch(type2){
@@ -131,8 +134,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         meetrooms.put(roomId, room);
 
         Set<RoomSession> roomSession = meetrooms.get(roomId);
-        System.out.println("roomId2 : " + roomId);
-        System.out.println("size2 : " + roomSession.size());
     }
 
     private void leaveRoom(String roomId, WebSocketSession session) {
@@ -149,6 +150,48 @@ public class WebSocketHandler extends TextWebSocketHandler {
         for (WebSocketSession session : CLIENTS.values()) {
             if (session.isOpen()) {
                 session.sendMessage(textMessage);
+            }
+        }
+    }
+
+    public void updateUserMsg(int userSeq) throws IOException {
+        Gson gson = new Gson();
+        UserResponse user = new UserResponse(userService.getUserBySeq(userSeq));
+        JsonObject jo = new JsonObject();
+        jo.addProperty("type1", "room");
+        jo.addProperty("type2", "updateUserMsg");
+        jo.addProperty("seq", userSeq);
+        jo.add("userInfo", gson.toJsonTree(user));
+        jo.addProperty("datetime", new Date().getTime());
+//        sendMessageToAll(jo.toString());
+        sendMessageToUserSeqInRoom(userSeq, jo);
+    }
+
+    public void sendMessageToUserSeqInRoom(Integer userSeq, JsonObject jo){
+        Optional<RoomSession> roomSessionOpt = meetrooms.values().stream()
+                .flatMap(Set::stream)
+                .filter(roomSession -> roomSession.getSenderSeq().equals(userSeq))
+                .findFirst();
+
+        roomSessionOpt.ifPresent(roomSession -> {
+            Set<RoomSession> roomSessions = meetrooms.get(roomSession.getRoomId());
+            if (roomSessions != null) {
+                for (RoomSession rs : roomSessions) {
+                    if(rs.getSession().isOpen()){
+                        try {
+                            rs.getSession().sendMessage(new TextMessage(jo.toString()));
+                        } catch (IOException e) {
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public void sendMessageToRoom(Integer roomId, JsonObject jo) throws IOException {
+        for (RoomSession s : meetrooms.get(roomId+"")) {
+            if(s.getSession().isOpen()){
+                s.getSession().sendMessage(new TextMessage(jo.toString()));
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.service;
 
+import com.wooreal.gravitygather.config.WebSocketHandler;
 import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -26,14 +28,17 @@ public class UserService {
     private final MailService mailService;
     private final RedisService redisService;
 
+    private final WebSocketHandler webSocketHandler;
+
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
 
 
-    public UserService(UserMapper userMapper, MailService mailService, RedisService redisService) {
+    public UserService(UserMapper userMapper, MailService mailService, RedisService redisService, WebSocketHandler webSocketHandler) {
         this.userMapper = userMapper;
         this.mailService = mailService;
         this.redisService = redisService;
+        this.webSocketHandler = webSocketHandler;
     }
 
     public User login(UserRequest userRequest){
@@ -111,7 +116,7 @@ public class UserService {
         return result;
     }
 
-    public void userUpdate(UserRequest userRequest){
+    public void userUpdate(UserRequest userRequest) throws IOException {
         User ur = getUserBySeq(userRequest.getSeq());
 
         if(userRequest.getPassword() != null && !userRequest.getPassword().equals("")){
@@ -132,10 +137,12 @@ public class UserService {
             userRequest.setPasswordSalt(newPasswordSalt);
         }
 
-        int result = userMapper.userUpdate(userRequest);
+        int result = userMapper.userUpdate(new User(userRequest));
         if(result == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "내 정보 변경 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+
+        webSocketHandler.updateUserMsg(userRequest.getSeq());
     }
 
 }
