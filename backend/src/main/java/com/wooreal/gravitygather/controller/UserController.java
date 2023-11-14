@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -50,5 +51,12 @@ public class UserController {
     public ResponseEntity<?> getPublicUserInfo(@PathVariable("seq") int seq) {
         UserResponse userInfo = userService.getPublicUserInfo(seq);
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
+    }
+
+    @PostMapping("/update")
+    @ApiOperation(value = "유저 정보 변경 api")
+    public ResponseEntity<?> userUpdate(UserRequest userRequest, @RequestParam(name="profile-image", required=false) MultipartFile imageFile) {
+        userService.userUpdate(userRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

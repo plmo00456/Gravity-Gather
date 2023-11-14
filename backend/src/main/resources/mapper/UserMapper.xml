@@ -68,4 +68,48 @@
             #{item}
         </foreach>
     </select>
+
+    <update id="userUpdate">
+        UPDATE users
+        <set>
+            <if test="seq != null">
+                seq = #{seq},
+            </if>
+            <if test="id != null">
+                id = #{id},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="passwordSalt != null">
+                password_salt = #{passwordSalt},
+            </if>
+            <if test="photo != null">
+                photo = #{photo},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="roomCharacter != null">
+                room_character = #{roomCharacter},
+            </if>
+            <if test="roomMap != null">
+                room_map = #{roomMap},
+            </if>
+            <if test="failLoginCnt != null">
+                fail_login_cnt = #{failLoginCnt},
+            </if>
+            updated_at = now()
+        </set>
+        WHERE seq = #{seq}
+    </update>
 </mapper>

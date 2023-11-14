@@ -43,7 +43,7 @@
             <button class="px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-2" type="submit">확인</button>
             <button class="px-5 py-2 bg-gray-500 rounded text-sm hover:bg-gray-400 ml-2" type="button"
                     @click="slideShow = false">취소
-            </button>
+            </button>소
           </p>
         </form>
       </div>
@@ -318,10 +318,8 @@ export default {
     });
 
     onMounted(() => {
-      console.log(1);
       console.log(document.querySelectorAll(".tooltip"));
       instance.appContext.config.globalProperties.utils.tooltips('tooltip');
-      console.log(2);
     });
 
     return {

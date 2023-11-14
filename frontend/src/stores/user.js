@@ -106,5 +106,21 @@ export const useUserStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
+
+        async userInfoUpdate(userInfo){
+            return http.post(`/user/update`, userInfo, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
+        }
     }
 })

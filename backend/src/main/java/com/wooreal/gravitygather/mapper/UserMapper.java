@@ -16,4 +16,6 @@ public interface UserMapper {
     List<User> getUserBySeqs(List<Integer> seqs);
 
     int setUserActive(String email);
+
+    int userUpdate(UserRequest userRequest);
 }

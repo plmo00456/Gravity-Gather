@@ -7,6 +7,7 @@ import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
+import com.wooreal.gravitygather.utils.SHA256Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,6 @@ public class UserService {
             }
             return builder.toString();
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("UserService.createCode() exception occur");
             throw new BusinessLogicException(HttpStatus.valueOf(500));
         }
     }
@@ -109,6 +109,33 @@ public class UserService {
         result.setRoomMap(ur.getRoom_map());
 
         return result;
+    }
+
+    public void userUpdate(UserRequest userRequest){
+        User ur = getUserBySeq(userRequest.getSeq());
+
+        if(userRequest.getPassword() != null && !userRequest.getPassword().equals("")){
+            String oriPassword = ur.getPassword();
+            String oriSalt = ur.getPassword_salt();
+
+            String password = userRequest.getPassword();
+            String valiPassword = SHA256Util.generateHashWithSalt(password, oriSalt);
+
+            if(!oriPassword.equals(valiPassword)){
+                throw new BusinessLogicException(HttpStatus.valueOf(500), "현재 비밀번호가 틀렸습니다.");
+            }
+
+            String newPasswordSalt = SHA256Util.generateSalt();
+            String newPassword = SHA256Util.generateHashWithSalt(userRequest.getNewPassword(), newPasswordSalt);
+
+            userRequest.setPassword(newPassword);
+            userRequest.setPasswordSalt(newPasswordSalt);
+        }
+
+        int result = userMapper.userUpdate(userRequest);
+        if(result == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "내 정보 변경 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
     }
 
 }
