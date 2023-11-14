@@ -110,7 +110,7 @@ export const useUserStore = defineStore({
         async userInfoUpdate(userInfo){
             return http.post(`/user/update`, userInfo, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data'
                 }
             })
                 .then(response => {

@@ -105,7 +105,7 @@
         <div
             class="w-10 h-10 rounded-3xl overflow-hidden absolute -left-5 -top-5 tooltip bg-white border border-gray-500"
             :data-tooltip="room.user.nickname">
-          <img class="w-full h-full object-cover" :src="room.user.photo" alt="프로필 사진" v-if="room.user.photo">
+          <img class="w-full h-full object-cover" :src="`${$env.protocol}${$env.serverIP}:${$env.port}${room.user.photo}`" alt="프로필 사진" v-if="room.user.photo">
           <div v-if="!room.user.photo"
                class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
             <span v-if="room.user.nickname">{{ room.user.nickname[0] }}</span>
@@ -485,9 +485,6 @@ export default {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
-.rooms-wrap {
-//height: 500px; overflow-y: scroll; /*  */
-}
 
 /* 스크롤바의 폭 너비 */
 .rooms-wrap::-webkit-scrollbar {

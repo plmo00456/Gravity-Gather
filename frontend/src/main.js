@@ -83,13 +83,20 @@ async function init(){
     app.config.globalProperties.utils.msgError = msgError;
     app.config.globalProperties.utils.normalErrorMsg = "오류가 발생하였습니다. 관리자에게 문의해주세요.";
 
+    // env 설정
+    app.config.globalProperties.$env = {};
+    app.config.globalProperties.$env.serverIP = process.env.VUE_APP_SERVER_IP;
+    app.config.globalProperties.$env.protocol = process.env.VUE_APP_PROTOCOL;
+    app.config.globalProperties.$env.port = process.env.VUE_APP_PORT;
+
 
     // notify
     app.config.globalProperties.utils.notify = {};
     app.config.globalProperties.utils.notify.success = async (message, title) => {
         const option = {
             message: message,
-            type: 'success'
+            type: 'success',
+            position: 'bottom-right',
         };
         if(title){
             option.title = title;

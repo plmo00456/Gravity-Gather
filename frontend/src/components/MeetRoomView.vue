@@ -1,5 +1,5 @@
 <template>
-  <div id="main-room-view" class="flex justify-center bg-right-top bg-[length:110%_120%] text-white"
+  <div id="main-room-view" class="flex justify-center bg-right-top bg-cover text-white"
        v-bind:style="{ backgroundImage: `url(${require('@/assets/background/room_bg_' + user.roomMap + '.jpg')})` }">
     <div class="left-window absolute w-1/5 h-full">
     </div>
@@ -58,7 +58,8 @@
                  :class="{'first_chat': chats[index - 1].type2 !== 'chat' || chats[index - 1].senderSeq !== chat.senderSeq}">
               <div v-if="chats[index - 1].type2 !== 'chat' || chats[index - 1].senderSeq !== chat.senderSeq"
                    class="w-10 h-10 absolute left-0 bottom-2 flex items-center">
-                <img class="w-full h-full object-cover bg-white rounded-3xl" :src="chat.senderPhoto"
+                <img class="w-full h-full object-cover bg-white rounded-3xl"
+                     :src="`${$env.protocol}${$env.serverIP}:${$env.port}${chat.senderPhoto}`"
                      alt="프로필 사진" v-if="chat.senderPhoto">
                 <div v-if="!chat.senderPhoto"
                      class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-lg shadow-2xl text-white bg-green-700">
@@ -97,7 +98,8 @@
             <div class="flex items-center justify-between py-3 border-b border-b-gray-400">
               <div class="flex items-center">
                 <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500 relative">
-                  <img class="w-full h-full object-cover bg-white" :src="participant.photo"
+                  <img class="w-full h-full object-cover bg-white"
+                       :src="`${$env.protocol}${$env.serverIP}:${$env.port}${participant.photo}`"
                        alt="프로필 사진" v-if="participant.photo">
                   <span class="w-full h-full flex justify-center items-center font-bold text-lg bg-green-700 text-white"
                         v-if="!participant.photo">{{ participant.nickname[0] }}</span>
@@ -275,7 +277,6 @@ export default {
                   chatElement.classList.add("hidden");
                 }, participantsCharacter.showTextMs)
               };
-              console.log(participantsCharacter);
               clearTimeout(participantsCharacter[seq].timeoutFN);
             }
             getRoomParticipants();
@@ -302,6 +303,17 @@ export default {
             console.log(chatElement);
           }
           chats.value.push(data);
+        }
+
+        if (data.type2 === 'updateUserMsg'){
+            let participant = participants.value.find(p => p.seq === data.userInfo.seq);
+            if (participant) {
+                for (let key in data.userInfo) {
+                    if (participant[key] !== undefined && participant[key] !== null && data.userInfo[key] !== undefined) {
+                        participant[key] = data.userInfo[key];
+                    }
+                }
+            }
         }
 
         if (data.type2 === 'delete') {

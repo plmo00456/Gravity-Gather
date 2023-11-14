@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wooreal.gravitygather.mapper.RoomMapper">
+    <resultMap id="RoomResultMap" type="Room">
+        <result property="seq" column="seq"/>
+        <result property="title" column="title"/>
+        <result property="topic" column="topic"/>
+        <result property="is_locked" column="is_locked"/>
+        <result property="is_delete" column="is_delete"/>
+        <result property="password" column="password"/>
+        <result property="password_salt" column="password_salt"/>
+        <result property="max_participant" column="max_participant"/>
+        <result property="current_participant" column="current_participant"/>
+        <result property="is_full" column="is_full"/>
+        <result property="owner_seq" column="owner_seq"/>
+        <result property="created_at" column="created_at"/>
+        <association property="user" javaType="User">
+            <result property="nickname" column="nickname"/>
+            <result property="photo" column="photo"/>
+        </association>
+    </resultMap>
+
+    <select id="getRooms" resultMap="RoomResultMap">
+        SELECT A.seq,
+        A.title,
+        A.topic,
+        A.is_locked,
+        A.is_delete,
+        A.password,
+        A.password_salt,
+        A.max_participant,
+        A.current_participant,
+        A.owner_seq,
+        A.created_at,
+        IF(A.current_participant = A.max_participant, true, false) as is_full,
+        B.nickname,
+        B.photo
+        FROM rooms A
+        inner join users B
+        on A.owner_seq = B.seq
+        WHERE A.is_delete = false
+        <if test="ownerSeq != null">
+            AND A.owner_seq = ${ownerSeq}
+        </if>
+        ORDER BY A.created_at DESC
+    </select>
+
+    <select id="getRoomBySeq" resultMap="RoomResultMap">
+        SELECT A.seq,
+               A.title,
+               A.topic,
+               A.is_locked,
+               A.is_delete,
+               A.password,
+               A.password_salt,
+               A.max_participant,
+               A.current_participant,
+               A.owner_seq,
+               A.created_at,
+               IF(A.current_participant = A.max_participant, true, false) as is_full,
+               B.nickname,
+               B.photo
+        FROM rooms A
+        inner join users B
+        on A.owner_seq = B.seq
+        WHERE A.is_delete = false
+        AND A.SEQ = ${seq}
+    </select>
+
+    <insert id="createRoom">
+        INSERT INTO rooms(
+            title,
+            topic,
+            is_locked,
+            is_delete,
+            password,
+            password_salt,
+            max_participant,
+            current_participant,
+            owner_seq,
+            created_at
+        ) VALUES (
+            #{title},
+            #{topic},
+            ${isLocked},
+            0,
+            #{password},
+            #{passwordSalt},
+            #{maxParticipant},
+            0,
+            ${ownerSeq},
+            now()
+        )
+        <selectKey keyProperty="seq" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="enterRoom">
+        UPDATE rooms SET
+            current_participant = current_participant + 1
+        WHERE
+            seq = ${seq}
+    </update>
+
+    <update id="leaveRoom">
+        UPDATE rooms SET
+            current_participant = current_participant - 1
+        WHERE
+            seq = ${seq}
+    </update>
+
+    <update id="updateRoom">
+        UPDATE rooms
+        <set>
+            <if test="seq != null">
+                seq = #{seq},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="topic != null">
+                topic = #{topic},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="isLocked != null">
+                is_locked = #{isLocked},
+            </if>
+            <if test="maxParticipant != null">
+                max_participant = #{maxParticipant},
+            </if>
+            <if test="ownerSeq != null">
+                owner_seq = #{ownerSeq},
+            </if>
+        </set>
+        WHERE seq = #{seq}
+    </update>
+
+    <insert id="insChatLog">
+        INSERT INTO chatlog
+        (
+            type,
+            room_seq,
+            msg,
+            sender_seq,
+            created_at
+        ) VALUES (
+            #{type},
+            #{room_seq},
+            #{msg},
+            #{sender_seq},
+            now()
+        )
+    </insert>
+</mapper>

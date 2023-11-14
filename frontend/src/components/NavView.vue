@@ -13,9 +13,11 @@
           <li class="hover:text-gray-200">메뉴3</li>
         </ul>
       </div>
-      <div class="flex w-2/6 text-white justify-end items-center cursor-pointer" @click="profileClick" id="profile-wrap">
+      <div class="flex w-fit p-3 text-white justify-end items-center cursor-pointer z-10 h-full" @click="profileClick" id="profile-wrap">
         <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
-          <img class="w-full h-full object-cover bg-white" :src="user.photo" alt="프로필 사진" v-if="user.photo">
+          <img class="w-full h-full object-cover bg-white"
+               :src="`${$env.protocol}${$env.serverIP}:${$env.port}${user.photo}`"
+               alt="프로필 사진" v-if="user.photo">
           <div v-if="!user.photo"
                class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
             <span v-if="user.nickname">{{ user.nickname[0] }}</span>
@@ -41,15 +43,6 @@
                                  icon="arrow-right-from-bracket"></font-awesome-icon>
             </template>
           </context-menu-item>
-          <!--          <context-menu-group label="Menu with child">-->
-          <!--            <context-menu-item label="Item1" @click="onMenuClick(2)">-->
-          <!--            </context-menu-item>-->
-          <!--            <context-menu-item label="Item2" @click="onMenuClick(3)"/>-->
-          <!--            <context-menu-group label="Child with v-for 50">-->
-          <!--              <context-menu-item v-for="index of 50" :key="index" :label="'Item3-'+index"-->
-          <!--                                 @click="onLoopMenuClick(index)"/>-->
-          <!--            </context-menu-group>-->
-          <!--          </context-menu-group>-->
         </context-menu>
       </div>
     </div>
@@ -62,11 +55,17 @@
     >
       <form @submit.prevent="userUpdate">
         <div class="flex flex-col items-center p-5">
-          <div class="flex w-[6rem] items-center h-[6rem] mb-3 justify-center relative cursor-pointer" @click="uploadImage('profile-photo-input')">
-            <div class="w-full h-full relative rounded-full overflow-hidden border-2 border-gray-400" @mouseover="profileImageHover = true" @mouseleave="profileImageHover = false">
+          <div class="flex w-[6rem] items-center h-[6rem] mb-3 justify-center relative cursor-pointer" >
+            <div v-if="myInfoValue.photo" @click="test" class="absolute -top-0 -right-0 bg-red-500 w-1/2 h-1/2 rounded flex justify-end items-start border border-gray-400 tooltip" data-tooltip="이미지 삭제">
+                <font-awesome-icon class="p-1 text-white text-xs" icon="fa-regular fa-trash-can"/>
+            </div>
+            <div @click="uploadImage('profile-photo-input')" class="w-full h-full relative rounded-full overflow-hidden border-2 border-gray-400" @mouseover="profileImageHover = true" @mouseleave="profileImageHover = false">
               <div id="profile-photo-prev" class="w-full h-full bg-cover cursor-pointer flex items-center justify-center font-bold text-3xl bg-green-700 text-white">
                 <span v-if="!myInfoValue.photo">{{user.nickname[0]}}</span>
-                <img id="profile-photo-prev" v-if="myInfoValue.photo" class="w-full h-full bg-cover cursor-pointer" :src="myInfoValue.photo" alt="프로필사진">
+
+                <img id="profile-photo-prev" v-if="myInfoValue.photo" class="w-full h-full bg-cover cursor-pointer"
+                     :src="`${myInfoValue.photo}`"
+                     alt="프로필사진">
               </div>
               <Transition>
                 <div v-if="profileImageHover" class="absolute rounded-b-full bottom-0 right-0 w-full h-2/5 text-white bg-gray-900 bg-opacity-40 flex justify-center items-start py-1">
@@ -74,8 +73,8 @@
                 </div>
               </Transition>
             </div>
-            <div class="absolute bottom-0 right-0 bg-gray-200 w-8 h-8 rounded-full flex justify-center items-center border border-gray-400">
-              <font-awesome-icon class=" w-full text-gray-400 text-md" icon="fa-regular fa-image"/>
+            <div @click="uploadImage('profile-photo-input')" class="absolute bottom-0 right-0 bg-gray-200 w-8 h-8 rounded-full flex justify-center items-center border border-gray-400 hover:bg-gray-300">
+              <font-awesome-icon class=" w-full text-gray-400 text-md hover:text-gray-500" icon="fa-regular fa-image"/>
             </div>
             <input id="profile-photo-input" name="profile-image" @click="handleImageUpload" class="hidden" type="file" v-on:change="handleImageUpload" accept="image/*">
           </div>
@@ -89,7 +88,11 @@
               <span>( {{ myInfoValue.name.length }} / 10 )</span>
             </p>
             <p class="flex w-3/5 h-full items-center">
-              <input type="text" class="w-full border rounded border-gray-300 h-[2.5rem] px-2 py-1" v-model.trim="myInfoValue.name" maxlength="10">
+              <input type="text" class="w-full border rounded border-gray-300 h-[2.5rem] px-2 py-1"
+                     :value="myInfoValue.name"
+                     @input="nowUpdateInput($event, 'myInfoValue.name')"
+                     @compositionend="nowUpdateInput"
+                     maxlength="10">
             </p>
           </div>
 
@@ -102,7 +105,11 @@
               <span>( {{ myInfoValue.nickname.length }} / 10 )</span>
             </p>
             <p class="flex w-3/5 h-full items-center">
-              <input type="text" class="w-full border rounded border-gray-300 h-[2.5rem] px-2 py-1" v-model.trim="myInfoValue.nickname" maxlength="10">
+              <input type="text" class="w-full border rounded border-gray-300 h-[2.5rem] px-2 py-1"
+                     :value="myInfoValue.nickname"
+                     @input="nowUpdateInput($event, 'myInfoValue.nickname')"
+                     @compositionend="nowUpdateInput"
+                     maxlength="10">
             </p>
           </div>
 
@@ -213,6 +220,8 @@ import {ContextMenuItem, ContextMenu, ContextMenuSeparator} from "@imengyu/vue3-
 import {router} from "@/router";
 import PopupWindow from "@/components/PopupWindow.vue";
 import Multiselect from 'vue-multiselect'
+import _ from 'lodash';
+import {nextTick} from "vue";
 
 export default {
   name: "NavView",
@@ -252,6 +261,15 @@ export default {
       },
     }
   },
+  directives: {
+      compose: {
+          inserted: function (el, binding, vnode) {
+              el.addEventListener('compositionend', () => {
+                  vnode.context[binding.expression] = el.value;
+              });
+          }
+      }
+  },
   setup() {
     const userStore = useUserStore();
     const user = userStore.userInfo;
@@ -278,7 +296,7 @@ export default {
       userStore.logout();
     },
     myInfoShowFn() {
-      this.myInfoValue.photo = this.user.photo;
+      this.myInfoValue.photo = this.user.photo ? (this.$env.protocol + this.$env.serverIP  + ':' + this.$env.port + this.user.photo) : this.user.photo;
       this.myInfoValue.name = this.user.name;
       this.myInfoValue.nickname = this.user.nickname;
       this.myInfoValue.roomCharacter = this.user.roomCharacter;
@@ -298,6 +316,10 @@ export default {
       }
 
       this.myInfoShow = true;
+
+      nextTick(() => {
+          this.utils.tooltips('tooltip');
+      })
     },
     uploadImage(id) {
       const fileInput = document.querySelector('#'+id);
@@ -313,15 +335,15 @@ export default {
         }
         reader.readAsDataURL(event.target.files[0]);
       }else{
-        this.myInfoValue.photo = this.user.photo;
+        this.myInfoValue.photo = this.user.photo ? (this.$env.protocol + this.$env.serverIP  + ':' + this.$env.port + this.user.photo) : this.user.photo;
       }
     },
     userUpdate() {
-      if(this.myInfoValue.name == null){
+      if(this.myInfoValue.name == null || this.myInfoValue.name === ''){
         this.utils.msgError("이름을 입력하세요");
         return;
       }
-      if(this.myInfoValue.nickname == null){
+      if(this.myInfoValue.nickname == null || this.myInfoValue.nickname === ''){
         this.utils.msgError("닉네임을 입력하세요");
         return;
       }
@@ -347,26 +369,27 @@ export default {
         if (result.isConfirmed) {
           const userStore = useUserStore();
           try {
-            const data = {
-              seq: this.user.seq,
-              name: this.myInfoValue.name,
-              nickname: this.myInfoValue.nickname,
-              roomCharacter: this.roomCharacterValue.roomCharacterValue,
-              roomMap: this.roomMapValue.roomMapValue,
-            };
+            let formData = new FormData();
+            const profilePhotoInput =  document.querySelector('#profile-photo-input');
 
-            if(document.querySelector('#profile-photo-input').value != null && document.querySelector('#profile-photo-input').value !== '')
-              data['profile-image'] = document.querySelector('#profile-photo-input').value;
-            if(this.myInfoValue.password != null){
-              data['password'] = this.myInfoValue.password;
-              data['newPassword'] = this.myInfoValue.newPassword;
+            if(profilePhotoInput.files && profilePhotoInput.files[0]){
+                formData.append('profileImage', profilePhotoInput.files[0]);
             }
+            if(this.myInfoValue.password != null){
+                formData.append('password', this.myInfoValue.password);
+                formData.append('newPassword', this.myInfoValue.newPassword);
+            }
+            formData.append("seq", this.user.seq);
+            formData.append("name", this.myInfoValue.name);
+            formData.append("nickname", this.myInfoValue.nickname);
+            formData.append("roomCharacter", this.roomCharacterValue.roomCharacter);
+            formData.append("roomMap", this.roomMapValue.roomMap);
 
-            await userStore.userInfoUpdate(data);
+            await userStore.userInfoUpdate(formData);
             if (userStore?.dataResponse.status === 200) {
               await userStore.userInfoStateUpdate(this.user.seq);
-
               this.utils.notify.success("내 정보가 변경되었습니다.", "변경 완료!");
+              this.myInfoShow = false;
             } else {
               this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
             }
@@ -378,6 +401,13 @@ export default {
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
       });
     },
+    nowUpdateInput(event, path) {
+      const trimmedValue = event.target.value.trim();
+      _.set(this, path, trimmedValue);
+    },
+    test(){
+        alert('ㅅㄷㄴㅅ');
+    }
   }
 }
 </script>
