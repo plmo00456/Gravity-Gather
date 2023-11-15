@@ -308,11 +308,15 @@ export default {
         if (data.type2 === 'updateUserMsg'){
             let participant = participants.value.find(p => p.seq === data.userInfo.seq);
             if (participant) {
+                let chkPhoto = false;
                 for (let key in data.userInfo) {
-                    if (participant[key] !== undefined && participant[key] !== null && data.userInfo[key] !== undefined) {
+                    if (participant[key] !== undefined && data.userInfo[key] !== undefined) {
+                        if(key === 'photo') chkPhoto = true;
                         participant[key] = data.userInfo[key];
                     }
                 }
+                if(!chkPhoto)
+                  participant['photo'] = null;
             }
         }
 

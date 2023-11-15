@@ -95,11 +95,16 @@ export const useUserStore = defineStore({
             .then(response => {
                 if (response.status === 200) {
                     this.dataResponse = response;
+
+                    let chkPhoto = false;
                     for (let key of Object.keys(response.data)) {
                         if (response.data[key] !== null && response.data[key] !== undefined) {
+                            if(key === 'photo') chkPhoto = true;
                             this.userInfo[key] = response.data[key];
                         }
                     }
+                    if(!chkPhoto)
+                        this.userInfo['photo'] = null;
                 }
             })
             .catch(error => {

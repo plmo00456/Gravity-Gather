@@ -85,7 +85,12 @@
                 password_salt = #{password_salt},
             </if>
             <if test="photo != null">
-                photo = #{photo},
+                <if test='photo.equals("")'>
+                    photo = null,
+                </if>
+                <if test='!photo.equals("")'>
+                    photo = #{photo},
+                </if>
             </if>
             <if test="name != null">
                 name = #{name},

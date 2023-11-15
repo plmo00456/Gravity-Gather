@@ -56,7 +56,7 @@
       <form @submit.prevent="userUpdate">
         <div class="flex flex-col items-center p-5">
           <div class="flex w-[6rem] items-center h-[6rem] mb-3 justify-center relative cursor-pointer" >
-            <div v-if="myInfoValue.photo" @click="test" class="absolute -top-0 -right-0 bg-red-500 w-1/2 h-1/2 rounded flex justify-end items-start border border-gray-400 tooltip" data-tooltip="이미지 삭제">
+            <div v-if="myInfoValue.photo" @click="removeImage" class="absolute -top-0 -right-0 bg-red-500 w-1/2 h-1/2 rounded flex justify-end items-start border border-gray-400 tooltip" data-tooltip="이미지 삭제">
                 <font-awesome-icon class="p-1 text-white text-xs" icon="fa-regular fa-trash-can"/>
             </div>
             <div @click="uploadImage('profile-photo-input')" class="w-full h-full relative rounded-full overflow-hidden border-2 border-gray-400" @mouseover="profileImageHover = true" @mouseleave="profileImageHover = false">
@@ -69,7 +69,7 @@
               </div>
               <Transition>
                 <div v-if="profileImageHover" class="absolute rounded-b-full bottom-0 right-0 w-full h-2/5 text-white bg-gray-900 bg-opacity-40 flex justify-center items-start py-1">
-                  <span class="text-lg text-white">변경</span>
+                  <span class="text-lg text-white pr-3">변경</span>
                 </div>
               </Transition>
             </div>
@@ -326,7 +326,6 @@ export default {
       fileInput.click();
     },
     handleImageUpload(event) {
-      console.log(event.target);
       const self = this;
       if(event.target.files.length > 0){
         const reader = new FileReader();
@@ -335,7 +334,9 @@ export default {
         }
         reader.readAsDataURL(event.target.files[0]);
       }else{
-        this.myInfoValue.photo = this.user.photo ? (this.$env.protocol + this.$env.serverIP  + ':' + this.$env.port + this.user.photo) : this.user.photo;
+        if(this.myInfoValue.photo !== null){
+          this.myInfoValue.photo = this.user.photo ? (this.$env.protocol + this.$env.serverIP  + ':' + this.$env.port + this.user.photo) : this.user.photo;
+        }
       }
     },
     userUpdate() {
@@ -375,6 +376,11 @@ export default {
             if(profilePhotoInput.files && profilePhotoInput.files[0]){
                 formData.append('profileImage', profilePhotoInput.files[0]);
             }
+            if(this.myInfoValue.photo == null){
+                formData.append('isRemoveImage', true);
+            }
+
+
             if(this.myInfoValue.password != null){
                 formData.append('password', this.myInfoValue.password);
                 formData.append('newPassword', this.myInfoValue.newPassword);
@@ -405,8 +411,10 @@ export default {
       const trimmedValue = event.target.value.trim();
       _.set(this, path, trimmedValue);
     },
-    test(){
-        alert('ㅅㄷㄴㅅ');
+    removeImage(){
+        const profilePhotoInput =  document.querySelector('#profile-photo-input');
+        profilePhotoInput.value = null;
+        this.myInfoValue.photo = null;
     }
   }
 }

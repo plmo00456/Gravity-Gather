@@ -71,10 +71,15 @@ public class UserController {
     @PostMapping("/update")
     @ApiOperation(value = "유저 정보 변경 api")
     public ResponseEntity<?> userUpdate(UserRequest userRequest,
-                                        @RequestParam(name = "profileImage", required=false) MultipartFile imageFile) throws IOException {
+                                        @RequestParam(name = "profileImage", required=false) MultipartFile imageFile,
+                                        @RequestParam(name = "isRemoveImage", required=false, defaultValue = "false") Boolean isRemoveImage
+    ) throws IOException {
         if(imageFile != null && !imageFile.isEmpty()){
             FileVO file = fileUploadService.singleFileUpload(imageFile, "img/");
             userRequest.setPhoto(file.getUpload_path());
+        }
+        if(isRemoveImage){
+            userRequest.setPhoto("");
         }
 
         userService.userUpdate(userRequest);
