@@ -105,14 +105,40 @@
                         v-if="!participant.photo">{{ participant.nickname[0] }}</span>
                 </div>
                 <span>
-                          {{ participant.nickname }}
-                        </span>
+                  {{ participant.nickname }}
+                </span>
               </div>
               <font-awesome-icon v-if="roomInfo.ownerSeq == participant.seq"
                                  class="text-2xl text-yellow-300 mr-2" icon="fa-solid fa-crown"/>
             </div>
           </div>
         </div>
+        <div class="setting flex flex-col overflow-x-hidden overflow-y-auto h-[calc(100%-3rem)] pr-3"
+             v-if="rightCurrentTab === 'setting'">
+            <div class="absolute bg-white bg-opacity-40 w-full left-0 top-0 h-full p-5">
+                <div class="flex items-center content-center align-middle text-center">
+                    <span class="flex justify-end pr-3 font-bold w-2/6">채팅 알림 음 : </span>
+                    <div class="flex mb-2 w-4/6">
+                        <ToggleSwitch v-model="refSetting.isChatSound" :isLocked="false"
+                                      on-str="활성화"
+                                      off-str="비 활성화"
+                                      on-text-color="text-lime-200"
+                                      off-text-color="text-rose-600"></ToggleSwitch>
+                    </div>
+                </div>
+                <div class="flex items-center content-center align-middle text-center">
+                    <span class="flex justify-end pr-3 font-bold w-2/6">백그라운드 채팅 알림 음 : </span>
+                    <div class="flex mb-2 w-4/6">
+                        <ToggleSwitch v-model="refSetting.isBackgroundChatSound" :isLocked="false"
+                                      on-str="활성화"
+                                      off-str="비 활성화"
+                                      on-text-color="text-lime-200"
+                                      off-text-color="text-rose-600"></ToggleSwitch>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="absolute w-full left-0 bottom-0 bg-white h-10 text-xl">
           <ul class="flex text-black justify-around items-center h-full">
             <li class="flex justify-center px-3 py-1 cursor-pointer"
@@ -132,9 +158,9 @@
               <span class="text-sm px-2 slide-in hidden" v-if="rightCurrentTab === '3'">ss</span>
             </li>
             <li class="flex justify-center px-3 py-1 cursor-pointer"
-                :class="{'currentTab': rightCurrentTab==='4'}" @click="rightCurrentTab='4'">
+                :class="{'currentTab': rightCurrentTab==='setting'}" @click="rightCurrentTab='setting'">
               <font-awesome-icon icon="fa-ellipsis"/>
-              <span class="text-sm px-2 slide-in hidden" v-if="rightCurrentTab === '4'">dd</span>
+              <span class="text-sm px-2 slide-in hidden" v-if="rightCurrentTab === 'setting'">설정</span>
             </li>
           </ul>
         </div>
@@ -148,18 +174,23 @@ import {useUserStore} from "@/stores/user";
 import {getCurrentInstance, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {useRoomStore} from "@/stores/room";
-// import {useRoomStore} from "@/stores/room";
+import ToggleSwitch from "@/components/ToggleSwitch.vue";
 
 export default {
   name: "MeetRoomView",
-  components: {FontAwesomeIcon},
+  components: {ToggleSwitch, FontAwesomeIcon},
   data() {
     return {
-      isRightSlide: true,
+      // isRightSlide: true,
+      // rightCurrentTab: 'chat',
+      isRightSlide: false,
       rightCurrentTab: 'chat',
       chatMsg: '',
       characterRandomNum1: 1,
       characterRandomNum2: 1,
+      setting: {
+        isChatSound: true,
+      },
     }
   },
   setup() {
@@ -175,6 +206,11 @@ export default {
     let isNewChat = ref(false);
     let chatLogElement = ref(null);
     let mainWindowElement = ref(null);
+
+    const refSetting = ref({
+        isChatSound: true,
+        isBackgroundChatSound: true,
+    });
 
     // 채팅방 사용자 가져오기
     const getRoomParticipants = async () => {
@@ -285,7 +321,16 @@ export default {
             const chatElement = document.querySelector("#character-chat-" + data.senderSeq);
             const chatElementText = chatElement.querySelector("span");
             const seq = "seq" + data.senderSeq;
-            console.log(participantsCharacter);
+            const isChatSound = refSetting.value.isChatSound;
+            const isBackgroundChatSound = refSetting.value.isBackgroundChatSound;
+            if(isChatSound && data.senderSeq != user.seq){
+                if(!document.hidden || (isBackgroundChatSound && document.hidden)){
+                  instance.appContext.config.globalProperties.utils.chatSound.play();
+                }
+            }
+
+            // b on
+
             if (participantsCharacter[seq]) {
               clearTimeout(participantsCharacter[seq].timeoutFN);
             }
@@ -299,8 +344,6 @@ export default {
             participantsCharacter[seq].timeoutFN = setTimeout(function () {
               chatElement.classList.add("hidden");
             }, participantsCharacter.showTextMs);
-
-            console.log(chatElement);
           }
           chats.value.push(data);
         }
@@ -386,7 +429,8 @@ export default {
       scrollToBottom,
       getRoomParticipants,
       participants,
-      randomCharacterLocation
+      randomCharacterLocation,
+      refSetting
     };
   },
   created() {

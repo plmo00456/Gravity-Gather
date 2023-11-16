@@ -1,59 +1,53 @@
-<script>
-import {ref, watch} from "vue";
+<script setup>
 
-export default {
-  props: {
-    check: {
-      type: Boolean,
-      default: false
+import {computed} from "vue";
+
+const props = defineProps({
+    'modelValue': {
+        type: Boolean,
+        default: false,
     },
-    isLocked: {
-      type: Boolean,
-      default: false
+    'isLocked': {
+        type: Boolean,
+        default: false,
     },
-    onStr: {
-      type: String,
-      default: 'on',
+    'onStr': {
+        type: String,
+        default: 'ON',
     },
-    offStr: {
-      type: String,
-      default: 'off',
+    'offStr': {
+        type: String,
+        default: 'OFF',
     },
-    readOnly: {
-      type: Boolean,
-      default: false
+    'onTextColor': {
+        type: String,
+        default: 'text-green-600',
     },
-    clickAble:{
-      type: Boolean,
-      default: true
+    'offTextColor': {
+        type: String,
+        default: 'text-red-400',
     }
-  },
-  setup(props) {
-    const chkStr = ref(props.check);
-
-    watch(
-        () => props.check,
-        (newCheckValue) => {
-          chkStr.value = newCheckValue;
-        }
-    );
-
-    return {
-      chkStr
+});
+const emit = defineEmits(['update:modelValue']);
+const value = computed({
+    get() {
+        return props.modelValue
+    },
+    set(value) {
+        emit('update:modelValue', value)
     }
-  },
-};
+})
 </script>
 
 <template>
-  <div class="flex text-left items-start h-10 mt-2 items-center">
+  <div class="flex text-left h-10 mt-2 items-center">
     <label class="flex switch px-2 mr-7 scale-150">
-      <input type="checkbox" :checked="check" @change="chkStr = $event.target.checked">
+      <input type="checkbox" v-model="value">
       <span>
         <em v-if="isLocked"></em>
       </span>
     </label>
-    <strong class="text-lg" :class="{'text-green-600': chkStr, 'text-red-400': !chkStr}">{{ chkStr ? onStr : offStr }}</strong>
+    <strong class="text-lg" :class="[modelValue ? onTextColor : offTextColor]">{{ modelValue ? onStr : offStr }}</strong>
   </div>
 </template>
 
