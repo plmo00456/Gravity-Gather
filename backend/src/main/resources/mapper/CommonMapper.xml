@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wooreal.gravitygather.mapper.CommonMapper">
+
+    <select id="getAlarm">
+        SELECT
+            A.seq,
+            A.receive_seq,
+            A.sender_seq,
+            B.nickname as sender_nickname,
+            B.photo as sender_photo,
+            A.msg,
+            A.is_check,
+            A.dte_cde_val,
+            getCdeNm('A01', dte_cde_val) as dte_cde_nm,
+            A.cont_seq,
+            A.create_at
+        FROM alarms A
+        LEFT JOIN users B
+        ON sender_seq = B.seq
+        WHERE
+            A.receive_seq = #{userId}
+        ORDER BY A.create_at DESC
+    </select>
+
+    <update id="readAlarm">
+        UPDATE alarms SET
+            is_check = true
+        WHERE
+            receive_seq = #{userId}
+        <if test="alarmSeq != 0">
+            AND seq <![CDATA[<=]]> #{alarmSeq}
+        </if>
+    </update>
+</mapper>

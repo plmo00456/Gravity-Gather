@@ -63,6 +63,14 @@ public class RoomController {
         return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 
+    // 인증
+    @PostMapping("/{roomId}/delete")
+    @ApiOperation(value = "방 삭제 api")
+    public ResponseEntity<?> deleteRoom(@PathVariable("roomId") int roomId) {
+        roomService.deleteRoom(roomId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/test")
     public void test(@RequestParam String test) throws IOException {
         String salt = SHA256Util.generateSalt();

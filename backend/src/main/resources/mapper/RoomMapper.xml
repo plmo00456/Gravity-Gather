@@ -139,6 +139,13 @@
         WHERE seq = #{seq}
     </update>
 
+    <update id="deleteRoom">
+        UPDATE rooms SET
+            is_delete = true
+        WHERE
+            seq = #{seq}
+    </update>
+
     <insert id="insChatLog">
         INSERT INTO chatlog
         (

@@ -23,5 +23,7 @@ public interface RoomMapper {
 
     int updateRoom(RoomRequest roomRequest);
 
+    int deleteRoom(int roomId);
+
     void insChatLog(ChatLog cl);
 }

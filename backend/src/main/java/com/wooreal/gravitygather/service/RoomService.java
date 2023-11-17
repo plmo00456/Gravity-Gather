@@ -87,6 +87,13 @@ public class RoomService {
         return roomMapper.leaveRoom(roomRequest);
     }
 
+    public void deleteRoom(int roomId){
+        int result = roomMapper.deleteRoom(roomId);
+        if(result == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
+    }
+
     public List<UserResponse> getRoomParticipants(int roomId){
         Map<String, Set<RoomSession>> rooms = webSocketHandler.getMeetrooms();
         Set<RoomSession> roomSession = rooms.get(roomId+"");

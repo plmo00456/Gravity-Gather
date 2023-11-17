@@ -22,6 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(fileMappingDir + "**")
                 .addResourceLocations("file:///" + fileUploadDir.replace("\\", "/"));
+        System.out.println("file:///" + fileUploadDir.replace("\\", "/"));
     }
 
     @Bean
