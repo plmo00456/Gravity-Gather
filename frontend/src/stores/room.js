@@ -77,6 +77,22 @@ export const useRoomStore = defineStore({
                 console.log(error);
                 this.dataResponse = error.response;
             });
+        },
+        async deleteRoom(roomId) {
+            return http.post('/room/'+roomId+'/delete', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.dataResponse = error.response;
+                });
         }
     }
 })

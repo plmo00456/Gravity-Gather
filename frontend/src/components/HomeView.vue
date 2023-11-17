@@ -43,7 +43,7 @@
             <button class="px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-2" type="submit">확인</button>
             <button class="px-5 py-2 bg-gray-500 rounded text-sm hover:bg-gray-400 ml-2" type="button"
                     @click="slideShow = false">취소
-            </button>소
+            </button>
           </p>
         </form>
       </div>
@@ -143,7 +143,6 @@
       </div>
 
     </div>
-    <div @click="test" class="text-white cursor-pointer">테스트</div>
     <div v-if="currentPasswordRoom.show" @click.self="noEnterPasswordRoom"
          class="w-full h-full absolute left-0 top-0 bg-black bg-opacity-40 cursor-pointer">
       <div
@@ -362,7 +361,6 @@ export default {
           }
           await roomStore.createRoom(roomInfo);
           this.dataResponse = roomStore.dataResponse;
-          console.log(this.dataResponse);
           if (this?.dataResponse?.status === 200) {
             this.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
           } else {
@@ -389,7 +387,7 @@ export default {
           const roomInfo = this.dataResponse.data;
           this.$router.push({
             name: 'room',
-            state: {test: 1, roomInfo: JSON.stringify(roomInfo)},
+            state: {roomInfo: JSON.stringify(roomInfo)},
             params: {id: roomInfo.seq}
           });
         }
@@ -423,7 +421,7 @@ export default {
           const roomInfo = this.dataResponse.data;
           this.$router.push({
             name: 'room',
-            state: {test: 1, roomInfo: JSON.stringify(roomInfo)},
+            state: {roomInfo: JSON.stringify(roomInfo)},
             params: {id: roomInfo.seq}
           });
         }
@@ -449,10 +447,6 @@ export default {
         password: null,
       }
     },
-    test() {
-      const userStore = useUserStore();
-      userStore.userInfoStateUpdate(this.user.seq);
-    }
   },
 }
 </script>

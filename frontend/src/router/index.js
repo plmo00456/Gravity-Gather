@@ -4,6 +4,7 @@ import userLogin from "@/components/UserLogin.vue";
 import userEmailVerify from "@/components/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
 import meetRoomView from "@/components/MeetRoomView.vue";
+import {useCommonStore} from "@/stores/common";
 
 const routes = [
     {
@@ -76,11 +77,23 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    // 이동할 경로가 메타 타이틀을 가지고 있다면,
+    // 브라우저 타이틀 지정
     if (to.meta && to.meta.title) {
         document.title = to.meta.title;
     } else {
         document.title = '끌림';
+    }
+
+    // 화면 이동 시 알림 가져옴
+    const user = useUserStore();
+    if (!to.meta.hideMenu && user.userInfo != null) {
+        const common = useCommonStore();
+        try{
+            common.getAlarm(user.userInfo.seq);
+            console.log(common.alarmList);
+        }catch (e){
+            console.error(e);
+        }
     }
 
     next();

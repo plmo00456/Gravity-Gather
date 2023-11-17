@@ -115,28 +115,41 @@
         </div>
         <div class="setting flex flex-col overflow-x-hidden overflow-y-auto h-[calc(100%-3rem)] pr-3"
              v-if="rightCurrentTab === 'setting'">
-            <div class="absolute bg-white bg-opacity-40 w-full left-0 top-0 h-full p-5">
-                <div class="flex items-center content-center align-middle text-center">
-                    <span class="flex justify-end pr-3 font-bold w-2/6">채팅 알림 음 : </span>
-                    <div class="flex mb-2 w-4/6">
-                        <ToggleSwitch v-model="refSetting.isChatSound" :isLocked="false"
-                                      on-str="활성화"
-                                      off-str="비 활성화"
-                                      on-text-color="text-lime-200"
-                                      off-text-color="text-rose-600"></ToggleSwitch>
-                    </div>
+          <div class="absolute bg-white bg-opacity-40 w-full left-0 top-0 h-full p-5">
+            <div class="h-5/6">
+              <div class="flex items-center content-center text-center">
+                <span class="flex justify-end pr-3 font-bold w-3/6">채팅 알림 음 : </span>
+                <div class="flex mb-2 w-3/6">
+                  <ToggleSwitch v-model="refSetting.isChatSound" :isLocked="false"
+                                on-str="활성화"
+                                off-str="비 활성화"
+                                on-text-color="text-lime-200"
+                                off-text-color="text-rose-600"></ToggleSwitch>
                 </div>
-                <div class="flex items-center content-center align-middle text-center">
-                    <span class="flex justify-end pr-3 font-bold w-2/6">백그라운드 채팅 알림 음 : </span>
-                    <div class="flex mb-2 w-4/6">
-                        <ToggleSwitch v-model="refSetting.isBackgroundChatSound" :isLocked="false"
-                                      on-str="활성화"
-                                      off-str="비 활성화"
-                                      on-text-color="text-lime-200"
-                                      off-text-color="text-rose-600"></ToggleSwitch>
-                    </div>
+              </div>
+              <div class="flex items-center content-center text-center">
+                <span class="flex justify-end pr-3 font-bold w-3/6">백그라운드 채팅 알림 음 : </span>
+                <div class="flex mb-2 w-3/6">
+                  <ToggleSwitch v-model="refSetting.isBackgroundChatSound" :isLocked="false"
+                                on-str="활성화"
+                                off-str="비 활성화"
+                                on-text-color="text-lime-200"
+                                off-text-color="text-rose-600"></ToggleSwitch>
                 </div>
+              </div>
             </div>
+            <div class="h-1/6 flex justify-end">
+              <div class="flex justify-end items-center content-center">
+              <span class="flex justify-end pr-3 font-bold w-full">
+                <button type="button"
+                        class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2" @click="deleteRoom">
+                  <font-awesome-icon class="text-xl mr-2" icon="fa-solid fa-trash-can"></font-awesome-icon>
+                  미팅 방 삭제하기
+                </button>
+              </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="absolute w-full left-0 bottom-0 bg-white h-10 text-xl">
@@ -181,9 +194,7 @@ export default {
   components: {ToggleSwitch, FontAwesomeIcon},
   data() {
     return {
-      // isRightSlide: true,
-      // rightCurrentTab: 'chat',
-      isRightSlide: false,
+      isRightSlide: true,
       rightCurrentTab: 'chat',
       chatMsg: '',
       characterRandomNum1: 1,
@@ -438,6 +449,34 @@ export default {
       this.characterRandomNum2 = this.randomNumber(1, 2);
   },
   methods: {
+    deleteRoom() {
+      this.$swal.fire({
+        title: "미팅 방을 삭제하시겠습니까?",
+        showCancelButton: true,
+        confirmButtonText: "확인",
+        cancelButtonText: "취소",
+        icon: "warning",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const roomStore = useRoomStore();
+          try {
+            await roomStore.deleteRoom(this.roomInfo.seq);
+            if (roomStore?.dataResponse.status === 200) {
+              this.utils.notify.success("미팅 방이 삭제되었습니다.", "삭제 완료!");
+              this.$router.push({
+                name: 'MainView',
+              });
+            } else {
+              this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+            }
+          } catch (error) {
+            this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+          }
+        }
+      }).catch((error) => {
+        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+      });
+    },
     chatSend() {
       if (this.chatMsg !== '') {
         this.chatSocketSend('chat', this.chatMsg);

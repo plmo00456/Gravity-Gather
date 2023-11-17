@@ -1,7 +1,7 @@
 <template>
   <div id="nav-view" class="nav-wrap flex justify-center z-10" v-if="user">
     <div class="flex justify-start w-4/6 items-center">
-      <div class="flex w-5/6 items-center">
+      <div class="flex w-4/6 items-center">
         <router-link to="/" class="cursor-pointer">
           <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
         </router-link>
@@ -13,37 +13,81 @@
           <li class="hover:text-gray-200">메뉴3</li>
         </ul>
       </div>
-      <div class="flex w-fit p-3 text-white justify-end items-center cursor-pointer z-10 h-full" @click="profileClick" id="profile-wrap">
-        <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
-          <img class="w-full h-full object-cover bg-white"
-               :src="`${$env.protocol}${$env.serverIP}:${$env.port}${user.photo}`"
-               alt="프로필 사진" v-if="user.photo">
-          <div v-if="!user.photo"
-               class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
-            <span v-if="user.nickname">{{ user.nickname[0] }}</span>
-            <span v-if="!user.nickname">{{ user.name[0] }}</span>
+      <div class="flex w-2/6 h-full justify-end">
+        <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full">
+          <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400" icon="fa-regular fa-bookmark"></font-awesome-icon>
+          <span :class="{'animate-bounce': (alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !topSetting.firstAlarmClick}" class="flex items-center relative" @click="alarmClick" id="alarm-wrap">
+            <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400" icon="fa-regular fa-bell"/>
+            <b v-if="(alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !topSetting.firstAlarmClick" class="absolute right-2.5 top-3.5 w-2 h-2 rounded-full bg-red-500"></b>
+          </span>
+        </div>
+        <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full" @click="profileClick" id="profile-wrap">
+          <div class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500">
+            <img class="w-full h-full object-cover bg-white"
+                 :src="`${$env.protocol}${$env.serverIP}:${$env.port}${user.photo}`"
+                 alt="프로필 사진" v-if="user.photo">
+            <div v-if="!user.photo"
+                 class="w-full h-full flex justify-center items-center font-bold text-xl bg-green-700 text-white">
+              <span v-if="user.nickname">{{ user.nickname[0] }}</span>
+              <span v-if="!user.nickname">{{ user.name[0] }}</span>
+            </div>
           </div>
+          <div class="flex">
+            {{ user.nickname }}
+          </div>
+
+          <!--    알림 컨텍스트 메뉴      -->
+          <context-menu
+              v-model:show="topSetting.isAlarmClick"
+              :options="topSetting.alarmContextOption"
+          >
+            <div class="px-3 h-[25rem]">
+              <div class="border-b-2 h-[2rem] flex">
+                <span class="text-black font-bold">알림</span>
+              </div>
+              <div class="h-[calc(100%-2rem)] flex flex-col">
+
+                <div v-for="alarm in alarmList" :key="alarm.seq"
+                     :class="{'text-black': !alarm.is_check, 'text-gray-400': alarm.is_check}"
+                     class="flex px-2 py-4 hover:bg-gray-300 w-full max-h-[5rem] border-b border-gray-400 border-opacity-10 cursor-pointer">
+                  <div class="flex justify-center items-center pr-2 w-[3rem]">
+                    <div class="w-7 h-7 rounded-full relative">
+                      <img class="w-full h-full object-cover rounded-full"
+                           :src="`${$env.protocol}${$env.serverIP}:${$env.port}${alarm.sender_photo}`"
+                           alt="프로필 사진" v-if="alarm.sender_photo">
+                      <div v-if="!alarm.is_check" class="absolute w-2 h-2 bg-red-500 rounded-full right-0 top-0 animate-bounce"></div>
+                    </div>
+                  </div>
+                  <div class="w-[25rem]">{{alarm.msg}}</div>
+                  <div class="flex justify-center w-1/6">
+                    {{ this.utils.timeAgoStr(alarm.create_at) }}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </context-menu>
+
+          <!--    내 정보 컨텍스트 메뉴      -->
+          <context-menu
+              v-model:show="topSetting.isProfileClick"
+              :options="topSetting.profileContextOption"
+              theme="mac"
+          >
+            <context-menu-item label="내 정보 관리" @click="myInfoShowFn" class="cursor-pointer">
+              <template #icon>
+                <font-awesome-icon class="fa-md font-bold text-gray-600" icon="fa-user"></font-awesome-icon>
+              </template>
+            </context-menu-item>
+            <context-menu-separator/>
+            <context-menu-item label="로그아웃" @click="logout()" class="cursor-pointer">
+              <template #icon>
+                <font-awesome-icon class="fa-md font-bold text-gray-600"
+                                   icon="arrow-right-from-bracket"></font-awesome-icon>
+              </template>
+            </context-menu-item>
+          </context-menu>
         </div>
-        <div class="flex">
-          {{ user.nickname }}
-        </div>
-        <context-menu
-            v-model:show="isProfileClick"
-            :options="profileContextOption"
-        >
-          <context-menu-item label="내 정보 관리" @click="myInfoShowFn" class="cursor-pointer">
-            <template #icon>
-              <font-awesome-icon class="fa-md font-bold text-gray-600" icon="fa-user"></font-awesome-icon>
-            </template>
-          </context-menu-item>
-          <context-menu-separator/>
-          <context-menu-item label="로그아웃" @click="logout()" class="cursor-pointer">
-            <template #icon>
-              <font-awesome-icon class="fa-md font-bold text-gray-600"
-                                 icon="arrow-right-from-bracket"></font-awesome-icon>
-            </template>
-          </context-menu-item>
-        </context-menu>
       </div>
     </div>
     <PopupWindow
@@ -221,17 +265,26 @@ import {router} from "@/router";
 import PopupWindow from "@/components/PopupWindow.vue";
 import Multiselect from 'vue-multiselect'
 import _ from 'lodash';
-import {nextTick} from "vue";
+import {nextTick, ref, watch} from "vue";
+import {useCommonStore} from "@/stores/common";
 
 export default {
   name: "NavView",
   components: {PopupWindow, ContextMenuSeparator, ContextMenuItem, ContextMenu, Multiselect,},
   data() {
     return {
-      isProfileClick: false,
-      profileContextOption: {
-        zIndex: 3,
-        minWidth: 230,
+      topSetting: {
+        isAlarmClick: false,
+        firstAlarmClick: false,
+        alarmContextOption: {
+          zIndex: 3,
+          minWidth: 400,
+        },
+        isProfileClick: false,
+        profileContextOption: {
+          zIndex: 3,
+          minWidth: 230,
+        },
       },
       myInfoShow: false,
       profileImageHover: false,
@@ -274,22 +327,43 @@ export default {
     const userStore = useUserStore();
     const user = userStore.userInfo;
 
+    const commonStore = useCommonStore();
+    const alarmList = ref(commonStore.alarmList);
+
     if (user == null) {
       router.push({
         name: 'LoginView',
       });
     }
 
+    watch(() => commonStore.alarmList, (newVal) => {
+      alarmList.value = newVal;
+    });
+
     return {
-      userStore, user
+      userStore, user, alarmList
     };
   },
   methods: {
+    alarmClick(e) {
+      this.topSetting.firstAlarmClick = true;
+      
+      const rect = e.target.closest("#alarm-wrap").getBoundingClientRect();
+      this.topSetting.isAlarmClick = !this.topSetting.isAlarmClick;
+      this.topSetting.alarmContextOption.x = rect.left;
+      this.topSetting.alarmContextOption.y = rect.top + rect.height + 10;
+
+      const commonStore = useCommonStore();
+      if(this.alarmList && this.alarmList.length > 0)
+        commonStore.readAlarm(this.user.seq, this.alarmList[0].seq);
+      else
+        commonStore.readAlarm(this.user.seq);
+    },
     profileClick(e) {
       const rect = e.target.closest("#profile-wrap").getBoundingClientRect();
-      this.isProfileClick = !this.isProfileClick;
-      this.profileContextOption.x = rect.left;
-      this.profileContextOption.y = rect.top + rect.height + 10;
+      this.topSetting.isProfileClick = !this.topSetting.isProfileClick;
+      this.topSetting.profileContextOption.x = rect.left;
+      this.topSetting.profileContextOption.y = rect.top + rect.height + 10;
     },
     logout() {
       const userStore = useUserStore();
