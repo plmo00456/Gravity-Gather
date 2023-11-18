@@ -36,8 +36,8 @@ public class CommonController {
     @PostMapping("/alarm/read/{userId}")
     @ApiOperation(value = "알람 읽음처리 api")
     public ResponseEntity<?> readAlarm(@PathVariable("userId") int userId
-            , @RequestParam(name="lastSeq", required = false, defaultValue = "0") int alarmSeq) {
-        commonService.readAlarm(userId, alarmSeq);
+            , @RequestBody(required = false) Alarm alarm) {
+        commonService.readAlarm(userId, alarm == null ? 0 : alarm.getSeq());
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
