@@ -1,5 +1,6 @@
 <template>
   <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover">
+      <button class="text-white text-xl" @click="test()">테스트</button>
     <slideWindow :show="slideShow" @close="slideShow = false" :title="'미팅 생성하기'">
       <div v-if="currentWindow === 'createRoom'">
         <form @submit.prevent="createRoom">
@@ -176,7 +177,6 @@
         </form>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -188,6 +188,7 @@ import slideWindow from "@/components/SlideWindow.vue";
 import Multiselect from 'vue-multiselect'
 import ToggleSwitch from "@/components/ToggleSwitch.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {router} from "@/router";
 
 export default {
   name: 'MainView',
@@ -447,6 +448,11 @@ export default {
         password: null,
       }
     },
+      test(){
+          router.push({
+              name: 'writeView',
+          });
+      }
   },
 }
 </script>

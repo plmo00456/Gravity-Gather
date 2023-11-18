@@ -5,6 +5,7 @@ import userEmailVerify from "@/components/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
 import meetRoomView from "@/components/MeetRoomView.vue";
 import {useCommonStore} from "@/stores/common";
+import writeView from "@/components/WriteView.vue";
 
 const routes = [
     {
@@ -58,6 +59,14 @@ const routes = [
                 next();
             }
         },
+    },
+    {
+        path: '/write',
+        name: 'writeView',
+        meta: {
+            title: '글쓰기',
+        },
+        component: writeView,
     },
     {
         path: '/room/:id',

@@ -25,7 +25,10 @@ export const useCommonStore = defineStore({
             });
         },
         async readAlarm(userId, alarmSeq){
-            return http.post(`/common/alarm/read/`+userId, alarmSeq, {
+            const data = {
+                'seq' : alarmSeq,
+            }
+            return http.post(`/common/alarm/read/`+userId, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -16,9 +16,9 @@
       <div class="flex w-2/6 h-full justify-end">
         <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full">
           <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400" icon="fa-regular fa-bookmark"></font-awesome-icon>
-          <span :class="{'animate-bounce': (alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !topSetting.firstAlarmClick}" class="flex items-center relative" @click="alarmClick" id="alarm-wrap">
+          <span :class="{'animate-bounce': (alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick}" class="flex items-center relative" @click="alarmClick" id="alarm-wrap">
             <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400" icon="fa-regular fa-bell"/>
-            <b v-if="(alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !topSetting.firstAlarmClick" class="absolute right-2.5 top-3.5 w-2 h-2 rounded-full bg-red-500"></b>
+            <b v-if="(alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick" class="absolute right-2.5 top-3.5 w-2 h-2 rounded-full bg-red-500"></b>
           </span>
         </div>
         <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full" @click="profileClick" id="profile-wrap">
@@ -275,7 +275,6 @@ export default {
     return {
       topSetting: {
         isAlarmClick: false,
-        firstAlarmClick: false,
         alarmContextOption: {
           zIndex: 3,
           minWidth: 400,
@@ -330,6 +329,8 @@ export default {
     const commonStore = useCommonStore();
     const alarmList = ref(commonStore.alarmList);
 
+    const firstClick = ref(false);
+
     if (user == null) {
       router.push({
         name: 'LoginView',
@@ -338,15 +339,16 @@ export default {
 
     watch(() => commonStore.alarmList, (newVal) => {
       alarmList.value = newVal;
+      firstClick.value = false;
     });
 
     return {
-      userStore, user, alarmList
+      userStore, user, alarmList, firstClick
     };
   },
   methods: {
     alarmClick(e) {
-      this.topSetting.firstAlarmClick = true;
+      this.firstClick = true;
       
       const rect = e.target.closest("#alarm-wrap").getBoundingClientRect();
       this.topSetting.isAlarmClick = !this.topSetting.isAlarmClick;
