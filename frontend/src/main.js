@@ -17,6 +17,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 import '@/styles.css';
 import "@/assets/css/font.css";
+
 // import '@s-r0/eggy-js/build/css/eggy.css';
 // import '@s-r0/eggy-js/build/css/progressbar.css';
 // import '@s-r0/eggy-js/build/css/theme.css';

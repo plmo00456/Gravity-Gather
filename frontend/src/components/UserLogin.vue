@@ -50,8 +50,8 @@ import {useUserStore} from '@/stores/user';
 export default {
     data() {
         return {
-            id: '',
-            password: '',
+            id: 'id',
+            password: 'qwe',
             idFocused: false,
             passwordFocused: false,
             showError: false,

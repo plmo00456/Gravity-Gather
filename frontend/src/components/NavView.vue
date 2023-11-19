@@ -349,7 +349,7 @@ export default {
   methods: {
     alarmClick(e) {
       this.firstClick = true;
-      
+
       const rect = e.target.closest("#alarm-wrap").getBoundingClientRect();
       this.topSetting.isAlarmClick = !this.topSetting.isAlarmClick;
       this.topSetting.alarmContextOption.x = rect.left;

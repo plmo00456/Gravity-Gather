@@ -1,11 +1,38 @@
 <template>
     <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover text-black">
         <div class="flex w-4/6 h-full text-white py-10 justify-between">
-            <div class="w-1/6">
-
-            </div>
-            <div class="w-5/6">
-                <div id="editor" v-cloak></div>
+            <div class="flex h-full flex-col w-full">
+              <div class="h-[4.5rem] flex flex-col items-start w-full mb-2">
+                <span class="text-lg">주제</span>
+                <Multiselect
+                    v-model="topicValue"
+                    label="name"
+                    :searchable="false"
+                    :close-on-select="true"
+                    :allow-empty="false"
+                    :multiple="false"
+                    :options="topic"
+                />
+              </div>
+              <div class="h-[4.5rem] flex flex-col items-start w-full mb-3">
+                <span class="text-lg">제목</span>
+                <input
+                    placeholder="제목을 입력해주세요."
+                    class="rounded text-black px-3 py-1.5 text-xl border-b-gray-300 w-full "
+                    type="text">
+              </div>
+              <div class="h-[calc(100%-14rem)] mb-2">
+                <writeEditor v-model="content"/>
+              </div>
+              <div class="h-[3rem] self-end ">
+                <button class="px-7 py-3 bg-gray-500 rounded text-sm hover:bg-gray-400 mr-3" type="button"
+                        @click="slideShow = false">취소
+                </button>
+                <button class="px-7 py-3 bg-blue-600 rounded text-sm hover:bg-blue-500" type="button"
+                        @click="openSlide('createRoom')">
+                  <span class="">등록</span>
+                </button>
+              </div>
             </div>
         </div>
     </div>
@@ -13,43 +40,38 @@
 
 
 <script>
-import { onMounted, ref} from 'vue';
-import Editor from '@toast-ui/editor';
+import writeEditor from "@/components/WriteEditor.vue";
+import Multiselect from "vue-multiselect";
+import {ref} from "vue";
 
 export default {
-    setup() {
-        const editor = ref(null);
-        const editorValid = ref(null);
-        const templateValue = ref("");
-
-        onMounted(async () => {
-            await import("@toast-ui/editor/dist/toastui-editor.css");
-            await import("@toast-ui/editor/dist/theme/toastui-editor-dark.css");
-
-            editor.value = new Editor({
-                el: document.querySelector("#editor"),
-                height: "100%",
-                initialValue: templateValue.value,
-                initialEditType: "markdown",
-                language: "ko-KR",
-                autofocus: true,
-                theme: 'dark'
-            });
-        });
-
-        return { editor, editorValid, templateValue };
+    components: {
+      Multiselect,
+      writeEditor
     },
+    data() {
+      return {
+        topicValue: {name: '기술', topicValue: 1},
+        topic: [
+          {name: '기술', topicValue: 1},
+          {name: '커리어', topicValue: 2},
+          {name: '기타', topicValue: 3},
+        ]
+      }
+    },
+    setup() {
+      const content = ref('');
+      return {
+        content
+      }
+    }
 };
 </script>
 
-<style
->
+<style>
 #main-view {
     height: 93%;
 }
 
-[v-cloak] {
-    display: none;
-}
-
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>

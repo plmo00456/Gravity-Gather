@@ -1,0 +1,141 @@
+<template>
+  <div class="flex flex-col h-full bg-gray-700 rounded ">
+    <quill-editor
+        v-model:content="content"
+        contentType="html"
+        class="bg-gray-800"
+        :modules="modules"
+        theme="snow"
+        toolbar="#toolbar">
+      <template #toolbar>
+        <div id="toolbar" class="flex">
+        <span class="ql-formats">
+          <select class="ql-size">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+            <option value="huge">Huge</option>
+          </select>
+          <select class="ql-header">
+            <option value="1">Header 1</option>
+            <option value="2">Header 2</option>
+            <option value="3">Header 3</option>
+            <option value="4">Header 4</option>
+            <option value="5">Header 5</option>
+            <option value="6">Header 6</option>
+          </select>
+        </span>
+          <span class="ql-formats">
+            <button class="ql-bold"/>
+            <button class="ql-italic"/>
+            <button class="ql-underline"/>
+            <button class="ql-strike"/>
+            <button class="ql-blockquote"/>
+          </span>
+          <span class="ql-formats">
+          <select class="ql-color"/>
+          <select class="ql-background"/>
+        </span>
+          <span class="ql-formats">
+          <button class="ql-image"/>
+          <button class="ql-video"/>
+        </span>
+          <span class="ql-formats">
+          <button class="ql-clean"/>
+        </span>
+        </div>
+      </template>
+    </quill-editor>
+  </div>
+</template>
+
+<script>
+import {QuillEditor} from "@vueup/vue-quill";
+
+import ("@vueup/vue-quill/dist/vue-quill.snow.css")
+import BlotFormatter from 'quill-blot-formatter'
+import {ImageDrop} from 'quill-image-drop-module';
+import { ref, watch} from "vue";
+// import ImageCompress from 'quill-image-compress';
+
+export default {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  components: {QuillEditor},
+  setup(props, { emit }) {
+    const content = ref(props.modelValue);
+
+    watch(content, newContent => {
+      emit('update:modelValue', newContent);
+    });
+
+
+    const modules = [
+      {
+        name: 'blotFormatter',
+        module: BlotFormatter,
+        options: {/* options */}
+      },
+      {
+        name: 'imageDrop',
+        module: ImageDrop,
+        options: {/* options */}
+      },
+      // {
+      //   name: 'imageCompress',
+      //   module: ImageCompress,
+      //   options: {
+      //     imageType: 'image/png',
+      //   }
+      // },
+    ]
+
+    return {
+      modules, content
+    }
+  },
+  methods: {
+    submit() {
+      this.$emit('submit', this.value);
+    },
+  },
+}
+</script>
+
+<style>
+.ql-toolbar,
+.ql-container{
+  border:none !important;
+  border-left: 1px solid #68696a !important;
+  border-right: 1px solid #68696a !important;
+}
+
+.ql-toolbar {
+  border: 1px solid #68696a !important;
+  border-radius: 3px 3px 0 0;
+}
+
+.ql-container {
+  border-bottom: 1px solid #68696a !important;
+  border-radius: 0 0 3px 3px;
+}
+
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #fff !important;
+}
+
+.ql-toolbar .ql-fill {
+  fill: #fff !important;
+  stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+  color: #fff !important;
+  background: #626262 !important;
+}
+
+.ql-toolbar .ql-picker .ql-picker-options{
+  background: #747474;
+}
+</style>

@@ -6,6 +6,7 @@ import {useUserStore} from "@/stores/user";
 import meetRoomView from "@/components/MeetRoomView.vue";
 import {useCommonStore} from "@/stores/common";
 import writeView from "@/components/WriteView.vue";
+import scheduleView from "@/components/ScheduleView.vue";
 
 const routes = [
     {
@@ -76,7 +77,16 @@ const routes = [
             hideMenu: false,
         },
         component: meetRoomView,
-    }
+    },
+    {
+        path: '/schedule',
+        name: 'scheduleView',
+        meta: {
+            title: '일정',
+        },
+        component: scheduleView,
+    },
+
 ]
 
 
