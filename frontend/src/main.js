@@ -10,6 +10,10 @@ import 'tippy.js/dist/tippy.css';
 import { Eggy } from '@s-r0/eggy-js';
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import 'dayjs/locale/ko'
+import langKR from 'element-plus/dist/locale/ko'
 
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
@@ -176,6 +180,7 @@ async function init(){
     app.use(createPinia())
         .use(router)
         .use(ContextMenu)
+        .use(ElementPlus, { size: 'small', zIndex: 3000, locale: langKR, })
         .component('font-awesome-icon', FontAwesomeIcon)
         .mount('#app');
 }
