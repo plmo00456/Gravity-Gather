@@ -13,11 +13,11 @@ const props = defineProps({
     },
     'onStr': {
         type: String,
-        default: 'ON',
+        default: '',
     },
     'offStr': {
         type: String,
-        default: 'OFF',
+        default: '',
     },
     'onTextColor': {
         type: String,
@@ -26,7 +26,11 @@ const props = defineProps({
     'offTextColor': {
         type: String,
         default: 'text-red-400',
-    }
+    },
+    'size': {
+        type: String,
+        default: 'md',
+    },
 });
 const emit = defineEmits(['update:modelValue']);
 const value = computed({
@@ -40,8 +44,8 @@ const value = computed({
 </script>
 
 <template>
-  <div class="flex text-left h-10 mt-2 items-center">
-    <label class="flex switch px-2 mr-7 scale-150">
+  <div class="flex text-left items-center" :class="{'h-10': size === 'lg'}">
+    <label class="flex switch px-2 mr-7" :class="{'scale-150': size === 'lg'}">
       <input type="checkbox" v-model="value">
       <span>
         <em v-if="isLocked"></em>

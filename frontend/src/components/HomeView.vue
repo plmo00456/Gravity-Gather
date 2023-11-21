@@ -33,8 +33,7 @@
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>비밀번호 여부</span>
-            <ToggleSwitch v-model="toggleState" :isLocked="true" on-str="잠금" off-str="잠금 해제"
-                          :readOnly="true"></ToggleSwitch>
+            <ToggleSwitch v-model="toggleState" :isLocked="true" on-str="잠금" off-str="잠금 해제" size="lg"></ToggleSwitch>
           </p>
           <p class="flex flex-col text-left mb-5">
             <span>비밀번호</span>

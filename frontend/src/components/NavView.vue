@@ -276,7 +276,7 @@ export default {
       topSetting: {
         isAlarmClick: false,
         alarmContextOption: {
-          zIndex: 3,
+          zIndex: 10,
           minWidth: 400,
         },
         isProfileClick: false,

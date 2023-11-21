@@ -117,9 +117,9 @@
              v-if="rightCurrentTab === 'setting'">
           <div class="absolute bg-white bg-opacity-40 w-full left-0 top-0 h-full p-5">
             <div class="h-5/6">
-              <div class="flex items-center content-center text-center">
+              <div class="flex items-center content-center text-center mb-2">
                 <span class="flex justify-end pr-3 font-bold w-3/6">채팅 알림 음 : </span>
-                <div class="flex mb-2 w-3/6">
+                <div class="flex w-3/6">
                   <ToggleSwitch v-model="refSetting.isChatSound" :isLocked="false"
                                 on-str="활성화"
                                 off-str="비 활성화"
@@ -127,9 +127,9 @@
                                 off-text-color="text-rose-600"></ToggleSwitch>
                 </div>
               </div>
-              <div class="flex items-center content-center text-center">
+              <div class="flex items-center content-center text-center mb-2">
                 <span class="flex justify-end pr-3 font-bold w-3/6">백그라운드 채팅 알림 음 : </span>
-                <div class="flex mb-2 w-3/6">
+                <div class="flex w-3/6">
                   <ToggleSwitch v-model="refSetting.isBackgroundChatSound" :isLocked="false"
                                 on-str="활성화"
                                 off-str="비 활성화"

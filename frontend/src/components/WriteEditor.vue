@@ -1,9 +1,10 @@
 <template>
-  <div class="flex flex-col h-full bg-gray-700 rounded ">
+  <div class="flex flex-col h-full bg-white dark:bg-slate-800 rounded ">
     <quill-editor
+        ref="editor"
         v-model:content="content"
         contentType="html"
-        class="bg-gray-800"
+        class="dark:bg-gray-800 text-black dark:text-white"
         :modules="modules"
         theme="snow"
         toolbar="#toolbar">
@@ -55,7 +56,7 @@ import {QuillEditor} from "@vueup/vue-quill";
 import ("@vueup/vue-quill/dist/vue-quill.snow.css")
 import BlotFormatter from 'quill-blot-formatter'
 import {ImageDrop} from 'quill-image-drop-module';
-import { ref, watch} from "vue";
+import {getCurrentInstance, ref, watch} from "vue";
 // import ImageCompress from 'quill-image-compress';
 
 export default {
@@ -64,6 +65,11 @@ export default {
   components: {QuillEditor},
   setup(props, { emit }) {
     const content = ref(props.modelValue);
+    const instance = getCurrentInstance();
+
+    const clearEditor = () => {
+      instance.refs.editor.setContents('');
+    };
 
     watch(content, newContent => {
       emit('update:modelValue', newContent);
@@ -91,7 +97,7 @@ export default {
     ]
 
     return {
-      modules, content
+      modules, content, clearEditor
     }
   },
   methods: {
@@ -120,22 +126,22 @@ export default {
   border-radius: 0 0 3px 3px;
 }
 
-.ql-toolbar .ql-stroke {
+html.dark .ql-toolbar .ql-stroke {
   fill: none;
   stroke: #fff !important;
 }
 
-.ql-toolbar .ql-fill {
+html.dark .ql-toolbar .ql-fill {
   fill: #fff !important;
   stroke: none;
 }
 
-.ql-toolbar .ql-picker {
+html.dark .ql-toolbar .ql-picker {
   color: #fff !important;
   background: #626262 !important;
 }
 
-.ql-toolbar .ql-picker .ql-picker-options{
+html.dark .ql-toolbar .ql-picker .ql-picker-options{
   background: #747474;
 }
 </style>

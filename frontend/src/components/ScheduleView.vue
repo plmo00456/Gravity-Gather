@@ -6,20 +6,61 @@ import interactionPlugin from '@fullcalendar/interaction'
 import fullCalendarLang from '@fullcalendar/core/locales/ko'
 import {getCurrentInstance, onMounted, ref} from "vue";
 import PopupWindow from "@/components/PopupWindow.vue";
+import writeEditor from "@/components/WriteEditor.vue";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import Multiselect from "vue-multiselect";
+import {useTaskStore} from "@/stores/task";
+import {useUserStore} from "@/stores/user";
+import ToggleSwitch from "@/components/ToggleSwitch.vue";
 
 export default {
     components: {
+        ToggleSwitch,
+        Multiselect,
+        FontAwesomeIcon,
+        writeEditor,
         PopupWindow,
         FullCalendar,
     },
     data() {
         return {
+            task: {
+                isShow: false,
+                value: {
+                    title: '',
+                    category_code: '00',
+                    content: '',
+                    is_all_day: false,
+                    start_date: null,
+                    end_date: null,
+                    start_time: null,
+                    end_time: null,
+                },
+                clickDateStr: null,
+                clickDate: null
+            },
+            share: {
+                isShow: false,
+                team: [
+                    { name: '김철득', teamValue: 1},
+                    { name: '이진성', teamValue: 2},
+                    { name: '박조상', teamValue: 3},
+                    { name: '4444', teamValue: 4},
+                    { name: '5555', teamValue: 5},
+                    { name: '6666', teamValue: 6},
+                    { name: '7777777', teamValue: 7},
+                ],
+                tmpTeamValue:[],
+                teamValue:[],
+                tmpCaption:'null',
+                caption: null,
+            },
             calendarOptions: {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
                 dateClick: this.handleDateClick,
                 events: [
-                    {title: 'event 1', date: '2023-11-15'},
+                    {title: 'event 1', date: '2023-11-15', color: '#ffffff', textColor: '#000000'},
                     {title: 'event 2', start: '2023-11-20 10:00', end: '2023-11-21 10:40'},
                 ],
                 locale: fullCalendarLang,
@@ -40,6 +81,9 @@ export default {
         }
     },
     setup() {
+        const userStore = useUserStore();
+        const user = userStore.userInfo;
+        const content = ref('');
         const instance = getCurrentInstance();
         const mainDatePicker = ref({
             date: '',
@@ -69,19 +113,73 @@ export default {
         })
 
         return {
-            mainDatePicker
+            mainDatePicker,
+            content,
+            user
         }
     },
     methods: {
         handleDateClick: function (arg) {
-            console.log('date click! ' + arg.dateStr)
+            const week = ['일', '월', '화', '수', '목', '금', '토'];
+            this.task.clickDate = Math.floor(arg.date.getTime() / 1000);
+            console.log(this.task.clickDate);
+            this.task.clickDateStr = arg.dateStr + ' (' + week[arg.date.getDay()] + ')';
+            this.task.isShow = true;
         },
-        test() {
+        handleDatePicker() {
             let calendarApi = this.$refs.fullCalendar.getApi()
             calendarApi.gotoDate(this.mainDatePicker.date);
         },
-        taskUpload() {
+        test2() {
+            const html = document.querySelector("html");
+            html.classList.toggle("dark");
+        },
+        addTask() {
+            const data = this.task.value;
 
+            const shareTeamValue = this.share.teamValue;
+            const shareUserSeq = [];
+            shareTeamValue.forEach((team) => {
+                shareUserSeq.push(team.teamValue);
+            });
+            data.shared_user_seq = shareUserSeq;
+            data.caption = this.share.caption;
+            data.user_seq = this.user.seq;
+
+            if(this.task.value.is_all_day){
+                this.task.value.start_date = this.task.clickDate;
+                this.task.value.start_time = this.task.clickDate;
+            }
+
+            if(this.task.value.start_date = null)
+            const taskStore = useTaskStore();
+            taskStore.addTask(data);
+        },
+        cancelTask() {
+            this.$refs.taskForm.reset();
+            this.$refs.taskContent.clearEditor();
+            this.content = '';
+        },
+        addTag (newTag) {
+            const tag = {
+                name: newTag,
+                teamValue: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+            }
+            this.options.push(tag)
+            this.value.push(tag)
+        },
+        openShare() {
+            this.share.tmpTeamValue = this.share.teamValue;
+            this.share.tmpCaption = this.share.caption;
+            this.share.isShow = true;
+        },
+        addShare() {
+            this.share.teamValue = this.share.tmpTeamValue;
+            this.share.caption = this.share.tmpCaption;
+            this.share.isShow = false;
+        },
+        cancelShare() {
+            this.share.isShow = false;
         }
     }
 }
@@ -103,45 +201,135 @@ export default {
                     v-model="mainDatePicker.date"
                     format="YYYY년 MM월"
                     :type="mainDatePicker.type"
-                    @change="test"
+                    @change="handleDatePicker"
             />
+            <div class="flex absolute outline-0 right-[calc(18%)] top-[2rem] z-10">
+                <div class="flex">
+                    <Multiselect
+                            class="w-[15rem] h-[3rem]"
+                            v-model="share.tmpTeamValue"
+                            track-by="teamValue"
+                            label="name"
+                            placeholder="분류"
+                            tag-placeholder="분류를 선택해주세요."
+                            :options="share.team"
+                            :multiple="true"
+                            :taggable="true"
+                            @tag="addTag"
+                            :close-on-select="false"
+                    />
+                </div>
+            </div>
         </div>
         <PopupWindow
-                :show="false"
+                :show="task.isShow"
+                @close="task.isShow = false"
                 :title="'일정 등록'"
+                :subTitle="task.clickDateStr"
                 :widthClass="'w-[70%]'"
                 :heightClass="'h-[45rem]'"
                 :alignClass="'justify-start'"
         >
-            <form @submit.prevent="taskUpload">
-                <div class="flex flex-col items-center p-5">
-
-                    <div class="flex w-full items-center h-[3.5rem] mb-1">
-                        <p class="flex flex-col w-2/5 justify-center items-start">
-                            <span class="flex w-full items-center font-semibold ml-1">
-                              이름
-                              <b class="ml-1 text-red-500">*</b>
-                            </span>
-                            <span>ㅎㅎ</span>
-                        </p>
-                        <p class="flex w-3/5 h-full items-center">
-                            <input type="text" class="w-full border rounded border-gray-300 h-[2.5rem] px-2 py-1"
-                                   maxlength="10">
-                        </p>
-                    </div>
-
-
-                    <p class="flex justify-center text-white w-full">
-                        <button class="px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-2 w-1/2 h-[3rem]"
-                                type="submit">확인
-                        </button>
-                        <button class="px-5 py-2 bg-gray-500 rounded text-sm hover:bg-gray-400 ml-2 w-1/2 h-[3rem]"
-                                type="button"
-                                @click="myInfoShow = false">취소
-                        </button>
+            <button class="absolute" @click="test2">
+                테스트
+            </button>
+            <form ref="taskForm" @submit.prevent="addTask">
+                <div class="flex flex-col items-center p-5 w-full h-full">
+                    <p class="flex flex-col items-start w-full mb-3">
+                        <span class="text-lg">
+                            제목
+                            <b class="text-red-500">*</b>
+                        </span>
+                        <input
+                                v-model="task.value.title"
+                                placeholder="제목을 입력해주세요."
+                                class="rounded text-black px-3 py-1.5 text-xl border border-gray-300 w-full "
+                                type="text">
+                    </p>
+                    <p class="flex flex-col items-start w-full mb-3">
+                        <label class="flex">
+                            <span>하루 종일</span>
+                            <ToggleSwitch v-model="task.value.is_all_day"></ToggleSwitch>
+                        </label>
+                    </p>
+                    <p class="flex w-full h-[25rem] mb-3 rounded">
+                        <writeEditor ref="taskContent" class="w-full h-full" v-model="task.value.content"/>
                     </p>
 
+                    <div class="flex justify-between text-white w-full">
+                        <div>
+                            <button class="px-5 py-3 bg-orange-500 rounded text-sm hover:bg-orange-400 mr-3 relative"
+                                    type="button"
+                                    @click="openShare">
+                                <span class="flex justify-center items-center">
+                                    <b  v-if="share.teamValue.length > 0"
+                                        class="absolute -right-3 -top-2 flex justify-center items-center w-6 h-6 mr-1 rounded-full bg-blue-500">
+                                        {{share.teamValue.length}}
+                                    </b>
+                                    <font-awesome-icon class="mr-1" icon="fa-user-group"/>
+                                    공유하기
+                                </span>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="px-7 py-3 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-3"
+                                    type="button"
+                                    @click="addTask">
+                                <span class="">등록</span>
+                            </button>
+                            <button class="px-7 py-3 bg-gray-500 rounded text-sm hover:bg-gray-400"
+                                    type="button"
+                                    @click="cancelTask">취소
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
+                <PopupWindow
+                        :show="share.isShow"
+                        @close="share.isShow = false"
+                        :title="'공유하기'"
+                        :widthClass="'w-[50%]'"
+                        :heightClass="'h-[30rem]'"
+                        :alignClass="'justify-start'"
+                >
+                    <div class="flex flex-col items-center p-5 w-full h-full">
+                        <p class="flex flex-col items-start w-full mb-3">
+                            <span class="text-lg">캡션</span>
+                            <input
+                                    v-model="share.tmpCaption"
+                                    placeholder="캡션"
+                                    class="rounded text-black px-3 py-1.5 text-md border border-gray-300 w-full "
+                                    type="text" maxlength="200">
+                        </p>
+                        <p class="flex flex-col items-start w-full mb-3 h-full">
+                            <Multiselect
+                                    v-model="share.tmpTeamValue"
+                                    track-by="teamValue"
+                                    label="name"
+                                    placeholder="공유 대상을 선택해주세요."
+                                    tag-placeholder="공유 대상을 선택해주세요."
+                                    :options="share.team"
+                                    :multiple="true"
+                                    :taggable="true"
+                                    @tag="addTag"
+                                    :close-on-select="false"
+                            />
+                        </p>
+                        <div class="flex justify-center text-white w-full">
+                            <button class="px-7 py-3 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-3"
+                                    type="button"
+                                    @click="addShare">
+                                <span class="">확인</span>
+                            </button>
+                            <button class="px-7 py-3 bg-gray-500 rounded text-sm hover:bg-gray-400"
+                                    type="button"
+                                    @click="cancelShare">취소
+                            </button>
+                        </div>
+
+                    </div>
+                </PopupWindow>
             </form>
         </PopupWindow>
     </div>
@@ -191,8 +379,14 @@ export default {
     background: rgba(220, 20, 60, .1); /*스크롤바 뒷 배경 색상*/
 }
 
-.fc-day:hover {
+.fc-day:not(.fc-col-header-cell):hover {
     cursor: pointer;
     background: #cdffff;
+}
+
+.fc-day-sat,
+.fc-day-sun
+{
+    color: red;
 }
 </style>
