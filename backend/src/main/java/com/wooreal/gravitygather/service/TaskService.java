@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TaskService {
@@ -19,7 +20,19 @@ public class TaskService {
         this.taskMapper = taskMapper;
     }
 
+    public List<Task> getTasks(Map<String, Object> map){
+        return taskMapper.getTasks(map);
+    }
+
     public void addTesk(Task task){
+        if(!task.getIs_all_day() && (
+                task.getStart_date() == null ||
+                task.getStart_time() == null ||
+                task.getEnd_date() == null ||
+                task.getEnd_time() == null)){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 기간을 입력 해 주세요.");
+        }
+
         int result = taskMapper.addTask(task);
 
         if(result == 0){

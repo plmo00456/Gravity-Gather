@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "Task Controller", description = "일정 컨트롤러")
 @CrossOrigin(origins = {"*"})
@@ -21,6 +22,22 @@ public class TaskController {
 
     public TaskController(TaskService taskService){
         this.taskService = taskService;
+    }
+
+    // 인증
+
+    /**
+     * @param map   int user_seq                        required
+     *              int startDatetime    // 1698764400
+     *              int endDatetime      // 1701356400
+     * @return new ResponseEntity<>(tasks, HttpStatus.OK)
+     */
+    @PostMapping("/get")
+    @ApiOperation(value = "일정 가져오는 api")
+    public ResponseEntity<?> getTasks(@RequestBody Map<String, Object> map) {
+        List<Task> tasks = taskService.getTasks(map);
+        tasks.forEach(System.out::println);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     // 인증

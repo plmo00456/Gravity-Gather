@@ -4,6 +4,43 @@
 
 <mapper namespace="com.wooreal.gravitygather.mapper.TaskMapper">
 
+    <select id="getTasks">
+        SELECT DISTINCT
+            A.SEQ,
+            A.TITLE,
+            A.CATEGORY_CODE,
+            A.CONTENT,
+            A.IS_ALL_DAY,
+            A.is_delete,
+            A.user_seq,
+            A.START_DATE,
+            A.END_DATE,
+            A.START_TIME,
+            A.END_TIME,
+            UNIX_TIMESTAMP(CONCAT(A.START_DATE, ' ', IFNULL(A.START_TIME, '00:00:00'))) AS start_date_time,
+            CASE
+                WHEN A.END_DATE IS NULL AND A.END_TIME IS NULL THEN NULL
+                ELSE UNIX_TIMESTAMP(CONCAT(IFNULL(A.END_DATE, A.START_DATE), ' ', IFNULL(A.END_TIME, '23:59:59')))
+            END AS end_date_time,
+            A.CREATED_AT,
+            A.UPDATED_AT,
+            B.SHARE_DATE,
+            B.CAPTION
+        from tasks A
+        left join task_share B
+        on A.SEQ = B.TASK_SEQ
+        where
+            (A.user_seq = 1 or B.user_seq = 1)
+            and A.is_delete = false
+            <if test="startDatetime != null">
+                and	UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[>=]]> #{startDatetime}
+            </if>
+            <if test="endDatetime != null">
+                and UNIX_TIMESTAMP(CONCAT(IFNULL(A.end_date, A.start_date), ' ', IFNULL(A.end_time, '23:59:59'))) <![CDATA[<]]> #{endDatetime}
+            </if>
+        order by A.seq
+    </select>
+
     <insert id="addTask">
         INSERT INTO TASKS(
             TITLE,
@@ -25,10 +62,10 @@
             #{is_all_day},
             false,
             #{user_seq},
-            FROM_UNIXTIME(${start_date}),
-            FROM_UNIXTIME(${end_date}),
-            FROM_UNIXTIME(${start_time}),
-            FROM_UNIXTIME(${end_time}),
+            FROM_UNIXTIME(#{start_date_time}),
+            FROM_UNIXTIME(#{start_date_time}),
+            FROM_UNIXTIME(#{end_date_time}),
+            FROM_UNIXTIME(#{end_date_time}),
             now(),
             now()
         )
@@ -43,16 +80,15 @@
             USER_SEQ,
             SHARE_DATE,
             CAPTION
-        ) VALUES (
-            <foreach item="item" index="index" collection="shared_user_seq" separator=",">
-                (
-                     #{seq},
-                     #{item},
-                     now(),
-                     #{caption}
-                )
-            </foreach>
-        )
+        ) VALUES
+        <foreach item="item" index="index" collection="shared_user_seq" separator=",">
+            (
+                 #{seq},
+                 #{item},
+                 now(),
+                 #{caption}
+            )
+        </foreach>
     </insert>
 
 </mapper>

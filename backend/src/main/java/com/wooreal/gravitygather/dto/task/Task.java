@@ -28,11 +28,14 @@ public class Task {
     private Integer user_seq;
     private String user_nm;
 
+    private Timestamp start_date;
+    private Timestamp end_date;
+    private Timestamp start_time;
+    private Timestamp end_time;
+
     //UNIX로 관리
-    private Integer start_date;
-    private Integer end_date;
-    private Integer start_time;
-    private Integer end_time;
+    private Integer start_date_time;
+    private Integer end_date_time;
 
     private Timestamp created_at;
     private Timestamp updated_at;
