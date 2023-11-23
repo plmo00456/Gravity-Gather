@@ -102,6 +102,39 @@ function tooltips(cls){
     })
 }
 
+function dateToUnix(date)
+{
+    return Math.floor(date.getTime() / 1000);
+}
+
+function unixToFormat(unix_timestamp, format) {
+    var date = new Date(unix_timestamp * 1000); // UNIX 타임스탬프를 밀리초로 변환
+
+    var map = {
+        '%Y': date.getFullYear(),
+        '%m': ('0' + (date.getMonth() + 1)).slice(-2),
+        '%d': ('0' + date.getDate()).slice(-2),
+        '%H': ('0' + date.getHours()).slice(-2),
+        '%M': ('0' + date.getMinutes()).slice(-2),
+        '%S': ('0' + date.getSeconds()).slice(-2)
+    };
+
+    return format.replace(/%[YmdHMS]/g, function(m) { return map[m]; });
+}
+
+function dateToFormat(date, format) {
+    var map = {
+        '%Y': date.getFullYear(),
+        '%m': ('0' + (date.getMonth() + 1)).slice(-2),
+        '%d': ('0' + date.getDate()).slice(-2),
+        '%H': ('0' + date.getHours()).slice(-2),
+        '%M': ('0' + date.getMinutes()).slice(-2),
+        '%S': ('0' + date.getSeconds()).slice(-2)
+    };
+
+    return format.replace(/%[YmdHMS]/g, function(m) { return map[m]; });
+}
+
 async function init(){
     // 폰트어썸 라이브러리 추가
 
@@ -128,6 +161,9 @@ async function init(){
     app.config.globalProperties.utils.chatSound = soundData;
 
     app.config.globalProperties.utils.timeAgoStr = timeAgo;
+    app.config.globalProperties.utils.dateToUnix = dateToUnix;
+    app.config.globalProperties.utils.unixToFormat = unixToFormat;
+    app.config.globalProperties.utils.dateToFormat = dateToFormat;
 
     // notify
     app.config.globalProperties.utils.notify = {};

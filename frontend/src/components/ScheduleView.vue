@@ -56,16 +56,14 @@ export default {
                 caption: null,
             },
             calendarOptions: {
+                wheelEndTimeout: null,
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
                 dateClick: this.handleDateClick,
-                events: [
-                    {title: 'event 1', date: '2023-11-15', color: '#ffffff', textColor: '#000000'},
-                    {title: 'event 2', start: '2023-11-20 10:00', end: '2023-11-21 10:40'},
-                ],
                 locale: fullCalendarLang,
                 height: '100%',
                 editable: true,
+                events: [],
                 headerToolbar: {
                     start: 'today',
                     center: 'title,datePickerButton',
@@ -83,6 +81,8 @@ export default {
     setup() {
         const userStore = useUserStore();
         const user = userStore.userInfo;
+        const taskStore = useTaskStore();
+        const tasks = ref([]);
         const content = ref('');
         const instance = getCurrentInstance();
         const mainDatePicker = ref({
@@ -90,14 +90,59 @@ export default {
             type: 'date',
         });
 
-        onMounted(() => {
+        const getTasks = async () => {
             const fullCalendarApi = instance.refs.fullCalendar.getApi();
+            let startDate = fullCalendarApi.currentData.dateProfile.renderRange.start;
+            let endDate = fullCalendarApi.currentData.dateProfile.renderRange.end;
+            startDate = new Date(startDate.getTime() + (startDate.getTimezoneOffset() * 60000));
+            endDate = new Date(endDate.getTime() + (endDate.getTimezoneOffset() * 60000));
+
+            const data = {
+                user_seq: user.seq,
+                startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
+                endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate)
+            }
+            console.log(data);
+
+            try {
+                await taskStore.getTasks(data);
+                if (taskStore?.dataResponse.status === 200) {
+                    instance.data.calendarOptions.events = taskStore.taskList;
+                } else {
+                    instance.appContext.config.globalProperties.utils.msgError(this.dataResponse.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                }
+                tasks.value = taskStore.taskList;
+            } catch (error) {
+                console.error(error);
+                instance.appContext.config.globalProperties.utils.msgError((error?.response?.data) || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+            }
+        }
+
+        onMounted(async () => {
+            const fullCalendarApi = instance.refs.fullCalendar.getApi();
+            console.log(fullCalendarApi);
             const datePicker = instance.refs.datePicker;
+            const fcTodayButton = document.querySelector(".fc-today-button");
             const fcToolbar = document.querySelector(".fc-toolbar-title").closest("div");
             fcToolbar.classList.add("cursor-pointer");
             fcToolbar.classList.add("p-2");
             fcToolbar.classList.add("rounded");
 
+            window.addEventListener('keyup', (e) => {
+                if(e.key === 'ArrowLeft')
+                    fullCalendarApi.prev();
+                else if(e.key === 'ArrowRight')
+                    fullCalendarApi.next();
+                if (instance.data.calendarOptions.wheelEndTimeout)
+                    clearTimeout(instance.data.calendarOptions.wheelEndTimeout);
+
+                instance.data.calendarOptions.wheelEndTimeout = setTimeout(async () => {
+                    await getTasks();
+                }, 500);
+            })
+            fcTodayButton.addEventListener('click', () => {
+                getTasks();
+            });
             fcToolbar.addEventListener('click', () => {
                 const currentType = fullCalendarApi.currentData.currentViewType;
                 if (currentType === 'dayGridMonth') {
@@ -110,32 +155,47 @@ export default {
 
                 datePicker.focus();
             });
+            await getTasks();
         })
 
         return {
             mainDatePicker,
             content,
-            user
+            user,
+            getTasks,
+            tasks
         }
     },
     methods: {
         handleDateClick: function (arg) {
             const week = ['일', '월', '화', '수', '목', '금', '토'];
             this.task.clickDate = Math.floor(arg.date.getTime() / 1000);
-            console.log(this.task.clickDate);
             this.task.clickDateStr = arg.dateStr + ' (' + week[arg.date.getDay()] + ')';
             this.task.isShow = true;
         },
         handleDatePicker() {
             let calendarApi = this.$refs.fullCalendar.getApi()
             calendarApi.gotoDate(this.mainDatePicker.date);
+
+            this.getTasks();
         },
         test2() {
             const html = document.querySelector("html");
             html.classList.toggle("dark");
         },
-        addTask() {
+        async addTask() {
             const data = this.task.value;
+
+            const fullCalendarApi = this.$refs.fullCalendar.getApi();
+            const currentTypeStr = fullCalendarApi.currentData.currentViewType;
+            let currentType = 0;
+            if (currentTypeStr === 'dayGridMonth') {
+                currentType = 0;
+            } else if (currentTypeStr === 'timeGridWeek') {
+                currentType = 1;
+            } else {
+                currentType = 2;
+            }
 
             const shareTeamValue = this.share.teamValue;
             const shareUserSeq = [];
@@ -145,20 +205,30 @@ export default {
             data.shared_user_seq = shareUserSeq;
             data.caption = this.share.caption;
             data.user_seq = this.user.seq;
-
+            data.type = currentType;
             if(this.task.value.is_all_day){
-                this.task.value.start_date = this.task.clickDate;
-                this.task.value.start_time = this.task.clickDate;
+                this.task.value.start_date_time = this.task.clickDate;
             }
 
-            if(this.task.value.start_date = null)
-            const taskStore = useTaskStore();
-            taskStore.addTask(data);
+            try {
+                const taskStore = useTaskStore();
+                await taskStore.addTask(data);
+                if (taskStore?.dataResponse.status === 200) {
+                    this.cancelTask();
+                    this.utils.notify.success("등록되었습니다.", "등록 완료!");
+                    await this.getTasks();
+                } else {
+                    this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+                }
+            } catch (error) {
+                this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            }
         },
         cancelTask() {
             this.$refs.taskForm.reset();
             this.$refs.taskContent.clearEditor();
             this.content = '';
+            this.task.isShow = false;
         },
         addTag (newTag) {
             const tag = {
@@ -192,6 +262,7 @@ export default {
                     class="z-10"
                     id="calendar"
                     :options="calendarOptions"
+                    :events="tasks"
                     ref="fullCalendar"
             />
             <el-date-picker
@@ -223,7 +294,6 @@ export default {
         </div>
         <PopupWindow
                 :show="task.isShow"
-                @close="task.isShow = false"
                 :title="'일정 등록'"
                 :subTitle="task.clickDateStr"
                 :widthClass="'w-[70%]'"
