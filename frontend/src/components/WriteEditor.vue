@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col h-full bg-white dark:bg-slate-800 rounded ">
+  <div class="flex flex-col h-full bg-white dark:bg-slate-800 rounded overflow-y-auto">
     <quill-editor
         ref="editor"
         v-model:content="content"
         contentType="html"
-        class="dark:bg-gray-800 text-black dark:text-white"
+        class="dark:bg-gray-800 text-black dark:text-white overflow-y-auto"
         :modules="modules"
         theme="snow"
         toolbar="#toolbar">

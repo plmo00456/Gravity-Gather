@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Swal from 'sweetalert2'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import 'tippy.js/themes/light.css';
 import { Eggy } from '@s-r0/eggy-js';
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
@@ -14,6 +15,8 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import 'dayjs/locale/ko'
 import langKR from 'element-plus/dist/locale/ko'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
@@ -211,13 +214,16 @@ async function init(){
         await Eggy(option);
     }
 
+    app.config.globalProperties.utils.tippy = tippy;
     app.config.globalProperties.utils.tooltips = tooltips;
 
+    app.provide("utils", app.config.globalProperties.utils);
     app.use(createPinia())
         .use(router)
         .use(ContextMenu)
         .use(ElementPlus, { size: 'small', zIndex: 3000, locale: langKR, })
         .component('font-awesome-icon', FontAwesomeIcon)
+        .component('VueDatePicker', VueDatePicker)
         .mount('#app');
 }
 

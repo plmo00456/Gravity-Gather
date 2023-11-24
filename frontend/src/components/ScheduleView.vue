@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from "@fullcalendar/timegrid"
 import interactionPlugin from '@fullcalendar/interaction'
 import fullCalendarLang from '@fullcalendar/core/locales/ko'
-import {getCurrentInstance, onMounted, ref} from "vue";
+import {getCurrentInstance, inject, onMounted, ref} from "vue";
 import PopupWindow from "@/components/PopupWindow.vue";
 import writeEditor from "@/components/WriteEditor.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -30,11 +30,17 @@ export default {
                     title: '',
                     category_code: '00',
                     content: '',
-                    is_all_day: false,
+                    is_all_day: true,
                     start_date: null,
                     end_date: null,
                     start_time: null,
                     end_time: null,
+                    date_time: [
+                        new Date(),
+                        new Date()
+                    ],
+                    bg_color: '#3688D8',
+                    text_color: '#ffffff',
                 },
                 clickDateStr: null,
                 clickDate: null
@@ -60,6 +66,72 @@ export default {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
                 dateClick: this.handleDateClick,
+                eventDidMount: function(info) {
+                    this.utils.tippy(info.el, {
+                        content: info.event.extendedProps.content,
+                        allowHTML: true,
+                        theme: 'light',
+                    });
+                    if(info.event._def.extendedProps.is_share){
+                        console.log(info.el);
+                        info.el.style = 'outline: 3px solid #ff6600 !important';
+                    }
+                }.bind(this),
+                eventDrop: function(info) {
+                    const start = this.utils.dateToUnix(info.event._instance.range.start);
+                    const end = this.utils.dateToUnix(info.event._instance.range.end);
+
+                    const _tmp = Object.assign({}, info.event._def);
+                    let data = Object.assign({}, info.event._def.extendedProps);
+
+                    data.content = data.oriContent;
+                    data.title = _tmp.title;
+                    data.is_all_day = _tmp.allDay;
+
+                    if(data.is_all_day){
+                        let _start = info.event._instance.range.start;
+                        _start.setHours(0,0,0,0);
+                        data.start_date_time = this.utils.dateToUnix(_start);
+                        data.end_date_time = null;
+                    }else{
+                        data.start_date_time = start;
+                        data.end_date_time = end;
+                    }
+                    this.dragTask(data);
+                }.bind(this),
+                eventResize: function(info) {
+                    const start = this.utils.dateToUnix(info.event._instance.range.start);
+                    const end = this.utils.dateToUnix(info.event._instance.range.end);
+
+                    const _tmp = Object.assign({}, info.event._def);
+                    let data = Object.assign({}, info.event._def.extendedProps);
+
+                    data.content = data.oriContent;
+                    data.title = _tmp.title;
+                    data.is_all_day = _tmp.allDay;
+
+                    if(data.is_all_day){
+                        let _start = info.event._instance.range.start;
+                        _start.setHours(0,0,0,0);
+                        data.start_date_time = this.utils.dateToUnix(_start);
+                        if(info.event._instance.range.start.getDate() != info.event._instance.range.end.getDate()){
+                            let _end = info.event._instance.range.end;
+                            _end.setHours(23,59,0,0);
+                            data.end_date_time = this.utils.dateToUnix(_end);
+                            data.is_all_day = false;
+                        }else{
+                            data.end_date_time = null;
+                        }
+                    }else{
+                        data.start_date_time = start;
+                        data.end_date_time = end;
+                    }
+                    this.dragTask(data);
+                    // console.log(info);
+                }.bind(this),
+                eventContent: function( info ) {
+                    return {html: info.event.title};
+                },
                 locale: fullCalendarLang,
                 height: '100%',
                 editable: true,
@@ -79,6 +151,7 @@ export default {
         }
     },
     setup() {
+        const utils = inject('utils');
         const userStore = useUserStore();
         const user = userStore.userInfo;
         const taskStore = useTaskStore();
@@ -91,54 +164,65 @@ export default {
         });
 
         const getTasks = async () => {
-            const fullCalendarApi = instance.refs.fullCalendar.getApi();
-            let startDate = fullCalendarApi.currentData.dateProfile.renderRange.start;
-            let endDate = fullCalendarApi.currentData.dateProfile.renderRange.end;
-            startDate = new Date(startDate.getTime() + (startDate.getTimezoneOffset() * 60000));
-            endDate = new Date(endDate.getTime() + (endDate.getTimezoneOffset() * 60000));
+            if (instance.refs.fullCalendar) {
+                const fullCalendarApi = instance.refs.fullCalendar.getApi();
+                let startDate = fullCalendarApi.currentData.dateProfile.renderRange.start;
+                let endDate = fullCalendarApi.currentData.dateProfile.renderRange.end;
+                startDate = new Date(startDate.getTime() + (startDate.getTimezoneOffset() * 60000));
+                endDate = new Date(endDate.getTime() + (endDate.getTimezoneOffset() * 60000));
 
-            const data = {
-                user_seq: user.seq,
-                startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
-                endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate)
-            }
-            console.log(data);
-
-            try {
-                await taskStore.getTasks(data);
-                if (taskStore?.dataResponse.status === 200) {
-                    instance.data.calendarOptions.events = taskStore.taskList;
-                } else {
-                    instance.appContext.config.globalProperties.utils.msgError(this.dataResponse.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                const data = {
+                    user_seq: user.seq,
+                    startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
+                    endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate)
                 }
-                tasks.value = taskStore.taskList;
-            } catch (error) {
-                console.error(error);
-                instance.appContext.config.globalProperties.utils.msgError((error?.response?.data) || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+
+                try {
+                    await taskStore.getTasks(data);
+                    if (taskStore?.dataResponse.status === 200) {
+                        instance.data.calendarOptions.events = taskStore.taskList;
+                    } else {
+                        instance.appContext.config.globalProperties.utils.msgError(this.dataResponse.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                    }
+                    tasks.value = taskStore.taskList;
+                } catch (error) {
+                    console.error(error);
+                    instance.appContext.config.globalProperties.utils.msgError((error?.response?.data) || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                }
             }
         }
 
         onMounted(async () => {
             const fullCalendarApi = instance.refs.fullCalendar.getApi();
-            console.log(fullCalendarApi);
             const datePicker = instance.refs.datePicker;
             const fcTodayButton = document.querySelector(".fc-today-button");
             const fcToolbar = document.querySelector(".fc-toolbar-title").closest("div");
             fcToolbar.classList.add("cursor-pointer");
             fcToolbar.classList.add("p-2");
             fcToolbar.classList.add("rounded");
+            const fcToolbarType = document.querySelector(".fc-dayGridMonth-button").closest("div");
+            fcToolbarType.addEventListener('click', () => {
+               getTasks();
+            });
 
             window.addEventListener('keyup', (e) => {
-                if(e.key === 'ArrowLeft')
-                    fullCalendarApi.prev();
-                else if(e.key === 'ArrowRight')
-                    fullCalendarApi.next();
-                if (instance.data.calendarOptions.wheelEndTimeout)
-                    clearTimeout(instance.data.calendarOptions.wheelEndTimeout);
+                let flag = false;
 
-                instance.data.calendarOptions.wheelEndTimeout = setTimeout(async () => {
-                    await getTasks();
-                }, 500);
+                if(e.key === 'ArrowLeft'){
+                    flag = true;
+                    fullCalendarApi.prev();
+                }else if(e.key === 'ArrowRight'){
+                    flag = true;
+                    fullCalendarApi.next();
+                }
+                if(flag){
+                    if (instance.data.calendarOptions.wheelEndTimeout)
+                        clearTimeout(instance.data.calendarOptions.wheelEndTimeout);
+
+                    instance.data.calendarOptions.wheelEndTimeout = setTimeout(async () => {
+                        await getTasks();
+                    }, 500);
+                }
             })
             fcTodayButton.addEventListener('click', () => {
                 getTasks();
@@ -163,7 +247,8 @@ export default {
             content,
             user,
             getTasks,
-            tasks
+            tasks,
+            utils
         }
     },
     methods: {
@@ -172,6 +257,10 @@ export default {
             this.task.clickDate = Math.floor(arg.date.getTime() / 1000);
             this.task.clickDateStr = arg.dateStr + ' (' + week[arg.date.getDay()] + ')';
             this.task.isShow = true;
+            const B = new Date(arg.date.getTime());
+            B.setHours(23, 59, 0, 0);
+            this.task.value.date_time[0] = arg.date;
+            this.task.value.date_time[1] = B;
         },
         handleDatePicker() {
             let calendarApi = this.$refs.fullCalendar.getApi()
@@ -184,19 +273,12 @@ export default {
             html.classList.toggle("dark");
         },
         async addTask() {
-            const data = this.task.value;
-
-            const fullCalendarApi = this.$refs.fullCalendar.getApi();
-            const currentTypeStr = fullCalendarApi.currentData.currentViewType;
-            let currentType = 0;
-            if (currentTypeStr === 'dayGridMonth') {
-                currentType = 0;
-            } else if (currentTypeStr === 'timeGridWeek') {
-                currentType = 1;
-            } else {
-                currentType = 2;
+            if(this.task.value.title == null ||this.task.value.title === ''){
+                this.utils.msgError("제목을 입력 해 주세요.");
+                return;
             }
 
+            const data = this.task.value;
             const shareTeamValue = this.share.teamValue;
             const shareUserSeq = [];
             shareTeamValue.forEach((team) => {
@@ -205,9 +287,11 @@ export default {
             data.shared_user_seq = shareUserSeq;
             data.caption = this.share.caption;
             data.user_seq = this.user.seq;
-            data.type = currentType;
             if(this.task.value.is_all_day){
                 this.task.value.start_date_time = this.task.clickDate;
+            }else{
+                this.task.value.start_date_time = Math.floor(this.task.value.date_time[0].getTime() / 1000);
+                this.task.value.end_date_time = Math.floor(this.task.value.date_time[1].getTime() / 1000);
             }
 
             try {
@@ -224,10 +308,24 @@ export default {
                 this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
             }
         },
+        async dragTask(data) {
+            try {
+                const taskStore = useTaskStore();
+                await taskStore.updateTask(data);
+                if (taskStore?.dataResponse.status === 200) {
+                    this.utils.notify.success("변경되었습니다.", "등록 완료!");
+                } else {
+                    this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+                }
+            } catch (error) {
+                this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            }
+        },
         cancelTask() {
+            this.task.value.title = null;
             this.$refs.taskForm.reset();
             this.$refs.taskContent.clearEditor();
-            this.content = '';
+            this.task.value.content = null;
             this.task.isShow = false;
         },
         addTag (newTag) {
@@ -316,14 +414,32 @@ export default {
                                 class="rounded text-black px-3 py-1.5 text-xl border border-gray-300 w-full "
                                 type="text">
                     </p>
-                    <p class="flex flex-col items-start w-full mb-3">
-                        <label class="flex">
-                            <span>하루 종일</span>
-                            <ToggleSwitch v-model="task.value.is_all_day"></ToggleSwitch>
-                        </label>
-                    </p>
+                    <div class="flex items-start w-full mb-3 justify-between">
+                        <div class="flex flex-col items-start w-5/6">
+                            <label class="flex items-center mb-1">
+                                <span class="flex items-center justify-center">하루 종일</span>
+                                <ToggleSwitch v-model="task.value.is_all_day"></ToggleSwitch>
+                            </label>
+                            <VueDatePicker v-model="task.value.date_time"
+                                           range
+                                           format='yyyy년 MM월 dd일 HH시 mm분'
+                                           locale="ko"
+                                           :disabled="task.value.is_all_day"
+                            ></VueDatePicker>
+                        </div>
+                        <div class="flex flex-col justify-end items-center w-1/6 h-full">
+                            <label class="w-4/6 flex justify-between">
+                                <span>배경 색 : </span>
+                                <el-color-picker v-model="task.value.bg_color" />
+                            </label>
+                            <label class="w-4/6 flex justify-between">
+                                <span>텍스트 색 : </span>
+                                <el-color-picker v-model="task.value.text_color" />
+                            </label>
+                        </div>
+                    </div>
                     <p class="flex w-full h-[25rem] mb-3 rounded">
-                        <writeEditor ref="taskContent" class="w-full h-full" v-model="task.value.content"/>
+                        <writeEditor ref="taskContent" class="w-full max-h-[25rem]" v-model="task.value.content"/>
                     </p>
 
                     <div class="flex justify-between text-white w-full">
@@ -454,9 +570,13 @@ export default {
     background: #cdffff;
 }
 
-.fc-day-sat,
-.fc-day-sun
+.fc-day-sat .fc-daygrid-day-number,
+.fc-day-sun .fc-daygrid-day-number
 {
     color: red;
+}
+
+.dp__disabled {
+    color: #e4e4e4 !important;
 }
 </style>
