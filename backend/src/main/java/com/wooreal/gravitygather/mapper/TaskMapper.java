@@ -15,4 +15,6 @@ public interface TaskMapper {
     int addTask(Task task);
 
     int addTaskShare(Task task);
+
+    int updateTask(Task task);
 }

@@ -26,10 +26,8 @@ public class TaskService {
 
     public void addTesk(Task task){
         if(!task.getIs_all_day() && (
-                task.getStart_date() == null ||
-                task.getStart_time() == null ||
-                task.getEnd_date() == null ||
-                task.getEnd_time() == null)){
+                task.getStart_date_time() == null ||
+                task.getEnd_date_time() == null)){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 기간을 입력 해 주세요.");
         }
 
@@ -46,6 +44,12 @@ public class TaskService {
             if(result == 0){
                 throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 공유 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
             }
+        }
+    }
+
+    public void updateTask(Task task){
+        if(taskMapper.updateTask(task) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 변경 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
         }
     }
 

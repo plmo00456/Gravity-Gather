@@ -27,6 +27,9 @@ public class Task {
     private Boolean is_shared;
     private Integer user_seq;
     private String user_nm;
+    private String user_nickname;
+    private String bg_color;
+    private String text_color;
 
     private Timestamp start_date;
     private Timestamp end_date;

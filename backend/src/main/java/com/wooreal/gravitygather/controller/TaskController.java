@@ -25,7 +25,6 @@ public class TaskController {
     }
 
     // 인증
-
     /**
      * @param map   int user_seq                        required
      *              int startDatetime    // 1698764400
@@ -36,7 +35,6 @@ public class TaskController {
     @ApiOperation(value = "일정 가져오는 api")
     public ResponseEntity<?> getTasks(@RequestBody Map<String, Object> map) {
         List<Task> tasks = taskService.getTasks(map);
-        tasks.forEach(System.out::println);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
@@ -45,6 +43,14 @@ public class TaskController {
     @ApiOperation(value = "일정 등록 api")
     public ResponseEntity<?> addTesk(@RequestBody Task task) {
         taskService.addTesk(task);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 인증
+    @PostMapping("/update")
+    @ApiOperation(value = "일정 수정 api")
+    public ResponseEntity<?> updateTesk(@RequestBody Task task) {
+        taskService.updateTask(task);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -13,6 +13,9 @@
             A.IS_ALL_DAY,
             A.is_delete,
             A.user_seq,
+            (select AA.nickname from users AA where AA.seq = A.user_seq) as user_nickname,
+            A.BG_COLOR,
+            A.TEXT_COLOR,
             A.START_DATE,
             A.END_DATE,
             A.START_TIME,
@@ -30,7 +33,7 @@
         left join task_share B
         on A.SEQ = B.TASK_SEQ
         where
-            (A.user_seq = 1 or B.user_seq = 1)
+            (A.user_seq = #{user_seq} or B.user_seq = #{user_seq})
             and A.is_delete = false
             <if test="startDatetime != null">
                 and	UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[>=]]> #{startDatetime}
@@ -49,6 +52,8 @@
             IS_ALL_DAY,
             IS_DELETE,
             USER_SEQ,
+            BG_COLOR,
+            TEXT_COLOR,
             START_DATE,
             END_DATE,
             START_TIME,
@@ -62,9 +67,11 @@
             #{is_all_day},
             false,
             #{user_seq},
-            FROM_UNIXTIME(#{start_date_time}),
+            #{bg_color},
+            #{text_color},
             FROM_UNIXTIME(#{start_date_time}),
             FROM_UNIXTIME(#{end_date_time}),
+            FROM_UNIXTIME(#{start_date_time}),
             FROM_UNIXTIME(#{end_date_time}),
             now(),
             now()
@@ -91,4 +98,20 @@
         </foreach>
     </insert>
 
+    <update id="updateTask">
+        UPDATE tasks SET
+            TITLE = #{title},
+            CONTENT = #{content},
+            IS_ALL_DAY = #{is_all_day},
+            IS_DELETE = #{is_delete},
+            BG_COLOR = #{bg_color},
+            TEXT_COLOR = #{text_color},
+            START_DATE = FROM_UNIXTIME(#{start_date_time}),
+            END_DATE = FROM_UNIXTIME(#{end_date_time}),
+            START_TIME = FROM_UNIXTIME(#{start_date_time}),
+            END_TIME = FROM_UNIXTIME(#{end_date_time}),
+            UPDATED_AT = now()
+        WHERE
+            SEQ = #{seq}
+    </update>
 </mapper>
