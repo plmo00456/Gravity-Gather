@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 public class Task {
     private Integer seq;
     private String title;
-    private String category_code;
+    private Integer category_seq;
     private String category_nm;
     private String content;
     private Boolean is_all_day;

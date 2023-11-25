@@ -1,6 +1,7 @@
 package com.wooreal.gravitygather.controller;
 
 import com.wooreal.gravitygather.dto.common.Alarm;
+import com.wooreal.gravitygather.dto.task.Category;
 import com.wooreal.gravitygather.dto.task.Task;
 import com.wooreal.gravitygather.service.TaskService;
 import io.swagger.annotations.Api;
@@ -39,6 +40,14 @@ public class TaskController {
     }
 
     // 인증
+    @PostMapping("/category/get")
+    @ApiOperation(value = "일정 카테고리 가져오는 api")
+    public ResponseEntity<?> getCategories(@RequestBody Category category) {
+        List<Category> categories = taskService.getCategories(category);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    // 인증
     @PostMapping("/add")
     @ApiOperation(value = "일정 등록 api")
     public ResponseEntity<?> addTesk(@RequestBody Task task) {
@@ -47,10 +56,33 @@ public class TaskController {
     }
 
     // 인증
+    @PostMapping("/category/add")
+    @ApiOperation(value = "일정 카테고리 등록 api")
+    public ResponseEntity<?> addCategory(@RequestBody Category category) {
+        taskService.addCategory(category);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 인증
     @PostMapping("/update")
     @ApiOperation(value = "일정 수정 api")
     public ResponseEntity<?> updateTesk(@RequestBody Task task) {
         taskService.updateTask(task);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 인증
+    @PostMapping("/category/update")
+    @ApiOperation(value = "일정 카테고리 수정 api")
+    public ResponseEntity<?> updateCategory(@RequestBody Category category) {
+        taskService.updateCategory(category);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/category/update/order")
+    @ApiOperation(value = "일정 카테고리 수정 api")
+    public ResponseEntity<?> updateCategoryOrder(@RequestBody Category category) {
+        taskService.updateCategoryOrder(category);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

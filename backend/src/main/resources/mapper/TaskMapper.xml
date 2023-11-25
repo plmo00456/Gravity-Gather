@@ -8,7 +8,8 @@
         SELECT DISTINCT
             A.SEQ,
             A.TITLE,
-            A.CATEGORY_CODE,
+            A.CATEGORY_SEQ,
+            (select AA. CATEGORY_NM from task_category AA where AA.seq = A.CATEGORY_SEQ) as CATEGORY_NM,
             A.CONTENT,
             A.IS_ALL_DAY,
             A.is_delete,
@@ -41,13 +42,46 @@
             <if test="endDatetime != null">
                 and UNIX_TIMESTAMP(CONCAT(IFNULL(A.end_date, A.start_date), ' ', IFNULL(A.end_time, '23:59:59'))) <![CDATA[<]]> #{endDatetime}
             </if>
+            <if test="category_seq != null">
+                and A.CATEGORY_SEQ = #{category_seq}
+            </if>
         order by A.seq
     </select>
+
+    <select id="getCategories">
+        SELECT
+            seq,
+            category_nm,
+            user_seq,
+            is_delete,
+            task_order,
+            create_at,
+            updated_at
+        FROM
+            TASK_CATEGORY
+        WHERE
+            user_seq = #{user_seq}
+        AND is_delete = false
+        ORDER BY
+            task_order
+    </select>
+
+    <insert id="addCategory">
+        INSERT INTO TASK_CATEGORY(
+            category_nm,
+            user_seq,
+            task_order
+        ) VALUES (
+            '새로운 카테고리',
+            #{user_seq},
+            (ifnull((select MAX(A.task_order) + 1 from task_category A where A.user_seq = #{user_seq}), 1))
+        )
+    </insert>
 
     <insert id="addTask">
         INSERT INTO TASKS(
             TITLE,
-            CATEGORY_CODE,
+            CATEGORY_SEQ,
             CONTENT,
             IS_ALL_DAY,
             IS_DELETE,
@@ -62,7 +96,7 @@
             UPDATED_AT
         ) VALUES (
             #{title},
-            #{category_code},
+            #{category_seq},
             #{content},
             #{is_all_day},
             false,
@@ -114,4 +148,29 @@
         WHERE
             SEQ = #{seq}
     </update>
+
+    <update id="updateCategory">
+        UPDATE task_category
+        <set>
+            <if test="category_nm != null">
+                category_nm = #{category_nm},
+            </if>
+            <if test="is_delete != null">
+                is_delete = #{is_delete},
+            </if>
+            updated_at = now()
+        </set>
+        WHERE seq = #{seq}
+    </update>
+
+    <update id="updateCategoryOrder">
+        UPDATE task_category
+        SET task_order = CASE seq
+        <foreach collection="seqs" item="seq" index="index">
+            WHEN #{seq} THEN ${index + 1}
+        </foreach>
+        ELSE task_order
+        END
+    </update>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.wooreal.gravitygather.service;
 
 import com.wooreal.gravitygather.dto.common.Alarm;
+import com.wooreal.gravitygather.dto.task.Category;
 import com.wooreal.gravitygather.dto.task.Task;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
@@ -22,6 +23,10 @@ public class TaskService {
 
     public List<Task> getTasks(Map<String, Object> map){
         return taskMapper.getTasks(map);
+    }
+
+    public List<Category> getCategories(Category category){
+        return taskMapper.getCategories(category);
     }
 
     public void addTesk(Task task){
@@ -47,10 +52,28 @@ public class TaskService {
         }
     }
 
+    public void addCategory(Category category){
+        if(taskMapper.addCategory(category) == 0)
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "카테고리 등록 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    }
+
     public void updateTask(Task task){
         if(taskMapper.updateTask(task) == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 변경 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
         }
     }
+
+    public void updateCategory(Category category){
+        if(taskMapper.updateCategory(category) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "카테고리 변경 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+        }
+    }
+
+    public void updateCategoryOrder(Category category){
+        if(taskMapper.updateCategoryOrder(category) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "카테고리 변경 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+        }
+    }
+
 
 }
