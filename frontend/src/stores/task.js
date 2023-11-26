@@ -54,7 +54,7 @@ export const useTaskStore = defineStore({
                         task.oriContent = task.content;
                         task.oriTitle = task.title;
                         let content = '';
-                        let categotyNM = task.category_nm ? ' [' + task.category_nm + ']' : '';
+                        let categotyNM = (data.category_seq == null || data.category_seq === 'important' || data.category_seq === 'share') && task.category_nm ? ' [' + task.category_nm + ']' : '';
                         if(task.content != null && task.content !== '' && task.content !== '<p></p>'){
                             content += '<div class="font-bold">' + task.title + categotyNM + '</div>'
                             content += '<div>' + task.content + '</div>'
@@ -167,6 +167,21 @@ export const useTaskStore = defineStore({
         },
         async updateCategoryOrder(task) {
             return http.post(`/task/category/update/order`, task, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async deleteCategory(category) {
+            return http.post(`/task/category/delete`, category, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

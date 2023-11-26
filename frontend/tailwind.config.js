@@ -42,7 +42,7 @@ module.exports = {
   },
   variants: {
     extend: {
-      userSelect: ['responsive']
+      userSelect: ['responsive'],
     }
   },
   plugins: [],

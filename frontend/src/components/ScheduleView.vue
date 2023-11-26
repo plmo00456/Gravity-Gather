@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from "@fullcalendar/timegrid"
 import interactionPlugin from '@fullcalendar/interaction'
 import fullCalendarLang from '@fullcalendar/core/locales/ko'
-import {getCurrentInstance, inject, onMounted, ref} from "vue";
+import {computed, getCurrentInstance, inject, onMounted, ref, watch} from "vue";
 import PopupWindow from "@/components/PopupWindow.vue";
 import writeEditor from "@/components/WriteEditor.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -13,6 +13,8 @@ import {useTaskStore} from "@/stores/task";
 import {useUserStore} from "@/stores/user";
 import ToggleSwitch from "@/components/ToggleSwitch.vue";
 import draggable from 'vuedraggable'
+import {ContextMenuSeparator, ContextMenuItem, ContextMenu} from "@imengyu/vue3-context-menu";
+
 
 export default {
     components: {
@@ -22,14 +24,15 @@ export default {
         writeEditor,
         PopupWindow,
         FullCalendar,
-        draggable
+        draggable,
+        ContextMenuSeparator, ContextMenuItem, ContextMenu
     },
     data() {
         return {
             category: {
                 editingItem: null,
                 editingTmpNm: null,
-                currentTab: 1,
+                currentTab: 'all',
                 isShow: true,
                 drag: true,
                 option: {
@@ -40,6 +43,12 @@ export default {
                 }
             },
             task: {
+                rightClick: true,
+                taskContextOption: {
+                    zIndex: 10,
+                    minWidth: 200,
+                    theme: 'mac'
+                },
                 isShow: false,
                 value: {
                     title: '',
@@ -82,11 +91,19 @@ export default {
                 initialView: 'dayGridMonth',
                 dateClick: this.handleDateClick,
                 eventDidMount: function(info) {
-                    this.utils.tippy(info.el, {
-                        content: info.event.extendedProps.content,
-                        allowHTML: true,
-                        theme: 'light',
-                    });
+                    if(info.event._def.extendedProps.is_important){
+                        info.el.classList.add("border-2");
+                        info.el.classList.add("!border-red-600");
+                    }
+
+                    info.el.innerHTML = this.highlightKeyword(info.el.innerHTML);
+                    if(info.event.extendedProps.content && info.event.extendedProps.content !== ''){
+                        this.utils.tippy(info.el, {
+                            content: this.highlightKeyword(info.event.extendedProps.content),
+                            allowHTML: true,
+                            theme: 'light',
+                        });
+                    }
                 }.bind(this),
                 eventDrop: function(info) {
                     const start = this.utils.dateToUnix(info.event._instance.range.start);
@@ -138,7 +155,6 @@ export default {
                         data.end_date_time = end;
                     }
                     this.dragTask(data);
-                    // console.log(info);
                 }.bind(this),
                 eventContent: function( info ) {
                     return {html: info.event.title};
@@ -170,6 +186,7 @@ export default {
         const taskCategory = ref([]);
         const content = ref('');
         const instance = getCurrentInstance();
+        const taskSearch = ref('');
         const mainDatePicker = ref({
             date: '',
             type: 'date',
@@ -198,7 +215,10 @@ export default {
                 const data = {
                     user_seq: user.seq,
                     startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
-                    endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate)
+                    endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate),
+                }
+                if(instance.data.category.currentTab !== 'all'){
+                    data.category_seq = instance.data.category.currentTab;
                 }
 
                 try {
@@ -266,7 +286,17 @@ export default {
 
             await getCategories();
             await getTasks();
-        })
+        });
+
+        const filteredTask = computed(() => {
+            return tasks.value.filter(task => {
+                return task.title.toLowerCase().includes(taskSearch.value) || task.content.toLowerCase().includes(taskSearch.value);
+            });
+        });
+        watch(filteredTask, () => {
+            instance.data.calendarOptions.events = filteredTask.value;
+            instance.refs.fullCalendar.getApi().refetchEvents();
+        });
 
         return {
             mainDatePicker,
@@ -276,7 +306,9 @@ export default {
             tasks,
             utils,
             taskCategory,
-            getCategories
+            getCategories,
+            filteredTask,
+            taskSearch
         }
     },
     methods: {
@@ -339,9 +371,12 @@ export default {
         async dragTask(data) {
             try {
                 const taskStore = useTaskStore();
+                data.title = data.oriTitle;
+                data.content = data.oriContent;
                 await taskStore.updateTask(data);
                 if (taskStore?.dataResponse.status === 200) {
                     this.utils.notify.success("수정되었습니다.", "수정 완료!");
+                    await this.getTasks();
                 } else {
                     this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
                 }
@@ -433,7 +468,53 @@ export default {
             data.category_nm = this.category.editingTmpNm;
             this.category.editingItem = null;
             this.category.editingTmpNm = null;
-        }
+        },
+        async deleteCategory(data){
+            console.log(data);
+            this.$swal.fire({
+                title: '카테고리 삭제',
+                html: `<b>[${data.category_nm}]</b>의 일정이 전부 삭제됩니다.<br>카테고리를 삭제 하시겠습니까?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "삭제",
+                cancelButtonText: "취소"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const taskStore = useTaskStore();
+                    try {
+                        await taskStore.deleteCategory({
+                            seq: data.seq,
+                        })
+                        if (taskStore?.dataResponse.status === 200) {
+                            if(this.category.currentTab === data.seq)
+                                this.category.currentTab = 'all';
+
+                            this.taskCategory = this.taskCategory.filter(category => {
+                               return category.seq !== data.seq;
+                            });
+
+                            this.utils.notify.success("삭제되었습니다.", "삭제 완료!");
+                            await this.getTasks();
+                        } else {
+                            this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+                        }
+                    } catch (error) {
+                        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+                    }
+                }
+            }).catch((error) => {
+                this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            });
+        },
+        highlightKeyword(text) {
+            if (this.taskSearch) {
+                const re = new RegExp(`>([^<]*?)(${this.taskSearch})([^<]*?)<`, 'gi');
+                return text.replace(re, (matchedText, p1, p2, p3) => {
+                    return `>${p1}<mark>${p2}</mark>${p3}<`;
+                });
+            }
+            return text;
+        },
     }
 }
 </script>
@@ -445,7 +526,7 @@ export default {
                 class="h-[90%] flex flex-col w-1/6 bg-white rounded p-6 border-blue-500 border-t-[5px] relative ml-2 mr-1 relative">
                 <div class="flex">
                     <div class="flex relative">
-                        <input type="text" placeholder="검색" v-model="search"
+                        <input type="text" placeholder="검색" v-model="taskSearch"
                                class="border text-sm pl-10 pr-4 py-2 rounded-l w-full focus:outline-none text-gray-400" maxlength="20">
                         <span class="flex justify-center absolute left-3 top-1/2 transform -translate-y-1/2">
                             <font-awesome-icon class="fa-sm text-gray-400" icon="magnifying-glass"></font-awesome-icon>
@@ -458,7 +539,7 @@ export default {
                 <div class="flex flex-col py-1 text-start border-b-2">
                     <div
                         :class="{'bg-blue-300' : category.currentTab === 'all', 'text-white' : category.currentTab === 'all' }"
-                        @click="category.currentTab = 'all'"
+                        @click="category.currentTab = 'all'; getTasks()"
                         class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
                         <span class="flex w-[13%]">
                             <font-awesome-icon
@@ -469,7 +550,7 @@ export default {
                     </div>
                     <div
                         :class="{'bg-blue-300' : category.currentTab === 'important', 'text-white' : category.currentTab === 'important' }"
-                        @click="category.currentTab = 'important'"
+                        @click="category.currentTab = 'important'; getTasks()"
                         class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
                         <span class="flex w-[13%]">
                             <font-awesome-icon
@@ -478,8 +559,19 @@ export default {
                         </span>
                         <span class="flex w-[87%]">중요</span>
                     </div>
+                    <div
+                            :class="{'bg-blue-300' : category.currentTab === 'share', 'text-white' : category.currentTab === 'share' }"
+                            @click="category.currentTab = 'share'; getTasks()"
+                            class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
+                        <span class="flex w-[13%]">
+                            <font-awesome-icon
+                                    :class="{'text-white' : category.currentTab === 'share'}"
+                                    class="self-start text-blue-400" icon="fa-share-nodes"></font-awesome-icon>
+                        </span>
+                        <span class="flex w-[87%]">공유</span>
+                    </div>
                 </div>
-                <div class="category-items flex flex-col py-1 text-start overflow-x-hidden overflow-y-auto select-none h-[30rem]">
+                <div class="category-items flex flex-col py-1 text-start overflow-x-hidden overflow-y-auto select-none h-[26.5rem]">
                     <draggable
                         class="list-group"
                         tag="transition-group"
@@ -498,19 +590,24 @@ export default {
                             <div
                                 :class="{'bg-blue-300' : category.currentTab === element.seq, 'text-white' : category.currentTab === element.seq }"
                                 class="item flex items-center mt-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer"
-                                @click="category.currentTab = element.seq"
+                                @click="category.currentTab = element.seq; getTasks()"
                                 @dblclick="category.editingItem = element.seq; category.editingTmpNm = element.category_nm">
                                 <span class="flex w-[15%]">
                                     <font-awesome-icon
                                         :class="{'text-white' : category.currentTab === element.seq}"
                                         class="self-start text-gray-400 hover:text-gray-600" icon="fa-bars"></font-awesome-icon>
                                 </span>
-                                <span class="flex w-[85%]" v-if="category.editingItem !== element.seq">{{ element.category_nm }}</span>
-                                <input class="text-black flex w-[85%]" v-else v-model="element.category_nm"
+                                <span class="flex w-[70%]" v-if="category.editingItem !== element.seq">{{ element.category_nm }}</span>
+                                <input class="text-black flex w-[70%]" v-else v-model="element.category_nm"
                                        maxlength="10"
                                        @keyup.esc="cancelCategoryNm(element)"
                                        @keyup.enter="saveCategoryNm(element)"
                                        @blur="saveCategoryNm(element)">
+                                <div class="w-[15%] text-red-400 flex justify-center items-center group">
+                                    <font-awesome-icon
+                                            @click.stop="deleteCategory(element)"
+                                            class="font-bold p-1 opacity-0 group-hover:opacity-100" icon="fa-trash-can"/>
+                                </div>
                             </div>
                         </template>
                     </draggable>
@@ -531,7 +628,6 @@ export default {
                     class="z-10"
                     id="calendar"
                     :options="calendarOptions"
-                    :events="tasks"
                     ref="fullCalendar"
             />
             <el-date-picker
@@ -543,23 +639,6 @@ export default {
                     :type="mainDatePicker.type"
                     @change="handleDatePicker"
             />
-            <div class="flex absolute outline-0 right-[calc(18%)] top-[2rem] z-10">
-                <div class="flex">
-                    <Multiselect
-                            class="w-[15rem] h-[3rem]"
-                            v-model="share.tmpTeamValue"
-                            track-by="teamValue"
-                            label="name"
-                            placeholder="분류"
-                            tag-placeholder="분류를 선택해주세요."
-                            :options="share.team"
-                            :multiple="true"
-                            :taggable="true"
-                            @tag="addTag"
-                            :close-on-select="false"
-                    />
-                </div>
-            </div>
         </div>
         <PopupWindow
                 :show="task.isShow"
@@ -692,6 +771,28 @@ export default {
                 </PopupWindow>
             </form>
         </PopupWindow>
+        <context-menu
+                v-model:show="task.rightClick"
+                :options="task.taskContextOption"
+        >
+            <context-menu-item label="수정" @click="myInfoShowFn" class="cursor-pointer">
+                <template #icon>
+                    <font-awesome-icon class="fa-md font-bold text-gray-600" icon="pen-to-square"></font-awesome-icon>
+                </template>
+            </context-menu-item>
+            <context-menu-item label="삭제" @click="myInfoShowFn" class="cursor-pointer">
+                <template #icon>
+                    <font-awesome-icon class="fa-md font-bold text-gray-600" icon="fa-regular fa-trash-can"></font-awesome-icon>
+                </template>
+            </context-menu-item>
+            <context-menu-separator/>
+            <context-menu-item label="닫기" class="cursor-pointer">
+                <template #icon>
+                    <font-awesome-icon class="fa-md font-bold text-gray-600"
+                                       icon="xmark"></font-awesome-icon>
+                </template>
+            </context-menu-item>
+        </context-menu>
     </div>
 </template>
 
@@ -789,5 +890,6 @@ export default {
 .category-items::-webkit-scrollbar-track {
     background: rgba(220, 20, 60, .1); /*스크롤바 뒷 배경 색상*/
 }
+
 
 </style>

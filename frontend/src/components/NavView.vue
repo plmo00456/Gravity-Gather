@@ -3,7 +3,7 @@
     <div class="flex justify-start w-4/6 items-center">
       <div class="flex w-4/6 items-center">
         <router-link to="/" class="cursor-pointer">
-          <img src="@/assets/image/logo.png" class="h-12 mr-16" alt="끌림 로고">
+          <img src="@/assets/image/logo.png" class="h-12 mr-16 select-none" alt="끌림 로고">
         </router-link>
         <ul class="flex text-gray-100 font-bold">
           <li class="mr-5 hover:text-gray-200">
@@ -278,11 +278,13 @@ export default {
         alarmContextOption: {
           zIndex: 10,
           minWidth: 400,
+            theme: 'mac',
         },
         isProfileClick: false,
         profileContextOption: {
           zIndex: 10,
           minWidth: 230,
+            theme: 'mac',
         },
       },
       myInfoShow: false,
