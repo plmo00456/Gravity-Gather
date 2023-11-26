@@ -25,6 +25,7 @@ public class Task {
     private Boolean is_all_day;
     private Boolean is_delete;
     private Boolean is_shared;
+    private Boolean is_important;
     private Integer user_seq;
     private String user_nm;
     private String user_nickname;

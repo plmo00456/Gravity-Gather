@@ -13,6 +13,7 @@
             A.CONTENT,
             A.IS_ALL_DAY,
             A.is_delete,
+            A.is_important,
             A.user_seq,
             (select AA.nickname from users AA where AA.seq = A.user_seq) as user_nickname,
             A.BG_COLOR,
@@ -33,8 +34,9 @@
         from tasks A
         left join task_share B
         on A.SEQ = B.TASK_SEQ
-        where
+        <where>
             (A.user_seq = #{user_seq} or B.user_seq = #{user_seq})
+            and (select AA.is_Delete from task_category AA where AA.seq = A.CATEGORY_SEQ) = false
             and A.is_delete = false
             <if test="startDatetime != null">
                 and	UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[>=]]> #{startDatetime}
@@ -43,8 +45,19 @@
                 and UNIX_TIMESTAMP(CONCAT(IFNULL(A.end_date, A.start_date), ' ', IFNULL(A.end_time, '23:59:59'))) <![CDATA[<]]> #{endDatetime}
             </if>
             <if test="category_seq != null">
-                and A.CATEGORY_SEQ = #{category_seq}
+                <choose>
+                    <when test="category_seq.toString() eq 'important'">
+                        and A.IS_IMPORTANT = true
+                    </when>
+                    <when test="category_seq.toString() eq 'share'">
+                        and A.user_seq != #{user_seq}
+                    </when>
+                    <otherwise>
+                        and A.CATEGORY_SEQ = #{category_seq}
+                    </otherwise>
+                </choose>
             </if>
+        </where>
         order by A.seq
     </select>
 
@@ -145,8 +158,27 @@
             START_TIME = FROM_UNIXTIME(#{start_date_time}),
             END_TIME = FROM_UNIXTIME(#{end_date_time}),
             UPDATED_AT = now()
-        WHERE
-            SEQ = #{seq}
+        <where>
+            <if test="seq != null">
+                and seq = #{seq}
+            </if>
+            <if test="category_seq != null">
+                and category_seq = #{category_seq}
+            </if>
+        </where>
+    </update>
+
+    <update id="deleteTask">
+        UPDATE tasks SET
+            IS_DELETE = true
+        <where>
+            <if test="seq != null">
+                seq = #{seq}
+            </if>
+            <if test="category_seq != null">
+                category_seq = #{category_seq}
+            </if>
+        </where>
     </update>
 
     <update id="updateCategory">
@@ -171,6 +203,13 @@
         </foreach>
         ELSE task_order
         END
+    </update>
+
+    <update id="deleteCategory">
+        UPDATE task_category
+        SET is_delete = true
+        WHERE
+            seq = #{seq}
     </update>
 
 </mapper>

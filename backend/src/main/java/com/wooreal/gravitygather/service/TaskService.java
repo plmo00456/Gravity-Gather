@@ -75,5 +75,15 @@ public class TaskService {
         }
     }
 
+    public void deleteCategory(Category category){
+        Task task = new Task();
+        task.setCategory_seq(category.getSeq());
+        task.setIs_delete(true);
+        if(taskMapper.deleteCategory(category) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "카테고리 삭제 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+        }
+        taskMapper.deleteTask(task);
+    }
+
 
 }

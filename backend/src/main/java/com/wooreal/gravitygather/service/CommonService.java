@@ -38,4 +38,6 @@ public class CommonService {
         commonMapper.readAlarm(userId, alarmSeq);
     }
 
+//    public void sendAlarm()
+
 }

@@ -86,4 +86,11 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/category/delete")
+    @ApiOperation(value = "일정 카테고리 삭제 api")
+    public ResponseEntity<?> deleteCategory(@RequestBody Category category) {
+        taskService.deleteCategory(category);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
