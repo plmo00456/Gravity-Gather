@@ -93,4 +93,11 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/delete")
+    @ApiOperation(value = "일정 삭제 api")
+    public ResponseEntity<?> deleteTask(@RequestBody Task task) {
+        taskService.deleteTask(task);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

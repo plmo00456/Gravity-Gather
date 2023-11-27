@@ -33,7 +33,7 @@ export default {
                 editingItem: null,
                 editingTmpNm: null,
                 currentTab: 'all',
-                isShow: true,
+                isShow: false,
                 drag: true,
                 option: {
                     animation: 200,
@@ -43,16 +43,27 @@ export default {
                 }
             },
             task: {
-                rightClick: true,
+                rightClick: false,
+                add: {
+                    title: '등록',
+                    clickFn: this.addTask,
+                },
+                update: {
+                    title: '수정',
+                    clickFn: this.updateTask,
+                },
+                rightClickEvent: null,
                 taskContextOption: {
                     zIndex: 10,
                     minWidth: 200,
-                    theme: 'mac'
+                    theme: 'mac',
+                    x: 100,
+                    y: 300,
                 },
-                isShow: false,
+                isShow: null,
                 value: {
+                    seq: null,
                     title: '',
-                    category_code: '00',
                     content: '',
                     is_all_day: true,
                     start_date: null,
@@ -67,7 +78,10 @@ export default {
                     text_color: '#ffffff',
                 },
                 clickDateStr: null,
-                clickDate: null
+                clickDate: {
+                    start: null,
+                    end: null
+                }
             },
             share: {
                 isShow: false,
@@ -86,6 +100,7 @@ export default {
                 caption: null,
             },
             calendarOptions: {
+                timeZone: 'UTC',
                 wheelEndTimeout: null,
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
@@ -104,27 +119,35 @@ export default {
                             theme: 'light',
                         });
                     }
+
+                    info.el.addEventListener("contextmenu", (e) => {
+                        e.preventDefault();
+                        if(info.event.extendedProps.user_seq !== this.user.seq) return;
+                        this.task.rightClickEvent = info.event;
+                        this.task.taskContextOption.x = e.clientX;
+                        this.task.taskContextOption.y = e.clientY;
+                        this.task.rightClick = true;
+                    });
+
                 }.bind(this),
                 eventDrop: function(info) {
-                    const start = this.utils.dateToUnix(info.event._instance.range.start);
-                    const end = this.utils.dateToUnix(info.event._instance.range.end);
+                    console.log(info);
+                    const oriStart = info.event._def.extendedProps.start_date_time;
+                    const oriEnd = info.event._def.extendedProps.end_date_time;
+                    const start = new Date(info.event.start.toISOString());
+                    const end = new Date(info.event.end.toISOString());
+                    end.setDate(end.getDate() - 1);
+                    start.setHours(this.utils.unixToFormat(oriStart, "%H"), this.utils.unixToFormat(oriStart, "%M"));
+                    end.setHours(this.utils.unixToFormat(oriEnd, "%H"), this.utils.unixToFormat(oriEnd, "%M"));
 
                     const _tmp = Object.assign({}, info.event._def);
                     let data = Object.assign({}, info.event._def.extendedProps);
 
                     data.content = data.oriContent;
                     data.title = _tmp.title;
-                    data.is_all_day = _tmp.allDay;
 
-                    if(data.is_all_day){
-                        let _start = info.event._instance.range.start;
-                        _start.setHours(0,0,0,0);
-                        data.start_date_time = this.utils.dateToUnix(_start);
-                        data.end_date_time = null;
-                    }else{
-                        data.start_date_time = start;
-                        data.end_date_time = end;
-                    }
+                    data.start_date_time = this.utils.dateToUnix(start);
+                    data.end_date_time = this.utils.dateToUnix(end);
                     this.dragTask(data);
                 }.bind(this),
                 eventResize: function(info) {
@@ -136,24 +159,9 @@ export default {
 
                     data.content = data.oriContent;
                     data.title = _tmp.title;
-                    data.is_all_day = _tmp.allDay;
 
-                    if(data.is_all_day){
-                        let _start = info.event._instance.range.start;
-                        _start.setHours(0,0,0,0);
-                        data.start_date_time = this.utils.dateToUnix(_start);
-                        if(info.event._instance.range.start.getDate() !== info.event._instance.range.end.getDate()){
-                            let _end = info.event._instance.range.end;
-                            _end.setHours(23,59,0,0);
-                            data.end_date_time = this.utils.dateToUnix(_end);
-                            data.is_all_day = false;
-                        }else{
-                            data.end_date_time = null;
-                        }
-                    }else{
-                        data.start_date_time = start;
-                        data.end_date_time = end;
-                    }
+                    data.start_date_time = start;
+                    data.end_date_time = end;
                     this.dragTask(data);
                 }.bind(this),
                 eventContent: function( info ) {
@@ -164,7 +172,7 @@ export default {
                 editable: true,
                 events: [],
                 headerToolbar: {
-                    start: 'today',
+                    start: '',
                     center: 'title,datePickerButton',
                     end: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
@@ -239,7 +247,6 @@ export default {
         onMounted(async () => {
             const fullCalendarApi = instance.refs.fullCalendar.getApi();
             const datePicker = instance.refs.datePicker;
-            const fcTodayButton = document.querySelector(".fc-today-button");
             const fcToolbar = document.querySelector(".fc-toolbar-title").closest("div");
             fcToolbar.classList.add("cursor-pointer");
             fcToolbar.classList.add("p-2");
@@ -268,9 +275,6 @@ export default {
                     }, 500);
                 }
             })
-            fcTodayButton.addEventListener('click', () => {
-                getTasks();
-            });
             fcToolbar.addEventListener('click', () => {
                 const currentType = fullCalendarApi.currentData.currentViewType;
                 if (currentType === 'dayGridMonth') {
@@ -313,14 +317,17 @@ export default {
     },
     methods: {
         handleDateClick: function (arg) {
-            const week = ['일', '월', '화', '수', '목', '금', '토'];
-            this.task.clickDate = Math.floor(arg.date.getTime() / 1000);
-            this.task.clickDateStr = arg.dateStr + ' (' + week[arg.date.getDay()] + ')';
-            this.task.isShow = true;
-            const B = new Date(arg.date.getTime());
-            B.setHours(23, 59, 0, 0);
-            this.task.value.date_time[0] = arg.date;
-            this.task.value.date_time[1] = B;
+            if(this.category.currentTab !== 'all' && this.category.currentTab !== 'important' && this.category.currentTab !== 'share'){
+                const week = ['일', '월', '화', '수', '목', '금', '토'];
+                this.task.clickDateStr = arg.dateStr + ' (' + week[arg.date.getDay()] + ')';
+                this.task.isShow = 'add';
+                const start = new Date(arg.date.getTime());
+                const end = new Date(arg.date.getTime());
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 0, 0);
+                this.task.value.date_time[0] = start;
+                this.task.value.date_time[1] = end;
+            }
         },
         handleDatePicker() {
             let calendarApi = this.$refs.fullCalendar.getApi()
@@ -347,16 +354,49 @@ export default {
             data.shared_user_seq = shareUserSeq;
             data.caption = this.share.caption;
             data.user_seq = this.user.seq;
-            if(this.task.value.is_all_day){
-                this.task.value.start_date_time = this.task.clickDate;
-            }else{
-                this.task.value.start_date_time = Math.floor(this.task.value.date_time[0].getTime() / 1000);
-                this.task.value.end_date_time = Math.floor(this.task.value.date_time[1].getTime() / 1000);
-            }
+            data.category_seq = this.category.currentTab;
+
+            this.task.value.start_date_time = Math.floor(this.task.value.date_time[0].getTime() / 1000);
+            this.task.value.end_date_time = Math.floor(this.task.value.date_time[1].getTime() / 1000);
 
             try {
                 const taskStore = useTaskStore();
                 await taskStore.addTask(data);
+                if (taskStore?.dataResponse.status === 200) {
+                    this.cancelTask();
+                    this.utils.notify.success("등록되었습니다.", "등록 완료!");
+                    await this.getTasks();
+                } else {
+                    this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+                }
+            } catch (error) {
+                this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            }
+        },
+        async updateTask() {
+            if(this.task.value.title == null ||this.task.value.title === ''){
+                this.utils.msgError("제목을 입력 해 주세요.");
+                return;
+            }
+
+            const data = this.task.value;
+            const shareTeamValue = this.share.teamValue;
+            const shareUserSeq = [];
+            shareTeamValue.forEach((team) => {
+                shareUserSeq.push(team.teamValue);
+            });
+            data.shared_user_seq = shareUserSeq;
+            data.caption = this.share.caption;
+            data.user_seq = this.user.seq;
+            data.is_delete = false;
+            data.seq = this.task.value.seq;
+
+            this.task.value.start_date_time = Math.floor(this.task.value.date_time[0].getTime() / 1000);
+            this.task.value.end_date_time = Math.floor(this.task.value.date_time[1].getTime() / 1000);
+
+            try {
+                const taskStore = useTaskStore();
+                await taskStore.updateTask(data);
                 if (taskStore?.dataResponse.status === 200) {
                     this.cancelTask();
                     this.utils.notify.success("등록되었습니다.", "등록 완료!");
@@ -389,7 +429,7 @@ export default {
             this.$refs.taskForm.reset();
             this.$refs.taskContent.clearEditor();
             this.task.value.content = null;
-            this.task.isShow = false;
+            this.task.isShow = null;
         },
         addTag (newTag) {
             const tag = {
@@ -411,9 +451,6 @@ export default {
         },
         cancelShare() {
             this.share.isShow = false;
-        },
-        t(e) {
-           console.log(e);
         },
         async updateCategoryOrder(){
             try {
@@ -470,7 +507,6 @@ export default {
             this.category.editingTmpNm = null;
         },
         async deleteCategory(data){
-            console.log(data);
             this.$swal.fire({
                 title: '카테고리 삭제',
                 html: `<b>[${data.category_nm}]</b>의 일정이 전부 삭제됩니다.<br>카테고리를 삭제 하시겠습니까?`,
@@ -515,6 +551,73 @@ export default {
             }
             return text;
         },
+        taskEventUpdate(){
+            if(!this.task.rightClickEvent)
+                this.utils.notify.error("오류가 발생했습니다.", "오류");
+
+            this.task.clickDateStr = null;
+            const eData = this.task.rightClickEvent;
+            console.log(eData);
+            this.task.value.seq = eData._def.extendedProps.seq;
+            this.task.value.is_all_day = eData._def.extendedProps.is_all_day;
+            this.task.value.title = eData._def.extendedProps.oriTitle;
+            this.task.value.content = eData._def.extendedProps.oriContent;
+            this.task.value.bg_color = eData._def.extendedProps.bg_color;
+            this.task.value.text_color = eData._def.extendedProps.text_color;
+
+            console.log(eData._def.extendedProps.start_date_time);
+
+            console.log(eData._def.extendedProps.start_date_time);
+
+            const start = new Date(eData._def.extendedProps.start_date_time * 1000);
+            let end = null;
+            if(eData._def.extendedProps.end_date_time){
+                end = new Date(eData._def.extendedProps.end_date_time * 1000);
+            }else{
+                end = new Date(eData._def.extendedProps.start_date_time * 1000);
+                end.setHours(23,59,0,0);
+            }
+
+            this.task.value.date_time[0] = start;
+            this.task.value.date_time[1] = end;
+
+            this.task.isShow = 'update';
+        },
+        deleteTask(){
+            const title = this.task.rightClickEvent._def.extendedProps.oriTitle;
+            const seq = this.task.rightClickEvent._def.extendedProps.seq;
+            this.$swal.fire({
+                title: '일정 삭제',
+                html: `<b>[${title}]</b> 일정을 삭제 하시겠습니까?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "삭제",
+                cancelButtonText: "취소"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const taskStore = useTaskStore();
+                    try {
+                        await taskStore.deleteTask({
+                            seq: seq,
+                            is_delete: true,
+                        })
+                        if (taskStore?.dataResponse.status === 200) {
+                            this.utils.notify.success("삭제되었습니다.", "삭제 완료!");
+                            await this.getTasks();
+                        } else {
+                            this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+                    }
+                }
+            }).catch((error) => {
+                console.log(error);
+                this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            });
+        }
+
     }
 }
 </script>
@@ -623,7 +726,6 @@ export default {
             </div>
         </transition>
         <div class="h-[90%] flex flex-col w-5/6 bg-white rounded p-6 border-yellow-500 border-t-[5px] relative">
-            <button @click="category.isShow = !category.isShow">테스트</button>
             <FullCalendar
                     class="z-10"
                     id="calendar"
@@ -639,10 +741,15 @@ export default {
                     :type="mainDatePicker.type"
                     @change="handleDatePicker"
             />
+            <button
+                class="absolute flex px-3 py-2 rounded bg-gray-200 left-[1.7rem] top-[1.7rem] text-white cursor-pointer hover:bg-gray-300 z-50"
+                @click="category.isShow = !category.isShow">
+                <font-awesome-icon icon="bars"></font-awesome-icon>
+            </button>
         </div>
         <PopupWindow
-                :show="task.isShow"
-                :title="'일정 등록'"
+                :show="task.isShow != null"
+                :title="'일정 ' + (task.isShow ? task[task.isShow].title : '')"
                 :subTitle="task.clickDateStr"
                 :widthClass="'w-[70%]'"
                 :heightClass="'h-[45rem]'"
@@ -713,8 +820,8 @@ export default {
                         <div>
                             <button class="px-7 py-3 bg-blue-600 rounded text-sm hover:bg-blue-500 mr-3"
                                     type="button"
-                                    @click="addTask">
-                                <span class="">등록</span>
+                                    @click="task[task.isShow].clickFn">
+                                <span> {{task.isShow ? task[task.isShow].title : ''}} </span>
                             </button>
                             <button class="px-7 py-3 bg-gray-500 rounded text-sm hover:bg-gray-400"
                                     type="button"
@@ -774,13 +881,14 @@ export default {
         <context-menu
                 v-model:show="task.rightClick"
                 :options="task.taskContextOption"
+                @close="task.rightClickEvent = null"
         >
-            <context-menu-item label="수정" @click="myInfoShowFn" class="cursor-pointer">
+            <context-menu-item label="수정" @click="taskEventUpdate" class="cursor-pointer">
                 <template #icon>
                     <font-awesome-icon class="fa-md font-bold text-gray-600" icon="pen-to-square"></font-awesome-icon>
                 </template>
             </context-menu-item>
-            <context-menu-item label="삭제" @click="myInfoShowFn" class="cursor-pointer">
+            <context-menu-item label="삭제" @click="deleteTask" class="cursor-pointer">
                 <template #icon>
                     <font-awesome-icon class="fa-md font-bold text-gray-600" icon="fa-regular fa-trash-can"></font-awesome-icon>
                 </template>
@@ -859,8 +967,8 @@ export default {
     background: var(--dp-primary-color) !important;
 }
 
-.dp__action_buttons {
-    witdh: 3rem;
+.dp__action_button {
+    width: 3rem;
     justify-content: center;
 }
 

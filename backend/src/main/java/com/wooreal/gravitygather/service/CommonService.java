@@ -38,6 +38,10 @@ public class CommonService {
         commonMapper.readAlarm(userId, alarmSeq);
     }
 
-//    public void sendAlarm()
+    public void sendAlarm(int receive_seq, int sender_seq, String msg){
+        try{
+            commonMapper.sendAlarm(receive_seq, sender_seq, msg);
+        }catch (Exception e){}
+    }
 
 }

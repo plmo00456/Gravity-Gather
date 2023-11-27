@@ -34,4 +34,17 @@
             AND seq <![CDATA[<=]]> #{alarmSeq}
         </if>
     </update>
+
+    <insert id="sendAlarm">
+        INSERT INTO alarms
+        (
+            receive_seq,
+            sender_seq,
+            msg
+        ) VALUES (
+            #{receive_seq},
+            #{sender_seq},
+            #{msg}
+        )
+    </insert>
 </mapper>

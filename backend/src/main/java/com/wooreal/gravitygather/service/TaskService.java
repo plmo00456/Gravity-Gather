@@ -16,9 +16,11 @@ import java.util.Map;
 public class TaskService {
 
     private final TaskMapper taskMapper;
+    private final CommonService commonService;
 
-    public TaskService(TaskMapper taskMapper) {
+    public TaskService(TaskMapper taskMapper, CommonService commonService) {
         this.taskMapper = taskMapper;
+        this.commonService = commonService;
     }
 
     public List<Task> getTasks(Map<String, Object> map){
@@ -46,6 +48,15 @@ public class TaskService {
                 && task.getShared_user_seq() != null && task.getShared_user_seq().length > 0){
 
             result = taskMapper.addTaskShare(task);
+
+            for(int seq : task.getShared_user_seq()){
+                String title = task.getTitle();
+                if (title.length() > 15) {
+                    title = title.substring(0, 12) + "...";
+                }
+                commonService.sendAlarm(seq, task.getUser_seq(), "\"" + title + "\" 일정이 공유되었습니다.");
+            }
+
             if(result == 0){
                 throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 공유 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
             }
@@ -73,6 +84,11 @@ public class TaskService {
         if(taskMapper.updateCategoryOrder(category) == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "카테고리 변경 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
         }
+    }
+
+    public void deleteTask(Task task){
+        if(taskMapper.deleteTask(task) == 0)
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 삭제 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
     }
 
     public void deleteCategory(Category category){

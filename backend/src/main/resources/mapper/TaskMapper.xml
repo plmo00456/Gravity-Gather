@@ -11,7 +11,6 @@
             A.CATEGORY_SEQ,
             (select AA. CATEGORY_NM from task_category AA where AA.seq = A.CATEGORY_SEQ) as CATEGORY_NM,
             A.CONTENT,
-            A.IS_ALL_DAY,
             A.is_delete,
             A.is_important,
             A.user_seq,
@@ -42,7 +41,7 @@
                 and	UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[>=]]> #{startDatetime}
             </if>
             <if test="endDatetime != null">
-                and UNIX_TIMESTAMP(CONCAT(IFNULL(A.end_date, A.start_date), ' ', IFNULL(A.end_time, '23:59:59'))) <![CDATA[<]]> #{endDatetime}
+                and UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[<]]> #{endDatetime}
             </if>
             <if test="category_seq != null">
                 <choose>
@@ -96,7 +95,6 @@
             TITLE,
             CATEGORY_SEQ,
             CONTENT,
-            IS_ALL_DAY,
             IS_DELETE,
             USER_SEQ,
             BG_COLOR,
@@ -111,7 +109,6 @@
             #{title},
             #{category_seq},
             #{content},
-            #{is_all_day},
             false,
             #{user_seq},
             #{bg_color},
@@ -149,7 +146,6 @@
         UPDATE tasks SET
             TITLE = #{title},
             CONTENT = #{content},
-            IS_ALL_DAY = #{is_all_day},
             IS_DELETE = #{is_delete},
             BG_COLOR = #{bg_color},
             TEXT_COLOR = #{text_color},

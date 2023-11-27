@@ -278,7 +278,6 @@ export default {
         alarmContextOption: {
           zIndex: 10,
           minWidth: 400,
-            theme: 'mac',
         },
         isProfileClick: false,
         profileContextOption: {

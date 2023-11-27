@@ -174,7 +174,7 @@ async function init(){
         const option = {
             message: message,
             type: 'success',
-            position: 'bottom-right',
+            position: 'top',
         };
         if(title){
             option.title = title;
@@ -184,7 +184,8 @@ async function init(){
     app.config.globalProperties.utils.notify.error = async (message, title) => {
         const option = {
             message: message,
-            type: 'error'
+            type: 'error',
+            position: 'top',
         };
         if(title){
             option.title = title;

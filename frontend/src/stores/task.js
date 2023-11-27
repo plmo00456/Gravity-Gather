@@ -61,6 +61,7 @@ export const useTaskStore = defineStore({
                         }
                         const tmp = task.title;
                         if(task.user_seq !== data.user_seq){
+                            task.startEditable = false;
                             task.is_share = true;
                             task.title = '<div class="flex items-center px-0.5"><div class="flex justify-center items-center rounded-full mr-0.5 bg-white w-[1rem] h-[1rem]"><img class="w-[0.6rem] h-[0.6rem]" src="' + require('@/assets/image/share-icon.png') + '" alt="공유 아이콘"></div>' + tmp + "</div>";
                             if(task.content){
@@ -74,11 +75,17 @@ export const useTaskStore = defineStore({
                             task.title = '<div class="flex items-center px-0.5">' + tmp + '</div>';
                         }
                         task.content = content;
-                       if(task.is_all_day){
+                        task.allDay = true;
+                        task.oriStart = task.start_date_time;
+                       if(!task.end_date_time){
                            task.date = unixToFormat(task.start_date_time, "%Y-%m-%d");
                        }else{
-                           task.start = formatDate(task.start_date_time, "%Y-%m-%d %H:%M:%S");
-                           task.end = formatDate(task.end_date_time, "%Y-%m-%d %H:%M:%S");
+                           let endDate = new Date(formatDate(task.end_date_time, "%Y-%m-%d %H:%M"));
+                           endDate.setDate(endDate.getDate() + 1);
+                           console.log(endDate);
+                           task.start = formatDate(task.start_date_time, "%Y-%m-%d %H:%M");
+                           task.end = endDate;
+                           task.oriEnd = task.end_date_time;
                        }
                     });
                     this.taskList = tasks;
@@ -194,6 +201,21 @@ export const useTaskStore = defineStore({
             .catch(error => {
                 this.dataResponse = error.response;
             });
+        },
+        async deleteTask(category) {
+            return http.post(`/task/delete`, category, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.dataResponse = response;
+                    }
+                })
+                .catch(error => {
+                    this.dataResponse = error.response;
+                });
         }
     }
 })
