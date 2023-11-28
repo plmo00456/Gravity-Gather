@@ -85,17 +85,9 @@ export default {
             },
             share: {
                 isShow: false,
-                team: [
-                    { name: '김철득', teamValue: 1},
-                    { name: '이진성', teamValue: 2},
-                    { name: '박조상', teamValue: 3},
-                    { name: '4444', teamValue: 4},
-                    { name: '5555', teamValue: 5},
-                    { name: '6666', teamValue: 6},
-                    { name: '7777777', teamValue: 7},
-                ],
-                tmpTeamValue:[],
-                teamValue:[],
+                team: [],
+                tmpFriendSeq:[],
+                friend_seq:[],
                 tmpCaption:'null',
                 caption: null,
             },
@@ -338,6 +330,20 @@ export default {
         test2() {
             const html = document.querySelector("html");
             html.classList.toggle("dark");
+
+            this.$swal.fire({
+                title: "미팅방 초대",
+                text: '테스트',
+                timer: 10000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    this.$swal.showLoading();
+                },
+            }).then((result) => {
+                if (result.dismiss === this.$swal.DismissReason.timer) {
+                    console.log("I was closed by the timer");
+                }
+            });
         },
         async addTask() {
             if(this.task.value.title == null ||this.task.value.title === ''){
@@ -346,10 +352,10 @@ export default {
             }
 
             const data = this.task.value;
-            const shareTeamValue = this.share.teamValue;
+            const shareTeamValue = this.share.friend_seq;
             const shareUserSeq = [];
             shareTeamValue.forEach((team) => {
-                shareUserSeq.push(team.teamValue);
+                shareUserSeq.push(team.friend_seq);
             });
             data.shared_user_seq = shareUserSeq;
             data.caption = this.share.caption;
@@ -380,10 +386,10 @@ export default {
             }
 
             const data = this.task.value;
-            const shareTeamValue = this.share.teamValue;
+            const shareTeamValue = this.share.friend_seq;
             const shareUserSeq = [];
             shareTeamValue.forEach((team) => {
-                shareUserSeq.push(team.teamValue);
+                shareUserSeq.push(team.friend_seq);
             });
             data.shared_user_seq = shareUserSeq;
             data.caption = this.share.caption;
@@ -433,19 +439,25 @@ export default {
         },
         addTag (newTag) {
             const tag = {
-                name: newTag,
-                teamValue: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+                user_nm: newTag,
+                friend_seq: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
             }
             this.options.push(tag)
             this.value.push(tag)
         },
-        openShare() {
-            this.share.tmpTeamValue = this.share.teamValue;
+        async openShare() {
+            const userStore = useUserStore();
+            await userStore.getFriends({
+                user_seq: this.user.seq,
+            });
+            this.share.team = userStore.friendList;
+
+            this.share.tmpFriendSeq = this.share.friend_seq;
             this.share.tmpCaption = this.share.caption;
             this.share.isShow = true;
         },
         addShare() {
-            this.share.teamValue = this.share.tmpTeamValue;
+            this.share.friend_seq = this.share.tmpFriendSeq;
             this.share.caption = this.share.tmpCaption;
             this.share.isShow = false;
         },
@@ -808,9 +820,9 @@ export default {
                                     type="button"
                                     @click="openShare">
                                 <span class="flex justify-center items-center">
-                                    <b  v-if="share.teamValue.length > 0"
+                                    <b  v-if="share.friend_seq.length > 0"
                                         class="absolute -right-3 -top-2 flex justify-center items-center w-6 h-6 mr-1 rounded-full bg-blue-500">
-                                        {{share.teamValue.length}}
+                                        {{share.friend_seq.length}}
                                     </b>
                                     <font-awesome-icon class="mr-1" icon="fa-user-group"/>
                                     공유하기
@@ -850,9 +862,9 @@ export default {
                         </p>
                         <p class="flex flex-col items-start w-full mb-3 h-full">
                             <Multiselect
-                                    v-model="share.tmpTeamValue"
-                                    track-by="teamValue"
-                                    label="name"
+                                    v-model="share.tmpFriendSeq"
+                                    track-by="friend_seq"
+                                    label="user_nm"
                                     placeholder="공유 대상을 선택해주세요."
                                     tag-placeholder="공유 대상을 선택해주세요."
                                     :options="share.team"

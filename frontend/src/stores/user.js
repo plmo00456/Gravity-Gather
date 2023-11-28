@@ -8,6 +8,7 @@ export const useUserStore = defineStore({
         isLoggedIn: false,
         userInfo: null,
         dataResponse: null,
+        friendList: [],
     }),
     getters: {
         username() {
@@ -118,14 +119,65 @@ export const useUserStore = defineStore({
                     'Content-Type': 'multipart/form-data'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+
+        async getFriends(friend){
+            return http.post(`/user/friend/get`, friend, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.friendList = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+
+        async addFriend(friend){
+            return http.post(`/user/friend/add`, friend, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.friendList = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+
+        async deleteFriend(friend){
+            return http.post(`/user/friend/delete`, friend, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.friendList = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         }
     }
 })

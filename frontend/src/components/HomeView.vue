@@ -6,13 +6,13 @@
       <div v-if="currentWindow === 'createRoom'">
         <form @submit.prevent="createRoom">
           <p class="flex flex-col text-left mb-5">
-            <span>미팅 제목</span>
+            <span>미팅 제목<b class="ml-1 text-red-500">*</b></span>
             <input type="text" v-model.lazy.trim="createRoomTitle" class="border border-gray-300 py-2 px-3"
                    :class="{'border-red-500':isCreateRoomTitle}" @focus="isCreateRoomTitle = false" placeholder="미팅 제목"
                    maxlength="30">
           </p>
           <p class="flex flex-col text-left mb-5">
-            <span>미팅 내용</span>
+            <span>미팅 내용<b class="ml-1 text-red-500">*</b></span>
             <input type="text" v-model.lazy.trim="createRoomTopic" class="border border-gray-300 py-2 px-3"
                    :class="{'border-red-500':isCreateRoomTopic}" @focus="isCreateRoomTopic = false" placeholder="미팅 내용"
                    maxlength="30">
@@ -253,6 +253,7 @@ export default {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log(data);
       if (data.type1 === 'room') {
         if (data.type2 === 'delete') {
           this.chatRooms = this.chatRooms.filter(room => room.id !== data.chatRoomId);
@@ -263,6 +264,24 @@ export default {
           if (index !== -1) {
             rooms.value.splice(index, 1, data.roomInfo);
           }
+        } else if (data.type2 === 'invite') {
+
+            //초대장 까지 넣었고, 수락 거절 버튼 넣어서 콜백처리 해야함
+            if(data.receiveSeq == user.seq){
+                instance.appContext.config.globalProperties.$swal.fire({
+                    title: "미팅방 초대",
+                    text: data.content,
+                    timer: data.timer,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        instance.appContext.config.globalProperties.$swal.showLoading();
+                    },
+                }).then((result) => {
+                    if (result.dismiss === instance.appContext.config.globalProperties.$swal.DismissReason.timer) {
+                        console.log("I was closed by the timer");
+                    }
+                });
+            }
         }
       }
     };
@@ -379,6 +398,7 @@ export default {
     async enterRoom(roomInfo) {
       const roomStore = useRoomStore();
       try {
+        roomInfo.user_seq = this.user.seq;
         await roomStore.enterRoom(roomInfo);
         this.dataResponse = roomStore.dataResponse;
 
