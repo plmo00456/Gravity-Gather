@@ -23,5 +23,6 @@ public class RoomRequest {
     private Integer currentParticipant;
     private Integer maxParticipant;
     private Integer ownerSeq;
+    private Integer userSeq;
 
 }

@@ -1,6 +1,7 @@
 package com.wooreal.gravitygather.mapper;
 
 import com.wooreal.gravitygather.dto.room.Room;
+import com.wooreal.gravitygather.dto.user.Friend;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,4 +20,10 @@ public interface UserMapper {
     int setUserActive(String email);
 
     int userUpdate(User user);
+
+    List<Friend> getFriends(Friend friend);
+
+    int addFriend(Friend friend);
+
+    int deleteFriend(Friend friend);
 }

@@ -1,10 +1,7 @@
 package com.wooreal.gravitygather.service;
 
 import com.wooreal.gravitygather.config.WebSocketHandler;
-import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
-import com.wooreal.gravitygather.dto.user.User;
-import com.wooreal.gravitygather.dto.user.UserRequest;
-import com.wooreal.gravitygather.dto.user.UserResponse;
+import com.wooreal.gravitygather.dto.user.*;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
@@ -17,6 +14,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -143,6 +141,18 @@ public class UserService {
         }
 
         webSocketHandler.updateUserMsg(userRequest.getSeq());
+    }
+
+    public List<Friend> getFriends(Friend friend){
+        return userMapper.getFriends(friend);
+    }
+
+    public int addFriend(Friend friend){
+        return userMapper.addFriend(friend);
+    }
+
+    public int deleteFriend(Friend friend){
+        return userMapper.deleteFriend(friend);
     }
 
 }

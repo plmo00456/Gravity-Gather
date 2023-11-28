@@ -7,6 +7,7 @@ import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.dto.room.RoomSession;
 import com.wooreal.gravitygather.dto.user.UserResponse;
+import com.wooreal.gravitygather.service.RedisService;
 import com.wooreal.gravitygather.service.RoomService;
 import com.wooreal.gravitygather.service.UserService;
 import com.wooreal.gravitygather.utils.comUtil;
@@ -19,6 +20,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,12 +28,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class WebSocketHandler extends TextWebSocketHandler {
 
+    private final int InviteSec = 11000;
+
+    private final RedisService redisService;
     private final RoomService roomService;
     private final UserService userService;
 
-    public WebSocketHandler(@Lazy RoomService roomService, @Lazy UserService userService) {
+    public WebSocketHandler(@Lazy RoomService roomService, @Lazy UserService userService, @Lazy RedisService redisService) {
         this.roomService = roomService;
         this.userService = userService;
+        this.redisService = redisService;
     }
 
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<String, WebSocketSession>();
@@ -78,6 +84,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String sender = comUtil.hasIsNullChk(jsonObject, "sender", null);
         String senderPhoto = comUtil.hasIsNullChk(jsonObject, "senderPhoto", null);
         String senderSeq = comUtil.hasIsNullChk(jsonObject, "senderSeq", null);
+        String receiveSeq = comUtil.hasIsNullChk(jsonObject, "receiveSeq", null);
         String content = comUtil.hasIsNullChk(jsonObject, "content", null);
 
         if (type1.equals("room")) {
@@ -109,6 +116,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     leaveRoom(roomId, session);
                     content = sender + "님이 방을 떠났습니다.";
                     break;
+                case "invite":
+                    inviteRoom(roomId, receiveSeq);
+                    jo.addProperty("type1", type1);
+                    jo.addProperty("type2", type2);
+                    jo.addProperty("content", content);
+                    jo.addProperty("datetime", new Date().getTime());
+                    jo.addProperty("roomId", roomId);
+                    jo.addProperty("receiveSeq", receiveSeq);
+                    jo.addProperty("timer", InviteSec - 1000);
+                    roomService.insChatLog(type2, Integer.parseInt(roomId), content, Integer.parseInt(senderSeq));
+                    sendMessageToAll(jo.toString());
+                    return;
             }
             jo.addProperty("type1", type1);
             jo.addProperty("type2", type2);
@@ -143,6 +162,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 .findFirst()
                 .ifPresent(room::remove);
         meetrooms.put(roomId, room);
+    }
+
+    private void inviteRoom(String roomId, String receiveSeq) {
+        redisService.setValues("InviteCode " + receiveSeq + " " + roomId, "true", Duration.ofMillis(InviteSec));
     }
 
     public void sendMessageToAll(String message) throws IOException {

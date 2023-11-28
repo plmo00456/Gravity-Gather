@@ -24,15 +24,17 @@ import java.util.stream.Collectors;
 @Service
 public class RoomService {
 
+    private final RedisService redisService;
     private final RoomMapper roomMapper;
     private final UserMapper userMapper;
 
     private final WebSocketHandler webSocketHandler;
 
-    public RoomService(RoomMapper roomMapper, UserMapper userMapper, WebSocketHandler webSocketHandler) {
+    public RoomService(RoomMapper roomMapper, UserMapper userMapper, WebSocketHandler webSocketHandler, RedisService redisService) {
         this.roomMapper = roomMapper;
         this.userMapper = userMapper;
         this.webSocketHandler = webSocketHandler;
+        this.redisService = redisService;
     }
 
     public List<Room> getRooms(){
@@ -143,6 +145,12 @@ public class RoomService {
         if(currentRoom.getCurrent_participant().equals(currentRoom.getMax_participant())){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "방 인원이 가득 찼습니다.");
         }
+
+        String redisAuthCode = redisService.getValues("InviteCode " + roomRequest.getUserSeq() + " " + roomRequest.getSeq());
+        boolean authResult = redisService.checkExistsValue(redisAuthCode);
+
+        if(authResult) return currentRoom;
+
         if(currentRoom.getIs_locked()){
             String passwordSalt = currentRoom.getPassword_salt();
             String password = SHA256Util.generateHashWithSalt(roomRequest.getPassword(), passwordSalt);

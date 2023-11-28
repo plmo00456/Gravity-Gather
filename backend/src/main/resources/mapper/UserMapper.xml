@@ -117,4 +117,37 @@
         </set>
         WHERE seq = #{seq}
     </update>
+
+    <select id="getFriends">
+        SELECT
+            seq,
+            user_seq,
+            (select AA.nickname from users AA where AA.seq = friend_seq ) as user_nm,
+            friend_seq,
+            create_at
+        FROM
+            friend
+        WHERE
+            user_seq = #{user_seq}
+        <if test="friend_seq != null">
+            and friend_seq = #{friend_seq}
+        </if>
+    </select>
+
+    <insert id="addFriend">
+        INSERT INTO friend
+        (
+            user_seq,
+            friend_seq
+        ) VALUES (
+            #{user_seq},
+            #{friend_seq}
+        )
+    </insert>
+
+    <delete id="deleteFriend">
+        DELETE FROM friend
+        WHERE user_seq = #{user_seq}
+        and friend_seq = #{friend_seq}
+    </delete>
 </mapper>

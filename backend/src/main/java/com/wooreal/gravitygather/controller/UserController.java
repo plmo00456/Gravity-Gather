@@ -1,10 +1,7 @@
 package com.wooreal.gravitygather.controller;
 
 import com.wooreal.gravitygather.dto.file.FileVO;
-import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
-import com.wooreal.gravitygather.dto.user.User;
-import com.wooreal.gravitygather.dto.user.UserRequest;
-import com.wooreal.gravitygather.dto.user.UserResponse;
+import com.wooreal.gravitygather.dto.user.*;
 import com.wooreal.gravitygather.service.FileUploadService;
 import com.wooreal.gravitygather.service.UserService;
 import io.swagger.annotations.Api;
@@ -83,6 +80,30 @@ public class UserController {
         }
 
         userService.userUpdate(userRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/friend/get")
+    @ApiOperation(value = "친구 가져오는 api")
+    public ResponseEntity<?> getFriends(@RequestBody Friend friend) {
+        List<Friend> friends = userService.getFriends(friend);
+        return new ResponseEntity<>(friends, HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/friend/add")
+    @ApiOperation(value = "친구 삭제하는 api")
+    public ResponseEntity<?> addFriends(@RequestBody Friend friend) {
+        userService.addFriend(friend);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/friend/delete")
+    @ApiOperation(value = "친구 삭제하는 api")
+    public ResponseEntity<?> deleteFriends(@RequestBody Friend friend) {
+        userService.deleteFriend(friend);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
