@@ -7,6 +7,7 @@ import meetRoomView from "@/components/MeetRoomView.vue";
 import {useCommonStore} from "@/stores/common";
 import writeView from "@/components/WriteView.vue";
 import scheduleView from "@/components/ScheduleView.vue";
+import communityView from "@/components/CommunityView.vue";
 
 const routes = [
     {
@@ -73,7 +74,7 @@ const routes = [
         path: '/room/:id',
         name: 'room',
         meta: {
-            title: '미팅 방',
+            title: '끌림 - 미팅룸',
             hideMenu: false,
         },
         component: meetRoomView,
@@ -82,9 +83,17 @@ const routes = [
         path: '/schedule',
         name: 'scheduleView',
         meta: {
-            title: '일정',
+            title: '끌림 - 일정',
         },
         component: scheduleView,
+    },
+    {
+        path: '/community',
+        name: 'communityView',
+        meta: {
+            title: '끌림 - 커뮤니티',
+        },
+        component: communityView,
     },
 
 ]

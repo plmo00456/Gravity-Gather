@@ -266,19 +266,24 @@ export default {
           }
         } else if (data.type2 === 'invite') {
 
-            //초대장 까지 넣었고, 수락 거절 버튼 넣어서 콜백처리 해야함
             if(data.receiveSeq == user.seq){
                 instance.appContext.config.globalProperties.$swal.fire({
                     title: "미팅방 초대",
                     text: data.content,
                     timer: data.timer,
                     timerProgressBar: true,
-                    didOpen: () => {
-                        instance.appContext.config.globalProperties.$swal.showLoading();
+                    showCancelButton: true,
+                    confirmButtonText: "수락",
+                    cancelButtonText: "거절",
+                    customClass: {
+                        timerProgressBar: 'bg-blue-500'
                     },
                 }).then((result) => {
-                    if (result.dismiss === instance.appContext.config.globalProperties.$swal.DismissReason.timer) {
-                        console.log("I was closed by the timer");
+                    if (result.isConfirmed) {
+                        enterRoom({
+                            seq: data.roomId,
+                            userSeq: user.seq,
+                        });
                     }
                 });
             }
@@ -341,8 +346,33 @@ export default {
       instance.appContext.config.globalProperties.utils.tooltips('tooltip');
     });
 
+      const enterRoom = async (roomInfo) => {
+          const roomStore = useRoomStore();
+          try {
+              const newRoomInfo = Object.assign({}, roomInfo);
+              newRoomInfo.user_seq = user.seq;
+
+              console.log(newRoomInfo);
+              await roomStore.enterRoom(newRoomInfo);
+
+              if (roomStore.dataResponse?.status !== 200) {
+                  instance.appContext.config.globalProperties.utils.msgError(roomStore.dataResponse?.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+              } else {
+                  const roomInfo = roomStore.dataResponse.data;
+                  await router.push({
+                      name: 'room',
+                      state: {roomInfo: JSON.stringify(roomInfo)},
+                      params: {id: roomInfo.seq}
+                  });
+              }
+          } catch (error) {
+              console.error(error);
+              instance.appContext.config.globalProperties.utils.msgError((error?.response?.data) || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+          }
+      }
+
     return {
-      userStore, user, socket, rooms, search, filteredRoom, toggleState, createRoomPassword, updateCreateRoomPassword
+      userStore, user, socket, rooms, search, filteredRoom, toggleState, createRoomPassword, updateCreateRoomPassword, enterRoom
     };
   },
   methods: {
@@ -393,28 +423,6 @@ export default {
         }
       } else {
         this.showError = true;
-      }
-    },
-    async enterRoom(roomInfo) {
-      const roomStore = useRoomStore();
-      try {
-        roomInfo.user_seq = this.user.seq;
-        await roomStore.enterRoom(roomInfo);
-        this.dataResponse = roomStore.dataResponse;
-
-        if (this?.dataResponse?.status !== 200) {
-          this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
-        } else {
-          const roomInfo = this.dataResponse.data;
-          this.$router.push({
-            name: 'room',
-            state: {roomInfo: JSON.stringify(roomInfo)},
-            params: {id: roomInfo.seq}
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
       }
     },
     async enterPasswordRoom() {
