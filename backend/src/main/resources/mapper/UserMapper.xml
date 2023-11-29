@@ -124,7 +124,7 @@
             user_seq,
             (select AA.nickname from users AA where AA.seq = friend_seq ) as user_nm,
             friend_seq,
-            create_at
+            created_at
         FROM
             friend
         WHERE

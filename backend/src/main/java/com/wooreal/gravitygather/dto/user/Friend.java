@@ -15,5 +15,5 @@ public class Friend {
     private Integer user_seq;
     private String user_nm;
     private Integer friend_seq;
-    private Timestamp create_at;
+    private Timestamp created_at;
 }

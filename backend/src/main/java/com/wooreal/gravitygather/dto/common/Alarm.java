@@ -42,7 +42,7 @@ public class Alarm {
     String dte_cde_val;
     String dte_cde_nm;
     Integer cont_seq;
-    Timestamp create_at;
+    Timestamp created_at;
 
     String sender_nickname;
     String sender_photo;

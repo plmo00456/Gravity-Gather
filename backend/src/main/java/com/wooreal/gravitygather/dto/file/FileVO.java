@@ -17,5 +17,5 @@ public class FileVO {
     private String new_name;
     private String upload_path;
     private String extension;
-    private Timestamp create_at;
+    private Timestamp created_at;
 }

@@ -19,7 +19,7 @@ public class Category {
     private Integer user_seq;
     private Boolean is_delete;
     private int task_order;
-    private Timestamp create_at;
+    private Timestamp created_at;
     private Timestamp updated_at;
 
     private Integer[] seqs;

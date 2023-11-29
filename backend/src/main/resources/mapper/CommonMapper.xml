@@ -16,13 +16,13 @@
             A.dte_cde_val,
             getCdeNm('A01', dte_cde_val) as dte_cde_nm,
             A.cont_seq,
-            A.create_at
+            A.created_at
         FROM alarms A
         LEFT JOIN users B
         ON sender_seq = B.seq
         WHERE
             A.receive_seq = #{userId}
-        ORDER BY A.create_at DESC
+        ORDER BY A.created_at DESC
     </select>
 
     <update id="readAlarm">

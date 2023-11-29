@@ -67,7 +67,7 @@
             user_seq,
             is_delete,
             task_order,
-            create_at,
+            created_at,
             updated_at
         FROM
             TASK_CATEGORY

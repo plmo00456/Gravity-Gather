@@ -142,13 +142,16 @@ public class RoomService {
         if(currentRoom == null || currentRoom.getSeq() == null || currentRoom.getSeq() == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+
         if(currentRoom.getCurrent_participant().equals(currentRoom.getMax_participant())){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "방 인원이 가득 찼습니다.");
         }
 
         String redisAuthCode = redisService.getValues("InviteCode " + roomRequest.getUserSeq() + " " + roomRequest.getSeq());
         boolean authResult = redisService.checkExistsValue(redisAuthCode);
-
+        System.out.println("InviteCode " + roomRequest.getUserSeq() + " " + roomRequest.getSeq());
+        System.out.println(redisAuthCode);
+        System.out.println(authResult);
         if(authResult) return currentRoom;
 
         if(currentRoom.getIs_locked()){

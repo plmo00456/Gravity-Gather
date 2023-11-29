@@ -89,7 +89,7 @@ CREATE TABLE `alarms` (
   `is_check` tinyint(1) DEFAULT 0,
   `dte_cde_val` varchar(255) DEFAULT NULL,
   `cont_seq` int(11) DEFAULT NULL,
-  `create_at` timestamp NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`seq`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1799,7 +1799,7 @@ CREATE TABLE `uploaded_files` (
   `new_name` varchar(255) NOT NULL,
   `upload_path` varchar(255) NOT NULL,
   `extension` varchar(10) DEFAULT NULL,
-  `create_at` timestamp NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`seq`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

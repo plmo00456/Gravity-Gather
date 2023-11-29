@@ -16,7 +16,7 @@
             new_name,
             upload_path,
             extension,
-            create_at
+            created_at
         ) VALUES (
             #{original_name},
             #{new_name},
