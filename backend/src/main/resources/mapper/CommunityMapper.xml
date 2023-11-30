@@ -65,4 +65,19 @@
         </if>
     </select>
 
+    <insert id="articleWrite">
+        INSERT INTO article
+        (
+            master_seq,
+            title,
+            content,
+            user_seq
+        ) VALUES (
+            #{master_seq},
+            #{title},
+            #{content},
+            #{user_seq}
+        )
+    </insert>
+
 </mapper>

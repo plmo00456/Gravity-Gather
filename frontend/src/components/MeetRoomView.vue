@@ -22,10 +22,10 @@
                              :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
                     </div>
                     <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-3 text-sm">
-                        <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
-                                           icon="fa-solid fa-crown"/>
-                        {{ participant.nickname }}
-                    </span>
+                            <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
+                                               icon="fa-solid fa-crown"/>
+                            {{ participant.nickname }}
+                        </span>
                 </div>
             </div>
         </div>
@@ -48,8 +48,8 @@
                             <span class="content text-start mr-2">{{ chat.content }}</span>
                             <span class="datetime text-xs text-gray-200"
                                   v-if="index === chats.length - 1 ||
-                                chat.senderSeq !== chats[index + 1].senderSeq ||
-                                !isSameMinute(chat.oriDatetime, chats[index + 1].oriDatetime)">{{
+                                    chat.senderSeq !== chats[index + 1].senderSeq ||
+                                    !isSameMinute(chat.oriDatetime, chats[index + 1].oriDatetime)">{{
                                     chat.datetime
                                 }}</span>
                         </div>
@@ -70,8 +70,8 @@
                             <span class="content text-start mr-2">{{ chat.content }}</span>
                             <span class="datetime text-xs text-gray-200"
                                   v-if="index === chats.length - 1 ||
-                                  chat.senderSeq !== chats[index + 1].senderSeq ||
-                                  !isSameMinute(chat.oriDatetime, chats[index + 1].oriDatetime)">{{
+                                      chat.senderSeq !== chats[index + 1].senderSeq ||
+                                      !isSameMinute(chat.oriDatetime, chats[index + 1].oriDatetime)">{{
                                     chat.datetime
                                 }}</span>
                         </div>
@@ -82,13 +82,13 @@
                                    class="w-5/6 py-2 pl-3 pr-9 text-black rounded-3xl" maxlength="500"
                                    placeholder="채팅을 입력하세요.">
                             <font-awesome-icon
-                                    class="absolute select-none right-14 bottom-3 text-blue-300 cursor-pointer hover:text-blue-400 active:text-blue-500"
-                                    icon="fa-solid fa-paper-plane" v-on:click="chatSend"/>
+                                class="absolute select-none right-14 bottom-3 text-blue-300 cursor-pointer hover:text-blue-400 active:text-blue-500"
+                                icon="fa-solid fa-paper-plane" v-on:click="chatSend"/>
                         </div>
                     </form>
                     <div class="absolute left-0 bottom-24 w-full select-none animate-bounce" v-if="isNewChat">
-                    <span class="px-2 py-0.5 bg-gray-700 rounded-2xl bg-opacity-50 cursor-pointer"
-                          @click="scrollToBottom"><font-awesome-icon icon="chevron-down"/> 새로운 채팅이 있습니다.</span>
+                        <span class="px-2 py-0.5 bg-gray-700 rounded-2xl bg-opacity-50 cursor-pointer"
+                              @click="scrollToBottom"><font-awesome-icon icon="chevron-down"/> 새로운 채팅이 있습니다.</span>
                     </div>
                 </div>
                 <div class="participant-list flex flex-col overflow-x-hidden overflow-y-auto h-[calc(100%-3rem)] pr-3"
@@ -101,7 +101,7 @@
                             <div class="flex items-center">
                                 <div
                                     :class="{'border-2' : participantTabSetting.context.currentClickUser != null && participantTabSetting.context.currentClickUser.seq === participant.seq,
-                                     'border-yellow-400' : participantTabSetting.context.currentClickUser != null && participantTabSetting.context.currentClickUser.seq === participant.seq}"
+                                         'border-yellow-400' : participantTabSetting.context.currentClickUser != null && participantTabSetting.context.currentClickUser.seq === participant.seq}"
                                     class="w-10 h-10 rounded-3xl overflow-hidden mr-2 border border-gray-500 relative hover:border-2 hover:border-yellow-400">
                                     <img class="w-full h-full object-cover bg-white"
                                          :src="`${$env.protocol}${$env.serverIP}:${$env.port}${participant.photo}`"
@@ -112,9 +112,9 @@
                                 <span>{{ participant.nickname }}</span>
                             </div>
                             <font-awesome-icon
-                                    v-if="roomInfo.ownerSeq == participant.seq"
-                                    class="text-2xl text-yellow-300 mr-2"
-                                    icon="fa-solid fa-crown"/>
+                                v-if="roomInfo.ownerSeq == participant.seq"
+                                class="text-2xl text-yellow-300 mr-2"
+                                icon="fa-solid fa-crown"/>
                         </div>
                     </div>
                 </div>
@@ -141,8 +141,8 @@
                             </div>
 
                             <button v-if="fr.isCurrentRoom !== true && fr.isInviteLoading !== true"
-                                @click="inviteRoom(fr)"
-                                class="px-2 py-1 bg-blue-400 rounded hover:bg-blue-300">
+                                    @click="inviteRoom(fr)"
+                                    class="px-2 py-1 bg-blue-400 rounded hover:bg-blue-300">
                                 <font-awesome-icon class="mirror" icon="fa-comment-medical"></font-awesome-icon>
                                 <span class="ml-2">초대하기</span>
                             </button>
@@ -177,15 +177,15 @@
                         <div v-if="user.seq === roomInfo.ownerSeq"
                              class="h-1/6 flex justify-end">
                             <div class="flex justify-end items-center content-center">
-                                  <span class="flex justify-end pr-3 font-bold w-full">
-                                        <button type="button"
-                                                class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
-                                                @click="deleteRoom">
-                                          <font-awesome-icon class="text-xl mr-2"
-                                                             icon="fa-solid fa-trash-can"></font-awesome-icon>
-                                          미팅 방 삭제하기
-                                        </button>
-                                  </span>
+                                      <span class="flex justify-end pr-3 font-bold w-full">
+                                            <button type="button"
+                                                    class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
+                                                    @click="deleteRoom">
+                                              <font-awesome-icon class="text-xl mr-2"
+                                                                 icon="fa-solid fa-trash-can"></font-awesome-icon>
+                                              미팅 방 삭제하기
+                                            </button>
+                                      </span>
                             </div>
                         </div>
                     </div>

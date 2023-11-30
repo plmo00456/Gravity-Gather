@@ -16,4 +16,6 @@ public interface CommunityMapper {
 
     Article getArticle(Article article);
 
+    int articleWrite(Article article);
+
 }

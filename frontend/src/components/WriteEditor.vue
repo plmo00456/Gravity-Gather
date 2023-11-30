@@ -109,22 +109,6 @@ export default {
 </script>
 
 <style>
-.ql-toolbar,
-.ql-container{
-  border:none !important;
-  border-left: 1px solid #68696a !important;
-  border-right: 1px solid #68696a !important;
-}
-
-.ql-toolbar {
-  border: 1px solid #68696a !important;
-  border-radius: 3px 3px 0 0;
-}
-
-.ql-container {
-  border-bottom: 1px solid #68696a !important;
-  border-radius: 0 0 3px 3px;
-}
 
 html.dark .ql-toolbar .ql-stroke {
   fill: none;

@@ -10,8 +10,8 @@ export const useCommunityStore = defineStore({
         dataResponse: null,
     }),
     actions: {
-        async getArticleMaster(article) {
-            return http.post(`/community/article-master/get`,article, {
+        async getArticleMaster() {
+            return http.post(`/community/article-master/get`, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -58,5 +58,20 @@ export const useCommunityStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
+        async writeArticle(article){
+            return http.post(`/community/article/write`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        }
     }
 })

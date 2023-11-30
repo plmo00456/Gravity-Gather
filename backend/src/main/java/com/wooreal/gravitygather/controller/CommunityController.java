@@ -46,4 +46,11 @@ public class CommunityController {
         return new ResponseEntity<>( getArticle, HttpStatus.OK);
     }
 
+    @PostMapping("/article/write")
+    @ApiOperation(value = "게시글 가져오는 api")
+    public ResponseEntity<?> articleWrite(@RequestBody Article article) {
+        communityService.articleWrite(article);
+        return new ResponseEntity<>( HttpStatus.OK);
+    }
+
 }

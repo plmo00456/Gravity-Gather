@@ -36,5 +36,10 @@ public class CommunityService {
         return articles.get(0);
     }
 
+    public void articleWrite(Article article){
+        if(communityMapper.articleWrite(article) == 0)
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "게시물 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+    }
+
 
 }

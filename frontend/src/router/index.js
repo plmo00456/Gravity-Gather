@@ -31,7 +31,7 @@ const routes = [
         path: '/user/login',
         name: 'LoginView',
         meta: {
-            title: '로그인',
+            title: '끌림 - 로그인',
             hideMenu: true,
         },
         component: userLogin,
@@ -49,7 +49,7 @@ const routes = [
         path: '/user/email-verify',
         name: 'emailVerify',
         meta: {
-            title: '이메일 검증',
+            title: '끌림 - 이메일 검증',
             hideMenu: true,
         },
         component: userEmailVerify,
@@ -66,7 +66,7 @@ const routes = [
         path: '/write',
         name: 'writeView',
         meta: {
-            title: '글쓰기',
+            title: '끌림 - 글쓰기',
         },
         component: writeView,
     },

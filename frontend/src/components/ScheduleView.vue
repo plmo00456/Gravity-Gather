@@ -33,7 +33,7 @@ export default {
                 editingItem: null,
                 editingTmpNm: null,
                 currentTab: 'all',
-                isShow: false,
+                isShow: true,
                 drag: true,
                 option: {
                     animation: 200,
@@ -636,115 +636,116 @@ export default {
 
 <template>
     <div id="main-view" class="flex items-center bg-main_background bg-cover h-[93%] justify-center">
-        <transition name="slide-fade">
-            <div v-if="category.isShow"
-                class="h-[90%] flex flex-col w-1/6 bg-white rounded p-6 border-blue-500 border-t-[5px] relative ml-2 mr-1 relative">
-                <div class="flex">
-                    <div class="flex relative">
-                        <input type="text" placeholder="검색" v-model="taskSearch"
-                               class="border text-sm pl-10 pr-4 py-2 rounded-l w-full focus:outline-none text-gray-400" maxlength="20">
-                        <span class="flex justify-center absolute left-3 top-1/2 transform -translate-y-1/2">
+        <div class="flex justify-center items-center w-full h-full bg-gray-300 bg-opacity-30">
+            <transition name="slide-fade">
+                <div v-if="category.isShow"
+                     class="h-[90%] flex flex-col w-1/6 bg-white rounded p-6 border-blue-500 border-t-[5px] relative ml-2 mr-1 relative">
+                    <div class="flex">
+                        <div class="flex relative">
+                            <input type="text" placeholder="검색" v-model="taskSearch"
+                                   class="border text-sm pl-10 pr-4 py-2 rounded-l w-full focus:outline-none text-gray-400" maxlength="20">
+                            <span class="flex justify-center absolute left-3 top-1/2 transform -translate-y-1/2">
                             <font-awesome-icon class="fa-sm text-gray-400" icon="magnifying-glass"></font-awesome-icon>
                         </span>
+                        </div>
+                        <button class="text-white px-3 py-2 bg-blue-600 rounded-r text-sm hover:bg-blue-500" type="button">
+                            <font-awesome-icon class="fa-md font-bold" icon="magnifying-glass"></font-awesome-icon>
+                        </button>
                     </div>
-                    <button class="text-white px-3 py-2 bg-blue-600 rounded-r text-sm hover:bg-blue-500" type="button">
-                        <font-awesome-icon class="fa-md font-bold" icon="magnifying-glass"></font-awesome-icon>
-                    </button>
-                </div>
-                <div class="flex flex-col py-1 text-start border-b-2">
-                    <div
-                        :class="{'bg-blue-300' : category.currentTab === 'all', 'text-white' : category.currentTab === 'all' }"
-                        @click="category.currentTab = 'all'; getTasks()"
-                        class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
+                    <div class="flex flex-col py-1 text-start border-b-2">
+                        <div
+                            :class="{'bg-blue-300' : category.currentTab === 'all', 'text-white' : category.currentTab === 'all' }"
+                            @click="category.currentTab = 'all'; getTasks()"
+                            class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
                         <span class="flex w-[13%]">
                             <font-awesome-icon
                                 :class="{'text-white' : category.currentTab === 'all'}"
                                 class="self-start text-blue-300" icon="fa-border-all"></font-awesome-icon>
                         </span>
-                        <span class="flex w-[87%]">전체</span>
-                    </div>
-                    <div
-                        :class="{'bg-blue-300' : category.currentTab === 'important', 'text-white' : category.currentTab === 'important' }"
-                        @click="category.currentTab = 'important'; getTasks()"
-                        class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
+                            <span class="flex w-[87%]">전체</span>
+                        </div>
+                        <div
+                            :class="{'bg-blue-300' : category.currentTab === 'important', 'text-white' : category.currentTab === 'important' }"
+                            @click="category.currentTab = 'important'; getTasks()"
+                            class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
                         <span class="flex w-[13%]">
                             <font-awesome-icon
                                 :class="{'text-white' : category.currentTab === 'important'}"
                                 class="self-start text-yellow-400" icon="fa-regular fa-star"></font-awesome-icon>
                         </span>
-                        <span class="flex w-[87%]">중요</span>
-                    </div>
-                    <div
+                            <span class="flex w-[87%]">중요</span>
+                        </div>
+                        <div
                             :class="{'bg-blue-300' : category.currentTab === 'share', 'text-white' : category.currentTab === 'share' }"
                             @click="category.currentTab = 'share'; getTasks()"
                             class="flex items-center m-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer">
                         <span class="flex w-[13%]">
                             <font-awesome-icon
-                                    :class="{'text-white' : category.currentTab === 'share'}"
-                                    class="self-start text-blue-400" icon="fa-share-nodes"></font-awesome-icon>
+                                :class="{'text-white' : category.currentTab === 'share'}"
+                                class="self-start text-blue-400" icon="fa-share-nodes"></font-awesome-icon>
                         </span>
-                        <span class="flex w-[87%]">공유</span>
+                            <span class="flex w-[87%]">공유</span>
+                        </div>
                     </div>
-                </div>
-                <div class="category-items flex flex-col py-1 text-start overflow-x-hidden overflow-y-auto select-none h-[26.5rem]">
-                    <draggable
-                        class="list-group"
-                        tag="transition-group"
-                        :component-data="{
+                    <div class="category-items flex flex-col py-1 text-start overflow-x-hidden overflow-y-auto select-none h-[26.5rem]">
+                        <draggable
+                            class="list-group"
+                            tag="transition-group"
+                            :component-data="{
                           tag: 'ul',
                           type: 'transition-group',
                           name: !drag ? 'flip-list' : null
                         }"
-                        :list="taskCategory"
-                        v-bind="category.option"
-                        @start="category.drag = true"
-                        @end="category.drag = false"
-                        @change="updateCategoryOrder"
-                    >
-                        <template #item="{ element }">
-                            <div
-                                :class="{'bg-blue-300' : category.currentTab === element.seq, 'text-white' : category.currentTab === element.seq }"
-                                class="item flex items-center mt-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer"
-                                @click="category.currentTab = element.seq; getTasks()"
-                                @dblclick="category.editingItem = element.seq; category.editingTmpNm = element.category_nm">
+                            :list="taskCategory"
+                            v-bind="category.option"
+                            @start="category.drag = true"
+                            @end="category.drag = false"
+                            @change="updateCategoryOrder"
+                        >
+                            <template #item="{ element }">
+                                <div
+                                    :class="{'bg-blue-300' : category.currentTab === element.seq, 'text-white' : category.currentTab === element.seq }"
+                                    class="item flex items-center mt-1 p-2 w-full rounded hover:bg-gray-200 cursor-pointer"
+                                    @click="category.currentTab = element.seq; getTasks()"
+                                    @dblclick="category.editingItem = element.seq; category.editingTmpNm = element.category_nm">
                                 <span class="flex w-[15%]">
                                     <font-awesome-icon
                                         :class="{'text-white' : category.currentTab === element.seq}"
                                         class="self-start text-gray-400 hover:text-gray-600" icon="fa-bars"></font-awesome-icon>
                                 </span>
-                                <span class="flex w-[70%]" v-if="category.editingItem !== element.seq">{{ element.category_nm }}</span>
-                                <input class="text-black flex w-[70%]" v-else v-model="element.category_nm"
-                                       maxlength="10"
-                                       @keyup.esc="cancelCategoryNm(element)"
-                                       @keyup.enter="saveCategoryNm(element)"
-                                       @blur="saveCategoryNm(element)">
-                                <div class="w-[15%] text-red-400 flex justify-center items-center group">
-                                    <font-awesome-icon
+                                    <span class="flex w-[70%]" v-if="category.editingItem !== element.seq">{{ element.category_nm }}</span>
+                                    <input class="text-black flex w-[70%]" v-else v-model="element.category_nm"
+                                           maxlength="10"
+                                           @keyup.esc="cancelCategoryNm(element)"
+                                           @keyup.enter="saveCategoryNm(element)"
+                                           @blur="saveCategoryNm(element)">
+                                    <div class="w-[15%] text-red-400 flex justify-center items-center group">
+                                        <font-awesome-icon
                                             @click.stop="deleteCategory(element)"
                                             class="font-bold p-1 opacity-0 group-hover:opacity-100" icon="fa-trash-can"/>
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                    </draggable>
-                </div>
-                <div class="absolute bottom-0 left-0 w-full h-[2.5rem] flex items-center select-none" @click="addCategory">
-                    <div class="item flex items-center w-full px-3 rounded hover:bg-gray-200 cursor-pointer h-full">
+                            </template>
+                        </draggable>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full h-[2.5rem] flex items-center select-none" @click="addCategory">
+                        <div class="item flex items-center w-full px-3 rounded hover:bg-gray-200 cursor-pointer h-full">
                         <span class="flex mr-2">
                             <font-awesome-icon class="self-start text-gray-400 hover:text-gray-600" icon="fa-plus"></font-awesome-icon>
                         </span>
-                        <span class="flex">새 카테고리</span>
+                            <span class="flex">새 카테고리</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </transition>
-        <div class="h-[90%] flex flex-col w-5/6 bg-white rounded p-6 border-yellow-500 border-t-[5px] relative">
-            <FullCalendar
+            </transition>
+            <div class="h-[90%] flex flex-col w-5/6 bg-white rounded p-6 border-yellow-500 border-t-[5px] relative">
+                <FullCalendar
                     class="z-10"
                     id="calendar"
                     :options="calendarOptions"
                     ref="fullCalendar"
-            />
-            <el-date-picker
+                />
+                <el-date-picker
                     ref="datePicker"
                     class="absolute z-20 border-0 outline-0 left-[calc(48%)] top-[4rem]"
                     id="date-picker"
@@ -752,12 +753,13 @@ export default {
                     format="YYYY년 MM월"
                     :type="mainDatePicker.type"
                     @change="handleDatePicker"
-            />
-            <button
-                class="absolute flex px-3 py-2 rounded bg-gray-200 left-[1.7rem] top-[1.7rem] text-white cursor-pointer hover:bg-gray-300 z-50"
-                @click="category.isShow = !category.isShow">
-                <font-awesome-icon icon="bars"></font-awesome-icon>
-            </button>
+                />
+                <button
+                    class="absolute flex px-3 py-2 rounded bg-gray-200 left-[1.7rem] top-[1.7rem] text-white cursor-pointer hover:bg-gray-300 z-50"
+                    @click="category.isShow = !category.isShow">
+                    <font-awesome-icon icon="bars"></font-awesome-icon>
+                </button>
+            </div>
         </div>
         <PopupWindow
                 :show="task.isShow != null"

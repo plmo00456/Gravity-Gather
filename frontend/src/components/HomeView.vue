@@ -1,7 +1,5 @@
 <template>
   <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover">
-    <button class="text-white text-xl" @click="test(1)">테스트1</button>
-    <button class="text-white text-xl" @click="test(2)">테스트2</button>
     <slideWindow :show="slideShow" @close="slideShow = false" :title="'미팅 생성하기'">
       <div v-if="currentWindow === 'createRoom'">
         <form @submit.prevent="createRoom">
@@ -476,17 +474,6 @@ export default {
         password: null,
       }
     },
-    test(mode){
-      if(mode === 1){
-        router.push({
-          name: 'writeView',
-        });
-      }else if(mode === 2){
-        router.push({
-          name: 'scheduleView',
-        });
-      }
-    }
   },
 }
 </script>
