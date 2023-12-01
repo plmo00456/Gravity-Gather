@@ -48,7 +48,7 @@
           프로필 사진
         </label>
         <img :src="user.profilePicture" @click="uploadImage" class="w-32 h-32 object-cover cursor-pointer">
-        <input type="file" ref="fileInput" class="hidden" @change="previewImage">
+        <input type="file" ref="fileInput" class="hidden" @change="previewImage" accept="image/gif, image/jpeg, image/png">
       </div>
 
       <div class="flex items-center justify-between mt-4">

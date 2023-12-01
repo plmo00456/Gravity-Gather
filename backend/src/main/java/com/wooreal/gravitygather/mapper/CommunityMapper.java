@@ -18,4 +18,6 @@ public interface CommunityMapper {
 
     int articleWrite(Article article);
 
+    void articleGoUpViewCount(Article article);
+
 }

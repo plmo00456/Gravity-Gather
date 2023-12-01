@@ -59,7 +59,6 @@ public class Article {
         System.out.println(staticFileMappingDir);
         if(this.photo != null && staticFileUploadDir != null && staticFileMappingDir != null) {
             String normalizedPhoto = this.photo.replace("\\", "/");
-            System.out.println(normalizedPhoto);
             return normalizedPhoto.replace(staticFileUploadDir, staticFileMappingDir);
         } else
             return null;

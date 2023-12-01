@@ -21,7 +21,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
 
-    public CommunityController(CommunityService communityService){
+    public CommunityController(CommunityService communityService) {
         this.communityService = communityService;
     }
 
@@ -29,28 +29,28 @@ public class CommunityController {
     @ApiOperation(value = "게시글 마스터 가져오는 api")
     public ResponseEntity<?> getArticleMaster() {
         List<ArticleMaster> articleMasters = communityService.getArticleMasters();
-        return new ResponseEntity<>( articleMasters, HttpStatus.OK);
+        return new ResponseEntity<>(articleMasters, HttpStatus.OK);
     }
 
     @PostMapping("/article/get")
     @ApiOperation(value = "게시글들 가져오는 api")
     public ResponseEntity<?> getArticles(@RequestBody Article article) {
         List<Article> articles = communityService.getArticles(article);
-        return new ResponseEntity<>( articles, HttpStatus.OK);
+        return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
-    @PostMapping("/article")
+    @PostMapping("/article/{seq}")
     @ApiOperation(value = "게시글 가져오는 api")
-    public ResponseEntity<?> getArticle(@RequestBody Article article) {
-        Article getArticle = communityService.getArticle(article);
-        return new ResponseEntity<>( getArticle, HttpStatus.OK);
+    public ResponseEntity<?> getArticle(@PathVariable("seq") int seq) {
+        Article getArticle = communityService.getArticle(seq);
+        return new ResponseEntity<>(getArticle, HttpStatus.OK);
     }
 
     @PostMapping("/article/write")
     @ApiOperation(value = "게시글 가져오는 api")
     public ResponseEntity<?> articleWrite(@RequestBody Article article) {
         communityService.articleWrite(article);
-        return new ResponseEntity<>( HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

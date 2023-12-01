@@ -43,7 +43,7 @@ export const useCommunityStore = defineStore({
             });
         },
         async getArticle(article) {
-            return http.post(`/community/article`, article,{
+            return http.post(`/community/article/${article}`,{
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -51,7 +51,7 @@ export const useCommunityStore = defineStore({
             .then(response => {
                 if (response.status === 200) {
                     this.dataResponse = response;
-                    this.article = response.data;
+                    return response.data;
                 }
             })
             .catch(error => {

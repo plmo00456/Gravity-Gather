@@ -213,36 +213,38 @@ export default {
                                         </div>
                                     </div>
                                     <span class="mr-3">{{article.nickname}}</span>
-                                    <span class="flex items-center border-l border-gray-300 pl-3">
-                                    <span class="flex items-center mr-1.5 text-sm">
-                                        <font-awesome-icon icon="fa-clock"/>
-                                    </span>
-                                    <span class="">{{ this.utils.timeAgoStr(article.created_at) }}</span>
-                                </span>
+                                    <div class="flex items-center border-l border-gray-300 pl-3 text-gray-400 text-xs">
+                                        <span class="flex items-center mr-1.5">
+                                            <font-awesome-icon icon="fa-clock"/>
+                                        </span>
+                                        <span class="">{{ this.utils.timeAgoStr(article.created_at) }}</span>
+                                    </div>
                                 </div>
                                 <div class="flex mt-2">
                                     <span
                                         :title="article.title"
-                                        class="truncate article-title text-gray-700 text-lg cursor-pointer hover:text-blue-400">{{ article.title }}</span>
+                                        class="truncate article-title text-gray-700 text-lg cursor-pointer hover:text-blue-400">
+                                        <router-link :to="`/community/${article.seq}`">{{ article.title }}</router-link>
+                                    </span>
                                 </div>
                             </div>
                             <div class="w-[20%] pr-2 flex justify-end items-end text-gray-500">
                                 <div class="flex mr-2">
-                                <span class="mr-1">
-                                    <font-awesome-icon icon="fa-regular fa-eye"/>
-                                </span>
+                                    <span class="mr-1">
+                                        <font-awesome-icon icon="fa-regular fa-eye"/>
+                                    </span>
                                     <span>{{ article.view_count }}</span>
                                 </div>
                                 <div class="flex mr-2">
-                                <span class="mr-1">
-                                    <font-awesome-icon icon="fa-regular fa-comment-dots"/>
-                                </span>
+                                    <span class="mr-1">
+                                        <font-awesome-icon icon="fa-regular fa-comment-dots"/>
+                                    </span>
                                     <span>{{ article.comment_count }}</span>
                                 </div>
                                 <div class="flex">
-                                <span class="mr-1">
-                                    <font-awesome-icon icon="fa-regular fa-thumbs-up"/>
-                                </span>
+                                    <span class="mr-1">
+                                        <font-awesome-icon icon="fa-regular fa-heart"/>
+                                    </span>
                                     <span>{{ article.likes }}</span>
                                 </div>
                             </div>

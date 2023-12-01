@@ -35,10 +35,10 @@
         <where>
             is_delete = false
             <if test="seq != null">
-                AND seq = #{seq}
+                AND A.seq = #{seq}
             </if>
             <if test="master_seq != null and master_seq != 0">
-                AND master_seq = #{master_seq}
+                AND A.master_seq = #{master_seq}
             </if>
             <if test="search != null and search != ''">
                 AND (A.title like '%${search}%' or A.content like '%${search}%')
@@ -79,5 +79,12 @@
             #{user_seq}
         )
     </insert>
+
+    <update id="articleGoUpViewCount">
+        UPDATE article SET
+            view_count = view_count + 1
+        WHERE
+            seq = #{seq}
+    </update>
 
 </mapper>

@@ -8,6 +8,7 @@ import {useCommonStore} from "@/stores/common";
 import writeView from "@/components/WriteView.vue";
 import scheduleView from "@/components/ScheduleView.vue";
 import communityView from "@/components/CommunityView.vue";
+import writeViewer from "@/components/WriteViewer.vue";
 
 const routes = [
     {
@@ -95,6 +96,14 @@ const routes = [
         },
         component: communityView,
     },
+    {
+        path: '/community/:seq',
+        name: 'writeViewer',
+        meta: {
+            title: '끌림 - 게시글',
+        },
+        component: writeViewer,
+    },
 
 ]
 
@@ -118,7 +127,6 @@ router.beforeEach((to, from, next) => {
         const common = useCommonStore();
         try{
             common.getAlarm(user.userInfo.seq);
-            console.log(common.alarmList);
         }catch (e){
             console.error(e);
         }

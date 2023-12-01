@@ -41,6 +41,22 @@ export const useCommonStore = defineStore({
                 .catch(error => {
                     this.dataResponse = error.response;
                 });
-        }
+        },
+        async imageUpload(userInfo){
+            return http.post(`/common/image/upload`, userInfo, {
+                headers: {
+                    // 'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
     }
 })

@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
+
     private final UserService userService;
 
     private final FileUploadService fileUploadService;
@@ -68,14 +69,14 @@ public class UserController {
     @PostMapping("/update")
     @ApiOperation(value = "유저 정보 변경 api")
     public ResponseEntity<?> userUpdate(UserRequest userRequest,
-                                        @RequestParam(name = "profileImage", required=false) MultipartFile imageFile,
-                                        @RequestParam(name = "isRemoveImage", required=false, defaultValue = "false") Boolean isRemoveImage
+        @RequestParam(name = "profileImage", required = false) MultipartFile imageFile,
+        @RequestParam(name = "isRemoveImage", required = false, defaultValue = "false") Boolean isRemoveImage
     ) throws IOException {
-        if(imageFile != null && !imageFile.isEmpty()){
+        if (imageFile != null && !imageFile.isEmpty()) {
             FileVO file = fileUploadService.singleFileUpload(imageFile, "img/");
             userRequest.setPhoto(file.getUpload_path());
         }
-        if(isRemoveImage){
+        if (isRemoveImage) {
             userRequest.setPhoto("");
         }
 

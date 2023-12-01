@@ -28,7 +28,12 @@ public class CommunityService {
         return communityMapper.getArticles(article);
     }
 
-    public Article getArticle(Article article){
+    public Article getArticle(int seq){
+        Article article = new Article();
+        article.setSeq(seq);
+
+        communityMapper.articleGoUpViewCount(article);
+
         List<Article> articles = getArticles(article);
         if(articles == null || articles.size() == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "존재하지 않는 게시물 입니다.");

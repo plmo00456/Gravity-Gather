@@ -27,22 +27,22 @@
           </select>
         </span>
           <span class="ql-formats">
-            <button class="ql-bold"/>
-            <button class="ql-italic"/>
-            <button class="ql-underline"/>
-            <button class="ql-strike"/>
-            <button class="ql-blockquote"/>
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
+            <button class="ql-strike"></button>
+            <button class="ql-blockquote"></button>
           </span>
           <span class="ql-formats">
-          <select class="ql-color"/>
-          <select class="ql-background"/>
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
         </span>
           <span class="ql-formats">
-          <button class="ql-image"/>
-          <button class="ql-video"/>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
         </span>
           <span class="ql-formats">
-          <button class="ql-clean"/>
+          <button class="ql-clean"></button>
         </span>
         </div>
       </template>
@@ -57,13 +57,16 @@ import ("@vueup/vue-quill/dist/vue-quill.snow.css")
 import BlotFormatter from 'quill-blot-formatter'
 import {ImageDrop} from 'quill-image-drop-module';
 import {getCurrentInstance, ref, watch} from "vue";
-// import ImageCompress from 'quill-image-compress';
+import ImageCompress from 'quill-image-compress';
+import ImageUploader from "quill-image-uploader";
+import 'quill-image-uploader/dist/quill.imageUploader.min.css';
+import {useCommonStore} from "@/stores/common";
 
 export default {
   props: ['modelValue'],
   emits: ['update:modelValue'],
   components: {QuillEditor},
-  setup(props, { emit }) {
+  setup(props, {emit}) {
     const content = ref(props.modelValue);
     const instance = getCurrentInstance();
 
@@ -74,7 +77,6 @@ export default {
     watch(content, newContent => {
       emit('update:modelValue', newContent);
     });
-
 
     const modules = [
       {
@@ -87,13 +89,38 @@ export default {
         module: ImageDrop,
         options: {/* options */}
       },
-      // {
-      //   name: 'imageCompress',
-      //   module: ImageCompress,
-      //   options: {
-      //     imageType: 'image/png',
-      //   }
-      // },
+      {
+        name: 'imageCompress',
+        module: ImageCompress,
+        options: {
+          imageType: 'image/png',
+        },
+      },
+      {
+        name: 'imageUploader',
+        module: ImageUploader,
+        options: {
+          upload: (file) => {
+            return new Promise((resolve, reject) => {
+              const formData = new FormData();
+              formData.append("imageFile", file);
+
+              const common = useCommonStore();
+              common.imageUpload(formData)
+              .then((result) => {
+                resolve(
+                    `${process.env.VUE_APP_PROTOCOL}${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_PORT}${result}`);
+              })
+              .catch((error) => {
+                reject("Upload failed");
+                console.error("Error:", error);
+              });
+
+            });
+          },
+        }
+      }
+
     ]
 
     return {
@@ -125,7 +152,7 @@ html.dark .ql-toolbar .ql-picker {
   background: #626262 !important;
 }
 
-html.dark .ql-toolbar .ql-picker .ql-picker-options{
+html.dark .ql-toolbar .ql-picker .ql-picker-options {
   background: #747474;
 }
 </style>
