@@ -3,6 +3,7 @@ package com.wooreal.gravitygather.controller;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
+import com.wooreal.gravitygather.dto.community.Comment;
 import com.wooreal.gravitygather.service.CommonService;
 import com.wooreal.gravitygather.service.CommunityService;
 import io.swagger.annotations.Api;
@@ -39,6 +40,13 @@ public class CommunityController {
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
+    @PostMapping("/article/get/count")
+    @ApiOperation(value = "게시글들 개수 가져오는 api")
+    public ResponseEntity<?> getArticlesCnt(@RequestBody Article article) {
+        Article cnt = communityService.getArticlesAllCnt(article);
+        return new ResponseEntity<>(cnt, HttpStatus.OK);
+    }
+
     @PostMapping("/article/{seq}")
     @ApiOperation(value = "게시글 가져오는 api")
     public ResponseEntity<?> getArticle(@PathVariable("seq") int seq) {
@@ -47,9 +55,25 @@ public class CommunityController {
     }
 
     @PostMapping("/article/write")
-    @ApiOperation(value = "게시글 가져오는 api")
+    @ApiOperation(value = "게시글 작성 api")
     public ResponseEntity<?> articleWrite(@RequestBody Article article) {
         communityService.articleWrite(article);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/article/{seq}/comment")
+    @ApiOperation(value = "게시글 댓글 가져오는 api")
+    public ResponseEntity<?> getComments(@PathVariable("seq") int articleSeq) {
+        List<Comment> comments = communityService.getComments(articleSeq);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+
+    //인증
+    @PostMapping("/article/comment/add")
+    @ApiOperation(value = "게시글 댓글 가져오는 api")
+    public ResponseEntity<?> addComment(@RequestBody Comment comment) {
+        communityService.addComment(comment);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

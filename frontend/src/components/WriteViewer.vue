@@ -1,7 +1,7 @@
 <template>
   <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover text-black">
     <div class="flex flex-col items-center w-full h-full bg-gray-300 bg-opacity-30">
-      <div class=" flex flex-col items-center bg-white w-[70%] h-full overflow-y-auto rounded">
+      <div class="flex flex-col items-center bg-white w-[70%] h-full overflow-y-auto rounded">
         <div class="flex w-[85%] h-full inset-0">
           <div class="flex h-full flex-col w-full">
             <div class="flex items-center relative w-full h-[2rem] mt-10">
@@ -61,6 +61,7 @@
               </div>
             </div>
             <div v-html="article.content"
+                 id="article-content"
                  class="flex flex-col items-start w-full pt-10 pb-5">
             </div>
             <div class="flex items-center justify-center mb-5">
@@ -72,7 +73,7 @@
                         :fill="isLikes === true ? 'blue' : '#1C274C'"/>
                 </svg>
               </button>
-              <span class="flex items-center px-5 border-y border-gray-300 h-full">-5</span>
+              <span class="flex items-center px-5 border-y border-gray-300 h-full">{{ utils.numberCommas(article.likes) }}</span>
               <button
                   @click="clickArticleUnlikeBtn"
                   class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100">
@@ -86,7 +87,7 @@
             </div>
             <div class="flex flex-col items-center text-gray-700 border-t border-gray-300 py-5">
               <div class="flex justify-between w-full items-center">
-                <span class="self-start h-[2rem]">1개의 댓글이 있습니다.</span>
+                <span class="self-start h-[2rem]">{{utils.numberCommas(comments.length)}}개의 댓글이 있습니다.</span>
                 <span
                     @click="refreshClick()"
                     class="flex justify-center select-none px-3 py-2 rounded cursor-pointer hover:bg-gray-200 hover:text-blue-400 mr-2 h-[2rem]">
@@ -95,39 +96,47 @@
                                 class="" icon="rotate-right"/>
                 </span>
               </div>
-              <div class="flex flex-col justify-center items-center border w-full px-8 mt-5 mb-3 h-[15rem] rounded">
+              <div class="flex flex-col justify-center items-center border w-full py-3 px-8 mt-5 mb-3 min-h-[15rem] rounded">
                 <writeEditor
-                    class="border-gray-300 hover:border-gray-400 shadow h-[10rem] w-full"
+                    ref="commentEditor"
+                    class="border-gray-300 hover:border-gray-400 shadow min-h-[8.5rem] w-full"
                     v-model.trim="comment.value.content"/>
                 <div class="self-end">
-                  <button class="text-white px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mt-3 mr-3"
-                          type="submit">
+                  <button
+                          @click="clickCommentBtn()"
+                          class="text-white px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mt-3 mr-3"
+                          type="button">
                     <span class="">등록</span>
                   </button>
                 </div>
               </div>
               <div class="flex flex-col w-full">
 
-                <div class="flex flex-col w-full py-5">
+                <div v-for="item in comments" :key="item.seq"
+                     :class="{'w-[95%] self-end border-l pl-5 bg-gray-50': item.parent_comment_seq !== null, 'w-full': item.parent_comment_seq === null }"
+                     class="flex flex-col py-5 relative">
+                  <font-awesome-icon v-if="item.parent_comment_seq !== null"
+                                     class="absolute -left-10 top-5 text-xl rotate-180"
+                                     icon="reply"/>
                   <div class="flex w-full">
                     <div class="flex w-[80%] h-fit">
                       <div class="w-10 h-10 rounded-full overflow-hidden mr-2">
                         <img class="w-full h-full object-cover bg-white"
-                             :src="`${$env.protocol}${$env.serverIP}:${$env.port}${article.photo}`"
-                             alt="프로필 사진" v-if="article.photo">
-                        <div v-if="!article.photo"
+                             :src="`${$env.protocol}${$env.serverIP}:${$env.port}${item.photo}`"
+                             alt="프로필 사진" v-if="item.photo">
+                        <div v-if="!item.photo"
                              class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-lg shadow-2xl text-white bg-green-700">
-                          <span>{{ article.nickname && article.nickname[0] }}</span>
+                          <span>{{ item.nickname && item.nickname[0] }}</span>
                         </div>
                       </div>
                       <div class="flex flex-col justify-start items-start">
-                        <span class="text-sm">{{ article.nickname }}</span>
+                        <span class="text-sm">{{ item.nickname }}</span>
                         <div class="flex items-center text-xs text-gray-400">
                           <div class="flex items-center">
                           <span class="flex items-center mr-1">
                             <font-awesome-icon icon="fa-clock"/>
                           </span>
-                            <span class="mr-2">{{ this.utils.timeAgoStr(article.created_at) }}</span>
+                            <span class="mr-2">{{ this.utils.timeAgoStr(item.created_at) }}</span>
                           </div>
                         </div>
                       </div>
@@ -141,7 +150,7 @@
                                 :fill="isLikes === true ? 'blue' : '#1C274C'"/>
                         </svg>
                       </button>
-                      <span class="flex items-center px-5 border-y border-gray-300 h-full text-sm">-5</span>
+                      <span class="flex items-center px-5 border-y border-gray-300 h-full text-sm">{{ utils.numberCommas(item.likes) }}</span>
                       <button
                           @click="clickArticleUnlikeBtn"
                           class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100">
@@ -154,47 +163,52 @@
                       </button>
                     </div>
                   </div>
-                  <div v-html="article.content" class="flex flex-col items-start">
+                  <div v-html="item.content" class="comment-content flex flex-col items-start">
                   </div>
                   <span
-                      @click="clickReplyBtn(1)"
+                      @click="clickReplyBtn(item.parent_comment_seq === null ? item.seq : item.parent_comment_seq)"
                       class="self-start mt-2 text-sm text-gray-400 cursor-pointer">댓글 달기</span>
-                  <div v-if="comment.replyValue.parentSeq != null" class="flex flex-col justify-start items-start mt-5 ml-16 w-full border-2 border-gray-200 rounded-[.5rem] p-4">
-                    <span class="font-bold">{{ article.nickname }}</span>
+                  <div
+                      v-if="comment.reply.value.parent_comment_seq === item.seq"
+                      class="flex flex-col justify-start items-start mt-5 ml-16 w-full border-2 border-gray-200 rounded-[.5rem] p-4">
+                    <span class="font-bold">{{ user.nickname }}</span>
                     <textarea
-                        v-model.trim="comment.replyValue.content"
+                        @focus.self="this.comment.reply.setting.isShowEmoji = false"
+                        v-model.trim="comment.reply.value.content"
                         placeholder="댓글을 남겨보세요!"
                         oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                         class="w-full outline-none resize-none max-h-[30rem]"/>
                     <div class="flex flex-col items-start w-full">
                       <div
-                          @click="comment.replyValue.imageUrl = null"
-                          v-if="comment.replyValue.imageUrl != null"
+                          @click="comment.reply.value.imageUrl = null"
+                          v-if="comment.reply.value.imageUrl != null"
                           class="w-14 h-14 border rounded my-1 relative overflow cursor-pointer">
-                        <img :src="comment.replyValue.imageUrl" alt="댓글 이미지" class="w-full h-full bg-cover rounded">
+                        <img :src="comment.reply.value.imageUrl" alt="댓글 이미지" class="w-full h-full bg-cover rounded">
                         <span class="absolute top-0.5 right-0.5 flex justify-center items-center w-5 h-5 bg-black bg-opacity-70 rounded-full">
                           <font-awesome-icon class="text-xs font-bold text-white" icon="xmark"></font-awesome-icon>
                         </span>
                       </div>
                       <div class="flex justify-between w-full">
                         <input type="file" class="hidden" @change="replyImageUpload($event)" ref="replyImgInput" accept="image/*">
-                        <span class="cursor-pointer text-lg" @click="clickReplyImageBtn">
-                          <font-awesome-icon icon="fa-regular fa-image"></font-awesome-icon>
-                        </span>
+                        <div class="relative">
+                          <span class="cursor-pointer text-lg" @click="clickReplyImageBtn">
+                            <font-awesome-icon icon="fa-regular fa-image"></font-awesome-icon>
+                          </span>
+                          <span class="cursor-pointer text-lg ml-2" @click="clickReplyEmojiBtn">
+                            <font-awesome-icon icon="fa-regular fa-face-smile p-1 border"></font-awesome-icon>
+                          </span>
+                          <EmojiPicker class="absolute" v-if="comment.reply.setting.isShowEmoji" :native="true" @select="onSelectEmoji" />
+                        </div>
                         <span>
-                          <button class="mr-8" @click="resetReply()">취소</button>
-                          <button>등록</button>
+                          <button class="mr-8 hover:text-blue-400" @click="resetReply()">취소</button>
+                          <button class="hover:text-blue-400" @click="clickReplyAddBtn()">등록</button>
                         </span>
                       </div>
                     </div>
                   </div>
-
-
                 </div>
 
-
               </div>
-
             </div>
           </div>
         </div>
@@ -208,24 +222,37 @@
 
 import {useRoute} from "vue-router";
 import {useCommunityStore} from "@/stores/community";
-import {getCurrentInstance, onMounted, ref} from "vue";
+import {getCurrentInstance, nextTick, onMounted, ref} from "vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import writeEditor from "@/components/WriteEditor.vue";
 import {useCommonStore} from "@/stores/common";
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
+import {useUserStore} from "@/stores/user";
+import interact from 'interactjs'
 
 export default {
-  components: {writeEditor, FontAwesomeIcon},
+  components: {EmojiPicker, writeEditor, FontAwesomeIcon},
   data() {
     return {
       isLikes: null,
       comment: {
-        replyValue: {
-          parentSeq: null,
-          content: null,
-          imageUrl: null,
+        reply: {
+          setting: {
+            isShowEmoji: false,
+          },
+          value: {
+            article_seq: null,
+            parent_comment_seq: null,
+            content: null,
+            imageUrl: null,
+            user_seq: null,
+          },
         },
         value: {
+          article_seq: null,
           content: null,
+          user_seq: null,
         },
       },
       setting: {
@@ -237,42 +264,207 @@ export default {
     const route = useRoute();
     const seq = route.params.seq;
     const communityStore = useCommunityStore();
+    const userStore = useUserStore();
     const article = ref({});
+    const comments = ref([]);
+    const user = userStore.userInfo;
+
+    const fn = {
+
+      getComments: () =>{
+        const communityStore = useCommunityStore();
+        communityStore.getComments(seq)
+        .then(result => {
+          comments.value = result;
+          nextTick(() => {
+            document.querySelectorAll(".comment-content img, .comment-content iframe.ql-video").forEach(el => {
+              let wrapper = document.createElement('div');
+              wrapper.className = 'relative flex items-center';
+              wrapper.style.cursor = 'default';
+
+              let leftDiv = document.createElement('div');
+              leftDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -left-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+              leftDiv.style.cursor = 'ew-resize';
+
+              let rightDiv = document.createElement('div');
+              rightDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -right-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+              rightDiv.style.cursor = 'ew-resize';
+
+              wrapper.appendChild(leftDiv);
+              el.parentNode.replaceChild(wrapper, el);
+              wrapper.appendChild(el);
+              wrapper.appendChild(rightDiv);
+
+              interact(wrapper)
+              .resizable({
+                edges: { top: false, left: true, bottom: false, right: true },
+                modifiers: [
+                  interact.modifiers.restrictSize({
+                    min: { width: 50, height: 50 }
+                  })
+                ],
+                listeners: {
+                  move: function (event) {
+                    let { x, y } = event.target.dataset
+                    x = (parseFloat(x) || 0) + event.deltaRect.left
+                    y = (parseFloat(y) || 0) + event.deltaRect.top
+
+                    if (event.deltaRect.left !== 0) {
+                      x -= event.deltaRect.left;
+                      el.style.left = x + "px";
+                    }
+
+                    let newWidth = event.rect.width;
+
+                    if (el.tagName.toLowerCase() === 'img') {
+                      let originalWidth = el.naturalWidth;
+                      let originalHeight = el.naturalHeight;
+                      let ratio = originalHeight / originalWidth;
+
+                      let newHeight = newWidth * ratio;
+
+                      Object.assign(el.style, {
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`,
+                        transform: `translate(${x}px, ${y}px)`
+                      });
+                    } else if (el.tagName.toLowerCase() === 'iframe') {
+                      el.setAttribute('width', newWidth);
+                      el.setAttribute('height', newWidth * 9 / 16);  // 16:9 비율로 높이 계산
+                    }
+
+                    Object.assign(el.dataset, { x, y });
+                  }
+                },
+                cursorChecker: () => 'default' // Change the cursor of the interact.js to default
+              })
+            });
+          })
+        })
+        .catch((error) => {
+          getCurrentInstance().appContext.config.globalProperties.utils.msgError(
+              (error?.response?.data)
+              || getCurrentInstance().appContext.config.globalProperties.utils.normalErrorMsg);
+        });
+      },
+
+    }
+
 
     onMounted(() => {
       communityStore.getArticle(seq)
       .then(result => {
         article.value = result;
+        nextTick(() => {
+          document.querySelectorAll("#article-content img").forEach(el => {
+            let wrapper = document.createElement('div');
+            wrapper.className = 'relative flex items-center';
+            wrapper.style.cursor = 'default';
+
+            let leftDiv = document.createElement('div');
+            leftDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -left-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+            leftDiv.style.cursor = 'ew-resize';
+
+            let rightDiv = document.createElement('div');
+            rightDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -right-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+            rightDiv.style.cursor = 'ew-resize';
+
+            wrapper.appendChild(leftDiv);
+            el.parentNode.replaceChild(wrapper, el);
+            wrapper.appendChild(el);
+            wrapper.appendChild(rightDiv);
+
+            interact(wrapper)
+            .resizable({
+              edges: { top: false, left: true, bottom: false, right: true },
+              modifiers: [
+                interact.modifiers.restrictSize({
+                  min: { width: 50, height: 50 }
+                })
+              ],
+              listeners: {
+                move: function (event) {
+                  let { x, y } = event.target.dataset
+                  x = (parseFloat(x) || 0) + event.deltaRect.left
+                  y = (parseFloat(y) || 0) + event.deltaRect.top
+
+                  if (event.deltaRect.left !== 0) {
+                    x -= event.deltaRect.left;
+                    el.style.left = x + "px";
+                  }
+
+                  let newWidth = event.rect.width;
+
+                  if (el.tagName.toLowerCase() === 'img') {
+                    let originalWidth = el.naturalWidth;
+                    let originalHeight = el.naturalHeight;
+                    let ratio = originalHeight / originalWidth;
+
+                    let newHeight = newWidth * ratio;
+
+                    Object.assign(el.style, {
+                      width: `${newWidth}px`,
+                      height: `${newHeight}px`,
+                      transform: `translate(${x}px, ${y}px)`
+                    });
+                  } else if (el.tagName.toLowerCase() === 'iframe') {
+                    el.setAttribute('width', newWidth);
+                    el.setAttribute('height', newWidth * 9 / 16);  // 16:9 비율로 높이 계산
+                  }
+
+                  Object.assign(el.dataset, { x, y });
+                }
+              },
+              cursorChecker: () => 'default' // Change the cursor of the interact.js to default
+            })
+          });
+        })
       })
       .catch((error) => {
         getCurrentInstance().appContext.config.globalProperties.utils.msgError(
             (error?.response?.data)
             || getCurrentInstance().appContext.config.globalProperties.utils.normalErrorMsg);
       });
+
+      fn.getComments();
     })
 
     return {
-      article
+      article,
+      comments,
+      user,
+      fn,
     }
   },
   methods: {
+    resetComment(){
+      this.$refs.commentEditor.clearEditor();
+      this.comment.value = {
+        article_seq: null,
+        content: null,
+        user_seq: null,
+      };
+    },
     resetReply(){
-      this.comment.replyValue = {
+      this.comment.reply.setting = {
+        isShowEmoji: false
+      };
+      this.comment.reply.value = {
                 parentSeq: null,
                 content: null,
                 imageUrl: null,
               };
     },
     clickReplyBtn(seq){
-      if(this.comment.replyValue.parentSeq != null){
-        if(this.comment.replyValue.parentSeq !== seq){
+      if(this.comment.reply.value.parent_comment_seq != null){
+        if(this.comment.reply.value.parent_comment_seq !== seq){
           this.resetReply();
-          this.comment.replyValue.parentSeq = seq;
+          this.comment.reply.value.parent_comment_seq = seq;
         }else{
           this.resetReply();
         }
       }else{
-        this.comment.replyValue.parentSeq = seq;
+        this.comment.reply.value.parent_comment_seq = seq;
       }
     },
     clickArticleLikeBtn() {
@@ -289,10 +481,10 @@ export default {
         this.isLikes = false;
       }
     },
-    async refreshClick(){
+    refreshClick(){
       if(!this.setting.refreshLoading){
         this.setting.refreshLoading = true;
-        // await this.getArticles();
+        this.fn.getComments();
 
         setTimeout(() => {
           this.setting.refreshLoading = false;
@@ -300,7 +492,7 @@ export default {
       }
     },
     clickReplyImageBtn() {
-      this.$refs.replyImgInput.click();
+      this.$refs.replyImgInput[0].click();
     },
     replyImageUpload(event) {
       if(event.target.files.length === 0) return;
@@ -310,10 +502,51 @@ export default {
       const common = useCommonStore();
       common.imageUpload(formData)
       .then((result) => {
-        this.comment.replyValue.imageUrl = `${process.env.VUE_APP_PROTOCOL}${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_PORT}${result}`;
+        this.comment.reply.value.imageUrl = `${process.env.VUE_APP_PROTOCOL}${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_PORT}${result}`;
       })
       .catch((error) => {
         console.error("Error:", error);
+      });
+    },
+    clickReplyEmojiBtn(){
+      this.comment.reply.setting.isShowEmoji = !this.comment.reply.setting.isShowEmoji;
+    },
+    onSelectEmoji(emoji) {
+      if(!this.comment.reply.value.content)
+        this.comment.reply.value.content = emoji.i;
+      else
+        this.comment.reply.value.content += emoji.i;
+    },
+    clickCommentBtn(){
+      this.comment.value.user_seq = this.user.seq;
+      this.comment.value.article_seq = this.article.seq;
+      const communityStore = useCommunityStore();
+      communityStore.addComment(this.comment.value)
+      .then((result) => {
+        if(result) {
+          this.resetComment();
+          this.utils.notify.success('댓글을 달았습니다!', '등록 완료!')
+          this.fn.getComments();
+        }
+      })
+      .catch((error) => {
+          this.utils.notify.error(error, '');
+      });
+    },
+    clickReplyAddBtn(){
+      this.comment.reply.value.user_seq = this.user.seq;
+      this.comment.reply.value.article_seq = this.article.seq;
+      const communityStore = useCommunityStore();
+      communityStore.addComment(this.comment.reply.value)
+      .then((result) => {
+        if(result) {
+          this.resetReply();
+          this.utils.notify.success('댓글을 달았습니다!', '등록 완료!')
+          this.fn.getComments();
+        }
+      })
+      .catch((error) => {
+        this.utils.notify.error(error, '');
       });
     },
   }

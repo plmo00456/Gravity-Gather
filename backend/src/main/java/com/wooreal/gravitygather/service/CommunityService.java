@@ -3,6 +3,7 @@ package com.wooreal.gravitygather.service;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
+import com.wooreal.gravitygather.dto.community.Comment;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.CommunityMapper;
@@ -28,6 +29,10 @@ public class CommunityService {
         return communityMapper.getArticles(article);
     }
 
+    public Article getArticlesAllCnt(Article article){
+        return communityMapper.getArticlesAllCnt(article);
+    }
+
     public Article getArticle(int seq){
         Article article = new Article();
         article.setSeq(seq);
@@ -44,6 +49,15 @@ public class CommunityService {
     public void articleWrite(Article article){
         if(communityMapper.articleWrite(article) == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "게시물 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+    }
+
+    public List<Comment> getComments(int articleSeq){
+        return communityMapper.getComments(articleSeq);
+    }
+
+    public void addComment(Comment comment){
+        if(communityMapper.addComment(comment) == 0)
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "댓글 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
 
 

@@ -3,6 +3,7 @@ package com.wooreal.gravitygather.mapper;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
+import com.wooreal.gravitygather.dto.community.Comment;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -14,10 +15,15 @@ public interface CommunityMapper {
 
     List<Article> getArticles(Article article);
 
+    Article getArticlesAllCnt(Article article);
+
     Article getArticle(Article article);
 
     int articleWrite(Article article);
 
     void articleGoUpViewCount(Article article);
 
+    List<Comment> getComments(int articleSeq);
+
+    int addComment(Comment comment);
 }

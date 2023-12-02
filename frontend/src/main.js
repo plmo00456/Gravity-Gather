@@ -25,10 +25,6 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import '@/styles.css';
 import "@/assets/css/font.css";
 
-// import '@s-r0/eggy-js/build/css/eggy.css';
-// import '@s-r0/eggy-js/build/css/progressbar.css';
-// import '@s-r0/eggy-js/build/css/theme.css';
-
 const app = createApp(App);
 
 const soundData = new Audio();
@@ -60,6 +56,10 @@ function timeAgo(dateString) {
     } else {
         return `${Math.round(years)}년 전`;
     }
+}
+
+function numberCommas(num) {
+    return (num+"").toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function msg(text){
@@ -163,6 +163,7 @@ async function init(){
 
     app.config.globalProperties.utils.chatSound = soundData;
 
+    app.config.globalProperties.utils.numberCommas = numberCommas;
     app.config.globalProperties.utils.timeAgoStr = timeAgo;
     app.config.globalProperties.utils.dateToUnix = dateToUnix;
     app.config.globalProperties.utils.unixToFormat = unixToFormat;

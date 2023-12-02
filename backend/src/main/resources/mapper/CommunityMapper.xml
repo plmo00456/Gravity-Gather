@@ -14,6 +14,26 @@
             articlemaster
     </select>
 
+    <select id="getArticlesAllCnt">
+        SELECT
+            count(*) as allCnt,
+            CAST(count(*) / #{viewPageCnt} + 1 AS signed integer) as lastPage
+        from
+        article A
+        <where>
+            is_delete = false
+            <if test="seq != null">
+                AND A.seq = #{seq}
+            </if>
+            <if test="master_seq != null and master_seq != 0">
+                AND A.master_seq = #{master_seq}
+            </if>
+            <if test="search != null and search != ''">
+                AND (A.title like '%${search}%' or A.content like '%${search}%')
+            </if>
+        </where>
+    </select>
+
     <select id="getArticles">
         SELECT
             A.seq,
@@ -63,6 +83,7 @@
                 </when>
             </choose>
         </if>
+        LIMIT #{viewPageCnt} OFFSET #{offset}
     </select>
 
     <insert id="articleWrite">
@@ -86,5 +107,42 @@
         WHERE
             seq = #{seq}
     </update>
+
+    <select id="getComments">
+        SELECT
+            A.seq,
+            A.article_seq,
+            A.parent_comment_seq,
+            A.content,
+            A.user_seq,
+            A.likes,
+            A.is_delete,
+            A.created_at,
+            A.updated_at,
+            B.photo,
+            B.nickname
+        FROM
+        comment A
+        left join users B
+        on A.user_seq = B.seq
+        WHERE ARTICLE_SEQ = #{articleSeq}
+        ORDER BY
+            COALESCE(A.parent_comment_seq, A.seq), A.seq
+    </select>
+
+    <insert id="addComment">
+        INSERT INTO comment
+        (
+            article_seq,
+            parent_comment_seq,
+            content,
+            user_seq
+        ) values (
+            #{article_seq},
+            #{parent_comment_seq},
+            #{content},
+            #{user_seq}
+        )
+    </insert>
 
 </mapper>

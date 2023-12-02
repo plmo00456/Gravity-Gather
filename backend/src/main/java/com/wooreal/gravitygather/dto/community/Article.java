@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 @ToString
 @Component
 public class Article {
+    private final int viewPageCnt = 15;
 
     @Value("${file.upload.dir}")
     @JsonIgnore
@@ -53,14 +54,21 @@ public class Article {
     private String order;
     private String search;
 
+    private int currentPage;
+    private int lastPage;
+    private int offset;
+    private int allCnt;
+
     public String getPhoto(){
-        System.out.println(this.photo);
-        System.out.println(staticFileUploadDir);
-        System.out.println(staticFileMappingDir);
         if(this.photo != null && staticFileUploadDir != null && staticFileMappingDir != null) {
             String normalizedPhoto = this.photo.replace("\\", "/");
             return normalizedPhoto.replace(staticFileUploadDir, staticFileMappingDir);
         } else
             return null;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+        this.offset = (currentPage - 1) * viewPageCnt;
     }
 }

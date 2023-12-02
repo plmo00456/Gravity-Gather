@@ -76,6 +76,7 @@ export default {
 
     watch(content, newContent => {
       emit('update:modelValue', newContent);
+      emit('input', newContent);
     });
 
     const modules = [
@@ -108,8 +109,8 @@ export default {
               const common = useCommonStore();
               common.imageUpload(formData)
               .then((result) => {
-                resolve(
-                    `${process.env.VUE_APP_PROTOCOL}${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_PORT}${result}`);
+                let imgUrl = `${process.env.VUE_APP_PROTOCOL}${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_PORT}${result}`;
+                resolve(imgUrl);
               })
               .catch((error) => {
                 reject("Upload failed");
@@ -154,5 +155,10 @@ html.dark .ql-toolbar .ql-picker {
 
 html.dark .ql-toolbar .ql-picker .ql-picker-options {
   background: #747474;
+}
+
+.ql-tooltip.ql-editing{
+  left: 30px !important;
+  top: 10px !important;
 }
 </style>

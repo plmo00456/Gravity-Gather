@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {useCommunityStore} from "@/stores/community";
 import {ContextMenu, ContextMenuItem} from "@imengyu/vue3-context-menu";
 import {router} from "@/router";
+import {getCurrentInstance, onMounted, ref} from "vue";
 
 export default {
     components: { ContextMenuItem, ContextMenu, FontAwesomeIcon},
@@ -14,7 +15,9 @@ export default {
               master_seq: 0,
               order: 'desc',
               search: '',
-              page: 1,
+              currentPage: 1,
+              totalArticleCnt: 0,
+              lastPage: 1,
           },
           setting: {
               refreshLoading: false,
@@ -38,26 +41,60 @@ export default {
           }
       }
     },
+    computed: {
+        surroundingPages() {
+            let start = Math.max(this.articleCondition.currentPage - 2, 1);
+            let end = Math.min(start + 4, this.articleCondition.lastPage);
+            start = Math.max(end - 4, 1);
+            return Array.from({ length: end - start + 1 }, (v, i) => i + start);
+        }
+    },
     setup() {
         const communityStore = useCommunityStore();
-        communityStore.getArticleMaster();
-        communityStore.getArticles({
-            order: 'desc',
-        });
+        const articleMasterList = ref([]);
+        const articleList = ref([]);
+        const articleAllCnt = ref(0);
+        const instance = getCurrentInstance();
+
+        let fn =  {};
+
+        communityStore.getArticleMaster()
+        .then((result) => {
+            articleMasterList.value = result;
+        })
+
+        onMounted(() => {
+            fn.getArticles = (manualCondition) => {
+                communityStore.getArticles(manualCondition ? manualCondition : instance.data.articleCondition)
+                .then(async (result) => {
+                    articleList.value = result;
+                    await communityStore.getArticlesAllCnt(instance.data.articleCondition)
+                    .then(cnt => {
+                        articleAllCnt.value = cnt.allCnt;
+                        instance.data.articleCondition.lastPage = cnt.lastPage;
+                    })
+                })
+            };
+
+            fn.getArticles({
+                order: 'desc',
+            });
+        })
+
+
         return {
-            communityStore
+            communityStore,
+            articleMasterList,
+            articleList,
+            articleAllCnt,
+            fn
         }
     },
     methods: {
-        async getArticles(){
-            const communityStore = useCommunityStore();
-            communityStore.articleList = [];
-            await communityStore.getArticles(this.articleCondition);
-        },
         async refreshClick(){
             if(!this.setting.refreshLoading){
                 this.setting.refreshLoading = true;
-                await this.getArticles();
+                await this.fn.getArticles();
 
                 setTimeout(() => {
                     this.setting.refreshLoading = false;
@@ -65,8 +102,16 @@ export default {
             }
         },
         async clickArticleTab(mode) {
+            this.articleCondition = {
+                master_seq: 0,
+                order: 'desc',
+                search: '',
+                currentPage: 1,
+                totalArticleCnt: 0,
+                lastPage: 1,
+            };
             this.articleCondition.master_seq = mode;
-            await this.getArticles();
+            await this.fn.getArticles();
         },
         clickOrderBtn(e){
             const el = e.target.closest('button');
@@ -77,10 +122,10 @@ export default {
         },
         async clickOrderBtnAct(mode){
             this.articleCondition.order = mode;
-            await this.getArticles();
+            await this.fn.getArticles();
         },
         async clickSearchBtn(){
-            await this.getArticles();
+            await this.fn.getArticles();
             const titles = document.querySelectorAll(".articles .article-title");
             titles.forEach(title => {
                 title.innerHTML = this.highlightKeyword(title.innerHTML);
@@ -115,7 +160,18 @@ export default {
                 }
             });
         },
-
+        clickPageBtn(page){
+            this.articleCondition.currentPage = page;
+            this.fn.getArticles();
+        },
+        prevPage(){
+            this.articleCondition.currentPage = this.articleCondition.currentPage === 1 ? 1 : this.articleCondition.currentPage - 1;
+            this.fn.getArticles();
+        },
+        nextPage(){
+            this.articleCondition.currentPage = this.articleCondition.currentPage === this.articleCondition.lastPage ? this.articleCondition.lastPage : this.articleCondition.currentPage + 1;
+            this.fn.getArticles();
+        }
     }
 }
 </script>
@@ -169,13 +225,19 @@ export default {
                                     class="" icon="rotate-right"/>
                         </span>
                         <div>
-                            <span class="text-gray-300 p-1 mr-1">
-                                <font-awesome-icon icon="arrow-left"/>
-                            </span>
-                            <span>1 / 20 페이지</span>
-                            <span class="p-1 ml-1 cursor-pointer text-gray-600 hover:text-blue-400">
-                                <font-awesome-icon icon="arrow-right"/>
-                            </span>
+                            <label @click="prevPage()"
+                                :class="{'text-gray-600 hover:text-blue-400 cursor-pointer':articleCondition.currentPage !== 1,'text-gray-300' : articleCondition.currentPage === 1}">
+                                <span class="p-1 ml-1">
+                                    <font-awesome-icon icon="arrow-left"/>
+                                </span>
+                            </label>
+                            <span>{{ this.articleCondition.currentPage }} / {{ this.articleCondition.lastPage }} 페이지</span>
+                            <label @click="nextPage()"
+                                :class="{'text-gray-600 hover:text-blue-400 cursor-pointer':articleCondition.currentPage !== articleCondition.lastPage,'text-gray-300' : articleCondition.currentPage === articleCondition.lastPage}">
+                                <span class="p-1 ml-1">
+                                    <font-awesome-icon icon="arrow-right"/>
+                                </span>
+                            </label>
                         </div>
                     </div>
                     <div class="flex relative">
@@ -199,8 +261,9 @@ export default {
                         <span>조회된 글이 없습니다.</span>
                     </div>
                     <template v-else>
-                        <div v-for="article in communityStore.articleList" :key="article.seq"
-                             class="flex justify-between border-b border-gray-300 w-full h-[5.5rem] py-3">
+                        <div v-for="( article, index ) in communityStore.articleList" :key="article.seq"
+                             :class="{ 'border-b border-gray-300': index < communityStore.articleList.length - 1 }"
+                             class="flex justify-between w-full h-[5.5rem] py-3">
                             <div class="w-[80%] flex flex-col pl-2">
                                 <div class="flex items-center text-gray-500">
                                     <div class="w-7 h-7 rounded-full overflow-hidden mr-2">
@@ -231,15 +294,15 @@ export default {
                             <div class="w-[20%] pr-2 flex justify-end items-end text-gray-500">
                                 <div class="flex mr-2">
                                     <span class="mr-1">
-                                        <font-awesome-icon icon="fa-regular fa-eye"/>
-                                    </span>
-                                    <span>{{ article.view_count }}</span>
-                                </div>
-                                <div class="flex mr-2">
-                                    <span class="mr-1">
                                         <font-awesome-icon icon="fa-regular fa-comment-dots"/>
                                     </span>
                                     <span>{{ article.comment_count }}</span>
+                                </div>
+                                <div class="flex mr-2">
+                                    <span class="mr-1">
+                                        <font-awesome-icon icon="fa-regular fa-eye"/>
+                                    </span>
+                                    <span>{{ article.view_count }}</span>
                                 </div>
                                 <div class="flex">
                                     <span class="mr-1">
@@ -247,6 +310,40 @@ export default {
                                     </span>
                                     <span>{{ article.likes }}</span>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="bg-white flex justify-between items-start border-gray-300 border-t w-full h-[5rem] px-2 my-10">
+                            <div class="flex justify-between items-center w-full select-none">
+                                <label @click="prevPage()"
+                                    :class="{'text-gray-600 hover:text-blue-400 cursor-pointer':articleCondition.currentPage !== 1,'text-gray-300' : articleCondition.currentPage === 1}">
+                                    <span class="p-1 mr-1">
+                                        <font-awesome-icon icon="arrow-left"/>
+                                    </span>
+                                    <span>이전</span>
+                                </label>
+                                <div class="flex items-center">
+                                    <button class="mr-2" v-if="articleCondition.currentPage > 3" @click="clickPageBtn(1)">1</button>
+                                    <span class="" v-if="articleCondition.currentPage > 3">...</span>
+
+                                    <button v-for="page in surroundingPages"
+                                            :key="page"
+                                            @click="clickPageBtn(page)"
+                                            class="p-4"
+                                            :class="{ 'text-blue-500 border-t-4 border-blue-400': articleCondition.currentPage === page }">{{ page }}</button>
+
+                                    <span v-if="articleCondition.currentPage < lastPage - 2">...</span>
+                                    <button class="ml-2" v-if="articleCondition.currentPage < lastPage - 2"
+                                            @click="clickPageBtn(lastPage)">{{ lastPage }}</button>
+                                </div>
+                                <label>
+                                    <label @click="nextPage()"
+                                        :class="{'text-gray-600 hover:text-blue-400 cursor-pointer':articleCondition.currentPage !== articleCondition.lastPage,'text-gray-300' : articleCondition.currentPage === articleCondition.lastPage}">
+                                        <span>다음</span>
+                                        <span class="p-1 ml-1">
+                                            <font-awesome-icon icon="arrow-right"/>
+                                        </span>
+                                    </label>
+                                </label>
                             </div>
                         </div>
                     </template>
@@ -268,6 +365,14 @@ export default {
 </template>
 
 <style>
+#main-view > div > div::-webkit-scrollbar {
+    display: none;
+}
+#main-view > div > div{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 .sticky-element {
     position: sticky;
     top: 0;
