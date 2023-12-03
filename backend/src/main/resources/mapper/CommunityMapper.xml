@@ -109,25 +109,58 @@
     </update>
 
     <select id="getComments">
-        SELECT
-            A.seq,
-            A.article_seq,
-            A.parent_comment_seq,
-            A.content,
-            A.user_seq,
-            A.likes,
-            A.is_delete,
-            A.created_at,
-            A.updated_at,
-            B.photo,
-            B.nickname
-        FROM
-        comment A
-        left join users B
-        on A.user_seq = B.seq
-        WHERE ARTICLE_SEQ = #{articleSeq}
-        ORDER BY
-            COALESCE(A.parent_comment_seq, A.seq), A.seq
+        WITH RECURSIVE comment_hierarchy AS (
+            SELECT
+                A.seq,
+                A.article_seq,
+                A.parent_comment_seq,
+                A.content,
+                A.user_seq,
+                A.likes,
+                A.is_delete,
+                A.created_at,
+                A.updated_at,
+                B.photo,
+                B.nickname,
+                A.seq AS root_seq
+            FROM gravitygather.comment A
+                 LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
+            <where>
+                A.parent_comment_seq IS NULL
+                <if test="seq != null">
+                    AND A.seq = #{seq}
+                </if>
+                <if test="article_seq != null">
+                    AND A.article_seq = #{article_seq}
+                </if>
+            </where>
+            UNION ALL
+            SELECT
+                A.seq,
+                A.article_seq,
+                A.parent_comment_seq,
+                A.content,
+                A.user_seq,
+                A.likes,
+                A.is_delete,
+                A.created_at,
+                A.updated_at,
+                B.photo,
+                B.nickname,
+                CH.root_seq
+            FROM gravitygather.comment A
+                 LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
+                 JOIN comment_hierarchy CH ON A.parent_comment_seq = CH.seq
+            <where>
+                <if test="seq != null">
+                    A.seq = #{seq}
+                </if>
+                <if test="article_seq != null">
+                    A.article_seq = #{article_seq}
+                </if>
+            </where>
+        )
+        SELECT * FROM comment_hierarchy ORDER BY root_seq, seq
     </select>
 
     <insert id="addComment">
@@ -144,5 +177,69 @@
             #{user_seq}
         )
     </insert>
+
+    <update id="updateArticle">
+        update article set
+           master_seq = #{master_seq},
+           title = #{title},
+           content = #{content}
+        where
+            seq = #{seq}
+    </update>
+
+    <update id="deleteArticle">
+        update article set
+            is_delete = true
+        where
+            seq = #{seq}
+    </update>
+
+    <update id="likeArticle">
+        update article set
+        <choose>
+            <when test="is_up == true">
+                like = like + 1
+            </when>
+            <otherwise>
+                like = like - 1
+            </otherwise>
+        </choose>
+        where
+            seq = #{content_seq}
+    </update>
+
+    <update id="likeComment">
+        update comment set
+        <choose>
+            <when test="is_up == true">
+                like = like + 1
+            </when>
+            <otherwise>
+                like = like - 1
+            </otherwise>
+        </choose>
+        where
+        seq = #{content_seq}
+    </update>
+
+    <insert id="addLike">
+        INSERT INTO like (
+            mode,
+            user_seq,
+            is_up
+        ) VALUES (
+            #{mode},
+            #{user_seq},
+            #{is_up}
+        )
+    </insert>
+
+    <delete id="deleteLike">
+        delete from like
+        where
+            mode = #{mode}
+        and #{user_seq}
+        and #{content_seq}
+    </delete>
 
 </mapper>

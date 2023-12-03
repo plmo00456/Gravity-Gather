@@ -4,6 +4,7 @@ import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
 import com.wooreal.gravitygather.dto.community.Comment;
+import com.wooreal.gravitygather.dto.community.Like;
 import com.wooreal.gravitygather.service.CommonService;
 import com.wooreal.gravitygather.service.CommunityService;
 import io.swagger.annotations.Api;
@@ -75,6 +76,38 @@ public class CommunityController {
     public ResponseEntity<?> addComment(@RequestBody Comment comment) {
         communityService.addComment(comment);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/article/update")
+    @ApiOperation(value = "게시글 수정 api")
+    public ResponseEntity<?> updateArticle(@RequestBody Article article) {
+        communityService.updateArticle(article);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/article/delete")
+    @ApiOperation(value = "게시글 삭제 api")
+    public ResponseEntity<?> deleteArticle(@RequestBody Article article) {
+        communityService.deleteArticle(article);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/article/like")
+    @ApiOperation(value = "게시글 좋아요 api")
+    public ResponseEntity<?> likeArticle(@RequestBody Like like) {
+        int data = communityService.likeArticle(like);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    //인증
+    @PostMapping("/article/comment/like")
+    @ApiOperation(value = "게시글 댓글 좋아요 api")
+    public ResponseEntity<?> likeComment(@RequestBody Like like) {
+        int data = communityService.likeComment(like);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
 }

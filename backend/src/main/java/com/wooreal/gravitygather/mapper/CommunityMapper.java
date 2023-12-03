@@ -4,6 +4,7 @@ import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
 import com.wooreal.gravitygather.dto.community.Comment;
+import com.wooreal.gravitygather.dto.community.Like;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -26,4 +27,16 @@ public interface CommunityMapper {
     List<Comment> getComments(int articleSeq);
 
     int addComment(Comment comment);
+
+    int updateArticle(Article article);
+
+    int deleteArticle(Article article);
+
+    void likeArticle(Like like);
+
+    void likeComment(Like like);
+
+    int addLike(Like like);
+
+    int deleteLike(Like like);
 }

@@ -59,6 +59,8 @@ public class Article {
     private int offset;
     private int allCnt;
 
+    private
+
     public String getPhoto(){
         if(this.photo != null && staticFileUploadDir != null && staticFileMappingDir != null) {
             String normalizedPhoto = this.photo.replace("\\", "/");
