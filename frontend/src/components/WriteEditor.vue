@@ -11,19 +11,13 @@
       <template #toolbar>
         <div id="toolbar" class="flex">
         <span class="ql-formats">
-          <select class="ql-size">
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-            <option value="huge">Huge</option>
-          </select>
           <select class="ql-header">
-            <option value="1">Header 1</option>
-            <option value="2">Header 2</option>
-            <option value="3">Header 3</option>
-            <option value="4">Header 4</option>
-            <option value="5">Header 5</option>
-            <option value="6">Header 6</option>
+            <option value="1">헤더 1</option>
+            <option value="2">헤더 2</option>
+            <option value="3">헤더 3</option>
+            <option value="4">헤더 4</option>
+            <option value="5">헤더 5</option>
+            <option value="6">헤더 6</option>
           </select>
         </span>
           <span class="ql-formats">
@@ -72,6 +66,10 @@ export default {
 
     const clearEditor = () => {
       instance.refs.editor.setContents('');
+    };
+
+    const setContent = (content) => {
+      instance.refs.editor.setContents(content);
     };
 
     watch(content, newContent => {
@@ -125,7 +123,7 @@ export default {
     ]
 
     return {
-      modules, content, clearEditor
+      modules, content, clearEditor, setContent
     }
   },
   methods: {

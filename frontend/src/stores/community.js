@@ -60,8 +60,8 @@ export const useCommunityStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
-        async getArticle(article) {
-            return http.post(`/community/article/${article}`,{
+        async getArticle(seq) {
+            return http.post(`/community/article/${seq}`,{
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -77,6 +77,7 @@ export const useCommunityStore = defineStore({
             });
         },
         async writeArticle(article){
+            article.content = article.content.replaceAll("cursor: nwse-resize;", '');
             return http.post(`/community/article/write`, article,{
                 headers: {
                     'Content-Type': 'application/json'
@@ -126,7 +127,38 @@ export const useCommunityStore = defineStore({
             .catch(error => {
                 this.dataResponse = error.response;
             });
-        }
+        },
+        async updateArticle(article){
+            article.content = article.content.replaceAll("cursor: nwse-resize;", '');
+            return http.post(`/community/article/update`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async deleteArticle(article){
+            return http.post(`/community/article/delete`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
 
     }
 })

@@ -47,5 +47,7 @@ module.exports = {
       userSelect: ['responsive'],
     }
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

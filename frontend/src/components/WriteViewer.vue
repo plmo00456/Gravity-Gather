@@ -1,5 +1,5 @@
 <template>
-  <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover text-black">
+  <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover text-black h-[93%]">
     <div class="flex flex-col items-center w-full h-full bg-gray-300 bg-opacity-30">
       <div class="flex flex-col items-center bg-white w-[70%] h-full overflow-y-auto rounded">
         <div class="flex w-[85%] h-full inset-0">
@@ -45,29 +45,61 @@
                   </div>
                 </div>
                 <div class="flex w-1/2 content-end justify-end items-end">
-                  <div class="flex mr-2">
+                  <div class="flex mr-2 h-[1.5rem]">
                     <span class="mr-1">
                         <font-awesome-icon icon="fa-regular fa-comment-dots"/>
                     </span>
                     <span>{{ article.comment_count }}</span>
                   </div>
                   <div class="flex">
-                    <span class="mr-1">
+                    <span class="mr-1 h-[1.5rem]">
                         <font-awesome-icon icon="fa-regular fa-heart"/>
                     </span>
                     <span>{{ article.likes }}</span>
+                  </div>
+
+                  <div v-if=" article.user_seq == user.seq " class="flex items-center">
+                    <font-awesome-icon
+                        @click="clickArticleSettingBtn($event)"
+                        class="ml-4 cursor-pointer h-[1.5rem] hover:text-blue-400"
+                        icon="ellipsis"></font-awesome-icon>
+                    <context-menu
+                        v-model:show="setting.articleContextOption.isShow"
+                        :options="setting.articleContextOption"
+                        @close="setting.articleContextOption.isShow = null"
+                    >
+                      <context-menu-item label="수정" @click="clickArticleEditBtn()" class="cursor-pointer">
+                        <template #icon>
+                          <font-awesome-icon class="fa-md font-bold text-gray-600"
+                                             icon="pen-to-square"></font-awesome-icon>
+                        </template>
+                      </context-menu-item>
+                      <context-menu-item label="삭제" @click="clickArticleDeleteBtn()" class="cursor-pointer">
+                        <template #icon>
+                          <font-awesome-icon class="fa-md font-bold text-gray-600"
+                                             icon="fa-regular fa-trash-can"></font-awesome-icon>
+                        </template>
+                      </context-menu-item>
+                      <context-menu-separator/>
+                      <context-menu-item label="닫기" class="cursor-pointer">
+                        <template #icon>
+                          <font-awesome-icon class="fa-md font-bold text-gray-600"
+                                             icon="xmark"></font-awesome-icon>
+                        </template>
+                      </context-menu-item>
+                    </context-menu>
                   </div>
                 </div>
               </div>
             </div>
             <div v-html="article.content"
                  id="article-content"
-                 class="flex flex-col items-start w-full pt-10 pb-5">
+                 class="w-full pt-10 pb-5 text-start prose">
             </div>
-            <div class="flex items-center justify-center mb-5">
+            <div class="flex items-center justify-center mb-5 h-[3rem]">
               <button
                   @click="clickArticleLikeBtn"
-                  class="p-3 border-y border-l border-gray-300 rounded-l-2xl hover:bg-blue-100">
+                  class="p-3 border-y border-l border-gray-300 rounded-l-2xl hover:bg-blue-100 h-full">
                 <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 5.50063L11.4596 6.02073C11.463 6.02421 11.4664 6.02765 11.4698 6.03106L12 5.50063ZM8.96173 18.9109L8.49742 19.4999L8.96173 18.9109ZM15.0383 18.9109L14.574 18.3219L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM13.4698 8.03034C13.7627 8.32318 14.2376 8.32309 14.5304 8.03014C14.8233 7.7372 14.8232 7.26232 14.5302 6.96948L13.4698 8.03034ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55955 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917ZM11.4698 6.03106L13.4698 8.03034L14.5302 6.96948L12.5302 4.97021L11.4698 6.03106Z"
                         :fill="isLikes === true ? 'blue' : '#1C274C'"/>
@@ -76,7 +108,7 @@
               <span class="flex items-center px-5 border-y border-gray-300 h-full">{{ utils.numberCommas(article.likes) }}</span>
               <button
                   @click="clickArticleUnlikeBtn"
-                  class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100">
+                  class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100 h-full">
                 <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.96173 18.9109L9.42605 18.3219L8.96173 18.9109ZM12 5.50063L11.4596 6.02073C11.601 6.16763 11.7961 6.25063 12 6.25063C12.2039 6.25063 12.399 6.16763 12.5404 6.02073L12 5.50063ZM15.0383 18.9109L15.5026 19.4999L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55954 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917Z"
                         :fill="isLikes === false ? 'red' : '#1C274C'"/>
@@ -166,7 +198,7 @@
                   <div v-html="item.content" class="comment-content flex flex-col items-start">
                   </div>
                   <span
-                      @click="clickReplyBtn(item.parent_comment_seq === null ? item.seq : item.parent_comment_seq)"
+                      @click="clickReplyBtn(item.seq)"
                       class="self-start mt-2 text-sm text-gray-400 cursor-pointer">댓글 달기</span>
                   <div
                       v-if="comment.reply.value.parent_comment_seq === item.seq"
@@ -230,9 +262,14 @@ import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 import {useUserStore} from "@/stores/user";
 import interact from 'interactjs'
+import {ContextMenu, ContextMenuItem, ContextMenuSeparator} from "@imengyu/vue3-context-menu";
+import {router} from "@/router";
 
 export default {
-  components: {EmojiPicker, writeEditor, FontAwesomeIcon},
+  components: {
+    EmojiPicker, writeEditor, FontAwesomeIcon,
+    ContextMenuSeparator, ContextMenuItem, ContextMenu
+  },
   data() {
     return {
       isLikes: null,
@@ -257,6 +294,14 @@ export default {
       },
       setting: {
         refreshLoading : false,
+        articleContextOption: {
+          isShow: false,
+          zIndex: 10,
+          minWidth: 200,
+          theme: 'mac',
+          x: 100,
+          y: 300,
+        },
       }
     }
   },
@@ -356,9 +401,9 @@ export default {
       .then(result => {
         article.value = result;
         nextTick(() => {
-          document.querySelectorAll("#article-content img").forEach(el => {
+          document.querySelectorAll("#article-content img, #article-content iframe.ql-video").forEach(el => {
             let wrapper = document.createElement('div');
-            wrapper.className = 'relative flex items-center';
+            wrapper.className = 'relative flex items-center w-fit h-fit';
             wrapper.style.cursor = 'default';
 
             let leftDiv = document.createElement('div');
@@ -379,7 +424,7 @@ export default {
               edges: { top: false, left: true, bottom: false, right: true },
               modifiers: [
                 interact.modifiers.restrictSize({
-                  min: { width: 50, height: 50 }
+                  min: { width: 100, height: 100 }
                 })
               ],
               listeners: {
@@ -549,6 +594,86 @@ export default {
         this.utils.notify.error(error, '');
       });
     },
+    getAbsolutePosition(element) {
+      let top = 0, left = 0;
+
+      while(element) {
+        top += element.offsetTop  || 0;
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+      }
+
+      return {
+        top: top,
+        left: left
+      };
+    },
+    clickArticleSettingBtn(e){
+      if(this.setting.articleContextOption.isShow === false){
+        const el = e.target.closest('div');
+        const xy = this.getAbsolutePosition(el);
+        this.setting.articleContextOption.isShow = true;
+        this.setting.articleContextOption.x = xy.left;
+        this.setting.articleContextOption.y = xy.top + el.clientHeight + 10;
+      }else{
+        this.setting.articleContextOption.isShow = false;
+      }
+    },
+    clickArticleEditBtn(){
+      router.push({
+        name: 'writeView',
+        state: {
+          mode: 'edit',
+          seq: this.article.seq,
+        },
+      });
+    },
+    clickArticleDeleteBtn(){
+      this.$swal.fire({
+        title: '게시글 삭제',
+        html: `<b>[${this.article.title}]</b> 게시글을 삭제 하시겠습니까?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "삭제",
+        cancelButtonText: "취소"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const communityStore = useCommunityStore();
+          try {
+            await communityStore.deleteArticle({
+              seq: this.article.seq,
+            })
+            if (communityStore?.dataResponse.status === 200) {
+              this.utils.notify.success("삭제되었습니다.", "삭제 완료!");
+              this.$router.push({
+                path: `/community`,
+              });
+            } else {
+              this.utils.msgError(typeof communityStore.dataResponse.data ==='object' ? this.utils.normalErrorMsg : communityStore.dataResponse.data);
+            }
+          } catch (error) {
+            console.log(error);
+            this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+          }
+        }
+      }).catch((error) => {
+        console.log(error);
+        this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+      });
+    },
+
   }
 };
 </script>
+
+<style>
+#article-content h1,
+#article-content h2,
+#article-content h3,
+#article-content h4,
+#article-content h5,
+#article-content h6,
+#article-content p{
+    margin: 0;
+}
+</style>
