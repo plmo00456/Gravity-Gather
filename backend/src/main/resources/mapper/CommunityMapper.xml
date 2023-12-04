@@ -17,7 +17,7 @@
     <select id="getArticlesAllCnt">
         SELECT
             count(*) as allCnt,
-            CAST(count(*) / #{viewPageCnt} + 1 AS signed integer) as lastPage
+            TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1 as lastPage
         from
         article A
         <where>
@@ -42,7 +42,7 @@
             A.content,
             A.user_seq,
             A.view_count,
-            A.likes,
+            IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'article' and AA.content_seq = A.seq), 0) as likes,
             A.created_at,
             A.updated_at,
             B.nickname,
@@ -116,7 +116,10 @@
                 A.parent_comment_seq,
                 A.content,
                 A.user_seq,
-                A.likes,
+                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+                <if test="user_seq != null">
+                    (select AA.is_up from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+                </if>
                 A.is_delete,
                 A.created_at,
                 A.updated_at,
@@ -141,7 +144,10 @@
                 A.parent_comment_seq,
                 A.content,
                 A.user_seq,
-                A.likes,
+                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+                <if test="user_seq != null">
+                    (select AA.is_up from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+                </if>
                 A.is_delete,
                 A.created_at,
                 A.updated_at,
@@ -194,52 +200,47 @@
             seq = #{seq}
     </update>
 
-    <update id="likeArticle">
-        update article set
-        <choose>
-            <when test="is_up == true">
-                like = like + 1
-            </when>
-            <otherwise>
-                like = like - 1
-            </otherwise>
-        </choose>
-        where
-            seq = #{content_seq}
-    </update>
-
-    <update id="likeComment">
-        update comment set
-        <choose>
-            <when test="is_up == true">
-                like = like + 1
-            </when>
-            <otherwise>
-                like = like - 1
-            </otherwise>
-        </choose>
-        where
-        seq = #{content_seq}
-    </update>
+    <select id="getLikes">
+        SELECT
+            mode,
+            content_seq,
+            user_seq,
+            is_up,
+            created_at
+        from Likes
+        <where>
+            <if test="mode">
+                mode = #{mode}
+            </if>
+            <if test="content_seq">
+                and content_seq = #{content_seq}
+            </if>
+            <if test="user_seq">
+                and user_seq = #{user_seq}
+            </if>
+        </where>
+    </select>
 
     <insert id="addLike">
-        INSERT INTO like (
+        INSERT INTO likes (
             mode,
+            content_seq,
             user_seq,
             is_up
         ) VALUES (
             #{mode},
+            #{content_seq},
             #{user_seq},
             #{is_up}
         )
     </insert>
 
     <delete id="deleteLike">
-        delete from like
+        delete from likes
         where
             mode = #{mode}
-        and #{user_seq}
-        and #{content_seq}
+        and user_seq = #{user_seq}
+        and content_seq = #{content_seq}
     </delete>
 
 </mapper>

@@ -98,28 +98,28 @@
             </div>
             <div class="flex items-center justify-center mb-5 h-[3rem]">
               <button
-                  @click="clickArticleLikeBtn"
+                  @click="clickArticleLikeBtn(true)"
                   class="p-3 border-y border-l border-gray-300 rounded-l-2xl hover:bg-blue-100 h-full">
                 <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 5.50063L11.4596 6.02073C11.463 6.02421 11.4664 6.02765 11.4698 6.03106L12 5.50063ZM8.96173 18.9109L8.49742 19.4999L8.96173 18.9109ZM15.0383 18.9109L14.574 18.3219L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM13.4698 8.03034C13.7627 8.32318 14.2376 8.32309 14.5304 8.03014C14.8233 7.7372 14.8232 7.26232 14.5302 6.96948L13.4698 8.03034ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55955 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917ZM11.4698 6.03106L13.4698 8.03034L14.5302 6.96948L12.5302 4.97021L11.4698 6.03106Z"
-                        :fill="isLikes === true ? 'blue' : '#1C274C'"/>
+                        :fill="isLike === true ? 'blue' : '#1C274C'"/>
                 </svg>
               </button>
               <span class="flex items-center px-5 border-y border-gray-300 h-full">{{ utils.numberCommas(article.likes) }}</span>
               <button
-                  @click="clickArticleUnlikeBtn"
+                  @click="clickArticleLikeBtn(false)"
                   class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100 h-full">
                 <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.96173 18.9109L9.42605 18.3219L8.96173 18.9109ZM12 5.50063L11.4596 6.02073C11.601 6.16763 11.7961 6.25063 12 6.25063C12.2039 6.25063 12.399 6.16763 12.5404 6.02073L12 5.50063ZM15.0383 18.9109L15.5026 19.4999L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55954 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917Z"
-                        :fill="isLikes === false ? 'red' : '#1C274C'"/>
+                        :fill="isLike === false ? 'red' : '#1C274C'"/>
                   <path d="M12 5.50073L10.5 8.5001L14 11.0001L11 14.5001L13 16.5001L12 20.5001"
-                        :stroke="isLikes === false ? 'red' : '#1C274C'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        :stroke="isLike === false ? 'red' : '#1C274C'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </button>
             </div>
             <div class="flex flex-col items-center text-gray-700 border-t border-gray-300 py-5">
               <div class="flex justify-between w-full items-center">
-                <span class="self-start h-[2rem]">{{utils.numberCommas(comments.length)}}개의 댓글이 있습니다.</span>
+                <span class="self-start h-[2rem]">{{comments ? utils.numberCommas(comments.length) : 0}}개의 댓글이 있습니다.</span>
                 <span
                     @click="refreshClick()"
                     class="flex justify-center select-none px-3 py-2 rounded cursor-pointer hover:bg-gray-200 hover:text-blue-400 mr-2 h-[2rem]">
@@ -162,7 +162,10 @@
                         </div>
                       </div>
                       <div class="flex flex-col justify-start items-start">
-                        <span class="text-sm">{{ item.nickname }}</span>
+                        <span class="flex text-sm">
+                          {{ item.nickname }}
+                          <b class="flex items-center ml-1 px-1 bg-blue-400 rounded-2xl text-xs text-white" v-if="item.user_seq === article.user_seq">작성자</b>
+                        </span>
                         <div class="flex items-center text-xs text-gray-400">
                           <div class="flex items-center">
                           <span class="flex items-center mr-1">
@@ -175,22 +178,22 @@
                     </div>
                     <div class="flex items-center justify-center mb-5 w-[20%]">
                       <button
-                          @click="clickArticleLikeBtn"
+                          @click="clickCommentLikeBtn(true, item)"
                           class="p-3 border-y border-l border-gray-300 rounded-l-2xl hover:bg-blue-100">
                         <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M12 5.50063L11.4596 6.02073C11.463 6.02421 11.4664 6.02765 11.4698 6.03106L12 5.50063ZM8.96173 18.9109L8.49742 19.4999L8.96173 18.9109ZM15.0383 18.9109L14.574 18.3219L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM13.4698 8.03034C13.7627 8.32318 14.2376 8.32309 14.5304 8.03014C14.8233 7.7372 14.8232 7.26232 14.5302 6.96948L13.4698 8.03034ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55955 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917ZM11.4698 6.03106L13.4698 8.03034L14.5302 6.96948L12.5302 4.97021L11.4698 6.03106Z"
-                                :fill="isLikes === true ? 'blue' : '#1C274C'"/>
+                                :fill="item.is_up === true ? 'blue' : '#1C274C'"/>
                         </svg>
                       </button>
                       <span class="flex items-center px-5 border-y border-gray-300 h-full text-sm">{{ utils.numberCommas(item.likes) }}</span>
                       <button
-                          @click="clickArticleUnlikeBtn"
+                          @click="clickCommentLikeBtn(false, item)"
                           class="p-3 border-y border-r border-gray-300 rounded-r-2xl hover:bg-red-100">
                         <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M8.96173 18.9109L9.42605 18.3219L8.96173 18.9109ZM12 5.50063L11.4596 6.02073C11.601 6.16763 11.7961 6.25063 12 6.25063C12.2039 6.25063 12.399 6.16763 12.5404 6.02073L12 5.50063ZM15.0383 18.9109L15.5026 19.4999L15.0383 18.9109ZM7.00061 16.4209C6.68078 16.1577 6.20813 16.2036 5.94491 16.5234C5.68169 16.8432 5.72758 17.3159 6.04741 17.5791L7.00061 16.4209ZM2.34199 13.4115C2.54074 13.7749 2.99647 13.9084 3.35988 13.7096C3.7233 13.5108 3.85677 13.0551 3.65801 12.6917L2.34199 13.4115ZM2.75 9.1371C2.75 6.98623 3.96537 5.18252 5.62436 4.42419C7.23607 3.68748 9.40166 3.88258 11.4596 6.02073L12.5404 4.98053C10.0985 2.44352 7.26409 2.02539 5.00076 3.05996C2.78471 4.07292 1.25 6.42503 1.25 9.1371H2.75ZM8.49742 19.4999C9.00965 19.9037 9.55954 20.3343 10.1168 20.6599C10.6739 20.9854 11.3096 21.25 12 21.25V19.75C11.6904 19.75 11.3261 19.6293 10.8736 19.3648C10.4213 19.1005 9.95208 18.7366 9.42605 18.3219L8.49742 19.4999ZM15.5026 19.4999C16.9292 18.3752 18.7528 17.0866 20.1833 15.4758C21.6395 13.8361 22.75 11.8026 22.75 9.1371H21.25C21.25 11.3345 20.3508 13.0282 19.0617 14.4798C17.7469 15.9603 16.0896 17.1271 14.574 18.3219L15.5026 19.4999ZM22.75 9.1371C22.75 6.42503 21.2153 4.07292 18.9992 3.05996C16.7359 2.02539 13.9015 2.44352 11.4596 4.98053L12.5404 6.02073C14.5983 3.88258 16.7639 3.68748 18.3756 4.42419C20.0346 5.18252 21.25 6.98623 21.25 9.1371H22.75ZM14.574 18.3219C14.0479 18.7366 13.5787 19.1005 13.1264 19.3648C12.6739 19.6293 12.3096 19.75 12 19.75V21.25C12.6904 21.25 13.3261 20.9854 13.8832 20.6599C14.4405 20.3343 14.9903 19.9037 15.5026 19.4999L14.574 18.3219ZM9.42605 18.3219C8.63014 17.6945 7.82129 17.0963 7.00061 16.4209L6.04741 17.5791C6.87768 18.2624 7.75472 18.9144 8.49742 19.4999L9.42605 18.3219ZM3.65801 12.6917C3.0968 11.6656 2.75 10.5033 2.75 9.1371H1.25C1.25 10.7746 1.66995 12.1827 2.34199 13.4115L3.65801 12.6917Z"
-                                :fill="isLikes === false ? 'red' : '#1C274C'"/>
+                                :fill="item.is_up === false ? 'red' : '#1C274C'"/>
                           <path d="M12 5.50073L10.5 8.5001L14 11.0001L11 14.5001L13 16.5001L12 20.5001"
-                                :stroke="isLikes === false ? 'red' : '#1C274C'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                :stroke="item.is_up === false ? 'red' : '#1C274C'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                       </button>
                     </div>
@@ -272,7 +275,7 @@ export default {
   },
   data() {
     return {
-      isLikes: null,
+      isLike: null,
       comment: {
         reply: {
           setting: {
@@ -313,12 +316,16 @@ export default {
     const article = ref({});
     const comments = ref([]);
     const user = userStore.userInfo;
+    const instance = getCurrentInstance();
 
     const fn = {
 
       getComments: () =>{
         const communityStore = useCommunityStore();
-        communityStore.getComments(seq)
+        communityStore.getComments({
+          article_seq: seq,
+          user_seq: user.seq,
+        })
         .then(result => {
           comments.value = result;
           nextTick(() => {
@@ -387,90 +394,111 @@ export default {
           })
         })
         .catch((error) => {
-          getCurrentInstance().appContext.config.globalProperties.utils.msgError(
+          instance.appContext.config.globalProperties.utils.msgError(
               (error?.response?.data)
-              || getCurrentInstance().appContext.config.globalProperties.utils.normalErrorMsg);
+              || instance.appContext.config.globalProperties.utils.normalErrorMsg);
         });
+      },
+      getArticle: () => {
+        communityStore.getArticle(seq)
+        .then(result => {
+          article.value = result;
+          nextTick(() => {
+            document.querySelectorAll("#article-content img, #article-content iframe.ql-video").forEach(el => {
+              let wrapper = document.createElement('div');
+              wrapper.className = 'relative flex items-center w-fit h-fit';
+              wrapper.style.cursor = 'default';
+
+              let leftDiv = document.createElement('div');
+              leftDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -left-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+              leftDiv.style.cursor = 'ew-resize';
+
+              let rightDiv = document.createElement('div');
+              rightDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -right-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
+              rightDiv.style.cursor = 'ew-resize';
+
+              wrapper.appendChild(leftDiv);
+              el.parentNode.replaceChild(wrapper, el);
+              wrapper.appendChild(el);
+              wrapper.appendChild(rightDiv);
+
+              interact(wrapper)
+              .resizable({
+                edges: { top: false, left: true, bottom: false, right: true },
+                modifiers: [
+                  interact.modifiers.restrictSize({
+                    min: { width: 100, height: 100 }
+                  })
+                ],
+                listeners: {
+                  move: function (event) {
+                    let { x, y } = event.target.dataset
+                    x = (parseFloat(x) || 0) + event.deltaRect.left
+                    y = (parseFloat(y) || 0) + event.deltaRect.top
+
+                    if (event.deltaRect.left !== 0) {
+                      x -= event.deltaRect.left;
+                      el.style.left = x + "px";
+                    }
+
+                    let newWidth = event.rect.width;
+
+                    if (el.tagName.toLowerCase() === 'img') {
+                      let originalWidth = el.naturalWidth;
+                      let originalHeight = el.naturalHeight;
+                      let ratio = originalHeight / originalWidth;
+
+                      let newHeight = newWidth * ratio;
+
+                      Object.assign(el.style, {
+                        width: `${newWidth}px`,
+                        height: `${newHeight}px`,
+                        transform: `translate(${x}px, ${y}px)`
+                      });
+                    } else if (el.tagName.toLowerCase() === 'iframe') {
+                      el.setAttribute('width', newWidth);
+                      el.setAttribute('height', newWidth * 9 / 16);  // 16:9 비율로 높이 계산
+                    }
+
+                    Object.assign(el.dataset, { x, y });
+                  }
+                },
+                cursorChecker: () => 'default' // Change the cursor of the interact.js to default
+              })
+            });
+          })
+        })
+        .catch((error) => {
+          instance.appContext.config.globalProperties.utils.msgError(
+              (error?.response?.data)
+              || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+        });
+      },
+      getArticleLike: () =>{
+        communityStore.getLike({
+          mode: 'article',
+          content_seq: seq,
+          user_seq: user.seq
+        }).then(result => {
+          if(result && result.is_up) instance.data.isLike = true;
+          else if(result && !result.is_up) instance.data.isLike = false;
+          fn.getArticle();
+        })
+      },
+      getCommentLike: (comment_seq) =>{
+        communityStore.getLike({
+          mode: 'comment',
+          content_seq: comment_seq,
+          user_seq: user.seq
+        }).then(result => {
+          return result ? result.is_up : null;
+        })
       },
 
     }
 
-
     onMounted(() => {
-      communityStore.getArticle(seq)
-      .then(result => {
-        article.value = result;
-        nextTick(() => {
-          document.querySelectorAll("#article-content img, #article-content iframe.ql-video").forEach(el => {
-            let wrapper = document.createElement('div');
-            wrapper.className = 'relative flex items-center w-fit h-fit';
-            wrapper.style.cursor = 'default';
-
-            let leftDiv = document.createElement('div');
-            leftDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -left-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
-            leftDiv.style.cursor = 'ew-resize';
-
-            let rightDiv = document.createElement('div');
-            rightDiv.className = 'transition-opacity ease-in duration-200 opacity-0 absolute h-full w-3 -right-1 rounded hover:bg-gray-500 hover:opacity-100 z-10';
-            rightDiv.style.cursor = 'ew-resize';
-
-            wrapper.appendChild(leftDiv);
-            el.parentNode.replaceChild(wrapper, el);
-            wrapper.appendChild(el);
-            wrapper.appendChild(rightDiv);
-
-            interact(wrapper)
-            .resizable({
-              edges: { top: false, left: true, bottom: false, right: true },
-              modifiers: [
-                interact.modifiers.restrictSize({
-                  min: { width: 100, height: 100 }
-                })
-              ],
-              listeners: {
-                move: function (event) {
-                  let { x, y } = event.target.dataset
-                  x = (parseFloat(x) || 0) + event.deltaRect.left
-                  y = (parseFloat(y) || 0) + event.deltaRect.top
-
-                  if (event.deltaRect.left !== 0) {
-                    x -= event.deltaRect.left;
-                    el.style.left = x + "px";
-                  }
-
-                  let newWidth = event.rect.width;
-
-                  if (el.tagName.toLowerCase() === 'img') {
-                    let originalWidth = el.naturalWidth;
-                    let originalHeight = el.naturalHeight;
-                    let ratio = originalHeight / originalWidth;
-
-                    let newHeight = newWidth * ratio;
-
-                    Object.assign(el.style, {
-                      width: `${newWidth}px`,
-                      height: `${newHeight}px`,
-                      transform: `translate(${x}px, ${y}px)`
-                    });
-                  } else if (el.tagName.toLowerCase() === 'iframe') {
-                    el.setAttribute('width', newWidth);
-                    el.setAttribute('height', newWidth * 9 / 16);  // 16:9 비율로 높이 계산
-                  }
-
-                  Object.assign(el.dataset, { x, y });
-                }
-              },
-              cursorChecker: () => 'default' // Change the cursor of the interact.js to default
-            })
-          });
-        })
-      })
-      .catch((error) => {
-        getCurrentInstance().appContext.config.globalProperties.utils.msgError(
-            (error?.response?.data)
-            || getCurrentInstance().appContext.config.globalProperties.utils.normalErrorMsg);
-      });
-
+      fn.getArticleLike();
       fn.getComments();
     })
 
@@ -512,19 +540,34 @@ export default {
         this.comment.reply.value.parent_comment_seq = seq;
       }
     },
-    clickArticleLikeBtn() {
-      if(this.isLikes === true){
-        this.isLikes = null;
-      }else{
-        this.isLikes = true;
-      }
+    clickArticleLikeBtn(isUp) {
+      const communityStore = useCommunityStore();
+      const data = {
+        content_seq: this.article.seq,
+        user_seq: this.user.seq,
+        is_up: isUp,
+      };
+      communityStore.likeHandle(data)
+      .then(result => {
+        this.isLike = result.is_up;
+        this.fn.getArticleLike(data);
+      });
     },
-    clickArticleUnlikeBtn() {
-      if(this.isLikes === false){
-        this.isLikes = null;
-      }else{
-        this.isLikes = false;
-      }
+    clickCommentLikeBtn(isUp, item){
+      const communityStore = useCommunityStore();
+      const data = {
+        mode: 'comment',
+        content_seq: item.seq,
+        user_seq: this.user.seq,
+        is_up: isUp,
+      };
+      communityStore.likeHandle(data)
+      .then(() => {
+        // this.isLike = result.is_up;
+        // const result2 = this.fn.getCommentLike(data);
+        // item.isLike = result2;
+        this.fn.getComments();
+      });
     },
     refreshClick(){
       if(!this.setting.refreshLoading){

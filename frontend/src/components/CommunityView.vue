@@ -271,7 +271,7 @@ export default {
                                              :src="`${$env.protocol}${$env.serverIP}:${$env.port}${article.photo}`"
                                              alt="프로필 사진" v-if="article.photo">
                                         <div v-if="!article.photo"
-                                             class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-lg shadow-2xl text-white bg-green-700">
+                                             class=" rounded-3xl w-full h-full flex justify-center items-center font-bold text-md shadow-2xl text-white bg-green-700">
                                             <span>{{ article.nickname[0] }}</span>
                                         </div>
                                     </div>

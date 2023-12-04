@@ -41,6 +41,7 @@ public class Comment {
     private String content;
     private String user_seq;
     private int likes;
+    private Boolean is_up;
     private Boolean is_delete;
     private Timestamp created_at;
     private Timestamp updated_at;
@@ -54,5 +55,10 @@ public class Comment {
             return normalizedPhoto.replace(staticFileUploadDir, staticFileMappingDir);
         } else
             return null;
+    }
+
+    public Boolean getIs_up() {
+        if(this.is_up == null) return null;
+        else return this.is_up;
     }
 }

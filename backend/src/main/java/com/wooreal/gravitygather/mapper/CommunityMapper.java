@@ -24,7 +24,7 @@ public interface CommunityMapper {
 
     void articleGoUpViewCount(Article article);
 
-    List<Comment> getComments(int articleSeq);
+    List<Comment> getComments(Comment comment);
 
     int addComment(Comment comment);
 
@@ -36,7 +36,11 @@ public interface CommunityMapper {
 
     void likeComment(Like like);
 
+    List<Like> getLikes(Like like);
+
     int addLike(Like like);
 
     int deleteLike(Like like);
+
+    int deleteComment(Like like);
 }

@@ -62,10 +62,10 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/article/{seq}/comment")
+    @PostMapping("/article/comment/get")
     @ApiOperation(value = "게시글 댓글 가져오는 api")
-    public ResponseEntity<?> getComments(@PathVariable("seq") int articleSeq) {
-        List<Comment> comments = communityService.getComments(articleSeq);
+    public ResponseEntity<?> getComments(@RequestBody Comment comment) {
+        List<Comment> comments = communityService.getComments(comment);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
@@ -94,11 +94,25 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/article/like/get")
+    @ApiOperation(value = "좋아요 가져오는 api")
+    public ResponseEntity<?> getLike(@RequestBody Like like) {
+        Like data = communityService.getLike(like);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    @PostMapping("/article/likes/get")
+    @ApiOperation(value = "좋아요 가져오는 api")
+    public ResponseEntity<?> getLikes(@RequestBody Like like) {
+        List<Like> likes = communityService.getLikes(like);
+        return new ResponseEntity<>(likes,  HttpStatus.OK);
+    }
+
     //인증
     @PostMapping("/article/like")
     @ApiOperation(value = "게시글 좋아요 api")
     public ResponseEntity<?> likeArticle(@RequestBody Like like) {
-        int data = communityService.likeArticle(like);
+        Like data = communityService.likeArticle(like);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -106,7 +120,7 @@ public class CommunityController {
     @PostMapping("/article/comment/like")
     @ApiOperation(value = "게시글 댓글 좋아요 api")
     public ResponseEntity<?> likeComment(@RequestBody Like like) {
-        int data = communityService.likeComment(like);
+        Like data = communityService.likeComment(like);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 

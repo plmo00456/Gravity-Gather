@@ -52,8 +52,8 @@ public class CommunityService {
             throw new BusinessLogicException(HttpStatus.valueOf(500), "게시물 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
 
-    public List<Comment> getComments(int articleSeq){
-        return communityMapper.getComments(articleSeq);
+    public List<Comment> getComments(Comment comment){
+        return communityMapper.getComments(comment);
     }
 
     public void addComment(Comment comment){
@@ -75,25 +75,59 @@ public class CommunityService {
         Comment comment = new Comment();
         comment.setSeq(seq);
 
-        List<Comment> comments = getComments(seq);
+        List<Comment> comments = getComments(comment);
         if(comments == null || comments.size() == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "존재하지 않는 댓글 입니다.");
 
         return comments.get(0);
     }
 
-    public int likeArticle(Like like){
-        like.setMode("article");
-        communityMapper.likeArticle(like);
-
-        return getArticle(like.getContent_seq()).getLikes();
+    public List<Like> getLikes(Like like){
+        return communityMapper.getLikes(like);
     }
 
-    public int likeComment(Like like){
-        like.setMode("comment");
-        communityMapper.likeComment(like);
+    public Like getLike(Like like){
+        List<Like> likes = communityMapper.getLikes(like);
+        if(likes.size() > 0) return likes.get(0);
+        else return null;
+    }
 
-        return getComment(like.getContent_seq()).getLikes();
+    public void addLike(Like like){
+        communityMapper.addLike(like);
+    }
+
+    public Like likeArticle(Like like){
+        like.setMode("article");
+        Like tmp = getLike(like);
+        if(tmp != null){
+            deleteLike(like);
+            if(tmp.getIs_up() != like.getIs_up()){
+                addLike(like);
+            }
+        }else{
+            addLike(like);
+        }
+
+        return getLike(like);
+    }
+
+    public Like likeComment(Like like){
+        like.setMode("comment");
+        Like tmp = getLike(like);
+        if(tmp != null){
+            deleteLike(like);
+            if(tmp.getIs_up() != like.getIs_up()){
+                addLike(like);
+            }
+        }else{
+            addLike(like);
+        }
+
+        return getLike(like);
+    }
+
+    public void deleteLike(Like like){
+        communityMapper.deleteLike(like);
     }
 
 }

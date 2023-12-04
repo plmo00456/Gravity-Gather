@@ -93,7 +93,7 @@ export const useCommunityStore = defineStore({
             });
         },
         async getComments(article) {
-            return http.post(`/community/article/${article}/comment` ,{
+            return http.post(`/community/article/comment/get`,article ,{
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -159,6 +159,41 @@ export const useCommunityStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
+        async getLike(like){
+            return http.post(`/community/article/like/get`, like,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async likeHandle(like){
+            let modeText = '';
+            if(like.mode === 'comment') modeText = '/comment';
+
+            return http.post(`/community/article${modeText}/like`, like,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        }
 
     }
 })
