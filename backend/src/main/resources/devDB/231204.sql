@@ -66,16 +66,14 @@ CREATE TABLE `article` (
   `is_delete` tinyint(1) DEFAULT 0,
   `user_seq` varchar(100) NOT NULL,
   `view_count` int(11) NOT NULL DEFAULT 0,
-  `likes` int(11) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`seq`),
   KEY `master_seq` (`master_seq`),
   KEY `idx_article_author` (`user_seq`),
   KEY `idx_article_view_count` (`view_count`),
-  KEY `idx_article_likes` (`likes`),
   CONSTRAINT `article_ibfk_1` FOREIGN KEY (`master_seq`) REFERENCES `articlemaster` (`seq`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,32 +83,33 @@ CREATE TABLE `article` (
 LOCK TABLES `article` WRITE;
 /*!40000 ALTER TABLE `article` DISABLE KEYS */;
 INSERT INTO `article` VALUES
-(1,2,'제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.','내용입니다.',0,'2',9,1,'2023-11-29 20:39:42','2023-12-03 17:34:28'),
-(2,2,'테스트','입니다',0,'2',18,0,'2023-11-29 22:05:06','2023-12-02 15:48:24'),
-(3,1,'ㅁㄴㅇ','<p>ㅋㅌㅊ</p>',0,'1',23,0,'2023-11-30 23:00:26','2023-12-02 15:55:44'),
-(4,2,'ㅂㅈㄷ','<p>ㅁㄴㅇ</p>',0,'1',4,0,'2023-11-30 23:00:32','2023-12-03 16:09:14'),
-(5,3,'ㅋㅌㅊ','<p>ㅁㄴㅇ</p>',0,'1',2,0,'2023-11-30 23:00:36','2023-12-03 16:09:01'),
-(6,1,'ㅎㅎ','<p><img src=\"http://192.168.0.100:8080/file/img/84df954a-304f-4870-b9e9-c88e5fdfd823.png\"></p>',0,'1',3,0,'2023-12-01 14:51:33','2023-12-02 16:19:10'),
-(7,1,'ㅎㅎ','<p><img src=\"http://192.168.0.100:8080/file/img/f1af1411-0295-46be-b775-56f861a03ded.png\" width=\"496\" height=\"269.89125242921557\" style=\"display: block; margin: auto;\" data-align=\"center\"></p><p><span class=\"ql-size-large\">반갑습니다</span></p>',0,'1',12,0,'2023-12-01 14:54:33','2023-12-03 15:47:39'),
-(8,1,'ㅁㄴㅇㅁㄴㅇ','<p>ㅂㅈㄷ</p>',0,'1',165,0,'2023-12-01 15:34:01','2023-12-03 16:58:40'),
-(9,2,'긴글 테스트','<p>ㅁㄴㅇㅁㄴㅇ</p><iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/_8UitQ-WSGY?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" style=\"cursor: nwse-resize;\" width=\"1068\" height=\"534\"></iframe><p><img src=\"http://192.168.0.100:8080/file/img/603e19de-4929-47d9-aaff-565c5b48853e.png\"><img src=\"http://192.168.0.100:8080/file/img/2f389b92-2c91-479b-9173-5ac745e974c5.png\"><img src=\"http://192.168.0.100:8080/file/img/e50bee5e-2e70-4f64-8301-e7c595bf1b84.png\"></p>',0,'1',11,0,'2023-12-01 17:36:24','2023-12-03 16:09:04'),
-(10,1,'ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ','<p>qweqwe</p>',0,'1',9,0,'2023-12-01 18:30:26','2023-12-03 16:08:48'),
-(11,1,'ㅂㅈㅇㅂㅈㅇ','<p>ㅂㅈㅇㅂㅈㅇㅂㅈㅇㄴㅇ</p><p>ㅂㅈㅇ</p><p>ㅂㅈㅇ</p><p>ㅁ</p><p>ㄴㅇ</p><p>ㅂㅈ</p><p>ㅇㅂㅈㅇㅂ</p><p>ㅈㅇㅁㅂㄴㅇ</p>',0,'1',90,0,'2023-12-01 22:01:39','2023-12-02 21:14:46'),
-(12,1,'asdqwe','<p>asd</p>',0,'1',1,0,'2023-12-02 19:46:51','2023-12-03 15:50:59'),
-(13,1,'wqfqwf','<p>qwfqwfqwf</p>',0,'1',31,0,'2023-12-02 19:46:56','2023-12-03 21:09:47'),
-(14,1,'qwfqwf','<p>qwfqwffw</p>',0,'1',0,0,'2023-12-02 19:47:04','2023-12-02 19:47:04'),
-(15,1,'asfasf','<p>asfasfasf</p>',0,'1',3,0,'2023-12-02 19:47:07','2023-12-03 17:38:02'),
-(16,1,'qweqwe','<p>qweqwe</p>',0,'1',0,0,'2023-12-02 19:47:11','2023-12-02 19:47:11'),
-(17,1,'qweqwea','<p>swdasdasd</p>',0,'1',1,0,'2023-12-02 19:47:13','2023-12-02 21:18:28'),
-(18,1,'qwdqwdasd','<p>asdasdasd</p>',0,'1',4,0,'2023-12-02 19:47:17','2023-12-02 21:18:26'),
-(19,1,'qwdawqdawda','<p>wdawdawd</p>',0,'1',2,0,'2023-12-02 19:47:20','2023-12-02 21:59:39'),
-(20,1,'qwdqwdadaw','<p>dasdasdqsd</p>',0,'1',8,0,'2023-12-02 19:47:23','2023-12-02 21:18:20'),
-(21,1,'qwdqwdqwd','<p>awdasdasd</p>',0,'1',15,0,'2023-12-02 19:47:28','2023-12-03 16:08:43'),
-(22,1,'ㅎㅎㅎㅎㅎ','<p><img src=\"http://localhost:8080/file/img/6a79a2ed-854a-4bea-9693-d2a7fd28a232.jpeg\" width=\"237\" height=\"177.75\" style=\"cursor: nwse-resize;\"></p>',0,'1',83,0,'2023-12-02 20:39:21','2023-12-03 17:40:09'),
-(23,1,'ㅎㅎㄹㄹㄹㄹ','<p>ㅎㅎ<img src=\"http://localhost:8080/file/img/541d14a1-b12d-462b-8a0b-a9e81f446deb.jpeg\" width=\"232\" height=\"174\" style=\"cursor: nwse-resize;\"></p><iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/QTbQfXDltX0?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" width=\"520\" height=\"260\" style=\"cursor: nwse-resize;\"></iframe><p><br></p>',0,'1',28,0,'2023-12-03 15:48:59','2023-12-03 17:43:19'),
-(24,1,'ㅁㄴㅇㅁㄴㅇ','<h1>가운데 정렬 <span class=\"ql-size-huge\">###</span></h1><p>### 테스트 ㅎㅎ..</p>',1,'1',94,0,'2023-12-03 15:56:38','2023-12-03 17:33:17'),
-(25,1,'ㅋㅋㅋㅋㅋㅋㅋ','<p>ㅋㅋㅋㅋㅋ</p><h2><span class=\"ql-size-huge\">테스트</span></h2><p><span class=\"ql-size-small\">테스트</span><img src=\"http://localhost:8080/file/img/cd85d2e7-1bcc-446d-9b19-52893833cb95.jpeg\" width=\"318\" height=\"238.4984660505142\" style=\"cursor: nwse-resize;\"></p>',1,'1',24,0,'2023-12-03 17:11:18','2023-12-03 17:33:10'),
-(26,1,'asdqwd','<p><img src=\"http://localhost:8080/file/img/026a5aac-78aa-4e82-ba52-e7a965cc0f60.jpeg\" width=\"337\" height=\"252.74834371989698\" style=\"\"></p>',0,'1',19,0,'2023-12-03 17:44:10','2023-12-03 17:53:20');
+(1,2,'제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.제목입니다.','내용입니다.',0,'2',9,'2023-11-29 20:39:42','2023-12-03 17:34:28'),
+(2,2,'테스트','입니다',0,'2',18,'2023-11-29 22:05:06','2023-12-02 15:48:24'),
+(3,1,'ㅁㄴㅇ','<p>ㅋㅌㅊ</p>',0,'1',23,'2023-11-30 23:00:26','2023-12-02 15:55:44'),
+(4,2,'ㅂㅈㄷ','<p>ㅁㄴㅇ</p>',0,'1',4,'2023-11-30 23:00:32','2023-12-03 16:09:14'),
+(5,3,'ㅋㅌㅊ','<p>ㅁㄴㅇ</p>',0,'1',2,'2023-11-30 23:00:36','2023-12-03 16:09:01'),
+(6,1,'ㅎㅎ','<p><img src=\"http://192.168.0.100:8080/file/img/84df954a-304f-4870-b9e9-c88e5fdfd823.png\"></p>',0,'1',3,'2023-12-01 14:51:33','2023-12-02 16:19:10'),
+(7,1,'ㅎㅎ','<p><img src=\"http://192.168.0.100:8080/file/img/f1af1411-0295-46be-b775-56f861a03ded.png\" width=\"496\" height=\"269.89125242921557\" style=\"display: block; margin: auto;\" data-align=\"center\"></p><p><span class=\"ql-size-large\">반갑습니다</span></p>',0,'1',12,'2023-12-01 14:54:33','2023-12-03 15:47:39'),
+(8,1,'ㅁㄴㅇㅁㄴㅇ','<p>ㅂㅈㄷ</p>',0,'1',165,'2023-12-01 15:34:01','2023-12-03 16:58:40'),
+(9,2,'긴글 테스트','<p>ㅁㄴㅇㅁㄴㅇ</p><iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/_8UitQ-WSGY?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" style=\"cursor: nwse-resize;\" width=\"1068\" height=\"534\"></iframe><p><img src=\"http://192.168.0.100:8080/file/img/603e19de-4929-47d9-aaff-565c5b48853e.png\"><img src=\"http://192.168.0.100:8080/file/img/2f389b92-2c91-479b-9173-5ac745e974c5.png\"><img src=\"http://192.168.0.100:8080/file/img/e50bee5e-2e70-4f64-8301-e7c595bf1b84.png\"></p>',0,'1',11,'2023-12-01 17:36:24','2023-12-03 16:09:04'),
+(10,1,'ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ','<p>qweqwe</p>',0,'1',9,'2023-12-01 18:30:26','2023-12-03 16:08:48'),
+(11,1,'ㅂㅈㅇㅂㅈㅇ','<p>ㅂㅈㅇㅂㅈㅇㅂㅈㅇㄴㅇ</p><p>ㅂㅈㅇ</p><p>ㅂㅈㅇ</p><p>ㅁ</p><p>ㄴㅇ</p><p>ㅂㅈ</p><p>ㅇㅂㅈㅇㅂ</p><p>ㅈㅇㅁㅂㄴㅇ</p>',0,'1',90,'2023-12-01 22:01:39','2023-12-02 21:14:46'),
+(12,1,'asdqwe','<p>asd</p>',0,'1',1,'2023-12-02 19:46:51','2023-12-03 15:50:59'),
+(13,1,'wqfqwf','<p>qwfqwfqwf</p>',0,'1',31,'2023-12-02 19:46:56','2023-12-03 21:09:47'),
+(14,1,'qwfqwf','<p>qwfqwffw</p>',0,'1',0,'2023-12-02 19:47:04','2023-12-02 19:47:04'),
+(15,1,'asfasf','<p>asfasfasf</p>',0,'1',3,'2023-12-02 19:47:07','2023-12-03 17:38:02'),
+(16,1,'qweqwe','<p>qweqwe</p>',0,'1',0,'2023-12-02 19:47:11','2023-12-02 19:47:11'),
+(17,1,'qweqwea','<p>swdasdasd</p>',0,'1',1,'2023-12-02 19:47:13','2023-12-02 21:18:28'),
+(18,1,'qwdqwdasd','<p>asdasdasd</p>',0,'1',4,'2023-12-02 19:47:17','2023-12-02 21:18:26'),
+(19,1,'qwdawqdawda','<p>wdawdawd</p>',0,'1',2,'2023-12-02 19:47:20','2023-12-02 21:59:39'),
+(20,1,'qwdqwdadaw','<p>dasdasdqsd</p>',0,'1',8,'2023-12-02 19:47:23','2023-12-02 21:18:20'),
+(21,1,'qwdqwdqwd','<p>awdasdasd</p>',0,'1',15,'2023-12-02 19:47:28','2023-12-03 16:08:43'),
+(22,1,'ㅎㅎㅎㅎㅎ','<p><img src=\"http://localhost:8080/file/img/6a79a2ed-854a-4bea-9693-d2a7fd28a232.jpeg\" width=\"237\" height=\"177.75\" style=\"cursor: nwse-resize;\"></p>',0,'1',84,'2023-12-02 20:39:21','2023-12-04 16:54:13'),
+(23,1,'ㅎㅎㄹㄹㄹㄹ','<p>ㅎㅎ<img src=\"http://localhost:8080/file/img/541d14a1-b12d-462b-8a0b-a9e81f446deb.jpeg\" width=\"232\" height=\"174\" style=\"cursor: nwse-resize;\"></p><iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/QTbQfXDltX0?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" width=\"520\" height=\"260\" style=\"cursor: nwse-resize;\"></iframe><p><br></p>',0,'1',28,'2023-12-03 15:48:59','2023-12-03 17:43:19'),
+(24,1,'ㅁㄴㅇㅁㄴㅇ','<h1>가운데 정렬 <span class=\"ql-size-huge\">###</span></h1><p>### 테스트 ㅎㅎ..</p>',1,'1',94,'2023-12-03 15:56:38','2023-12-03 17:33:17'),
+(25,1,'ㅋㅋㅋㅋㅋㅋㅋ','<p>ㅋㅋㅋㅋㅋ</p><h2><span class=\"ql-size-huge\">테스트</span></h2><p><span class=\"ql-size-small\">테스트</span><img src=\"http://localhost:8080/file/img/cd85d2e7-1bcc-446d-9b19-52893833cb95.jpeg\" width=\"318\" height=\"238.4984660505142\" style=\"cursor: nwse-resize;\"></p>',1,'1',24,'2023-12-03 17:11:18','2023-12-03 17:33:10'),
+(26,1,'asdqwd','<p><img src=\"http://localhost:8080/file/img/026a5aac-78aa-4e82-ba52-e7a965cc0f60.jpeg\" width=\"337\" height=\"252.74834371989698\" style=\"\"></p>',0,'1',29,'2023-12-03 17:44:10','2023-12-04 20:27:51'),
+(27,3,'이번 테스트 게시글','<p>ㅎㅎ</p>',0,'1',5798,'2023-12-04 16:59:26','2023-12-04 21:34:40');
 /*!40000 ALTER TABLE `article` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2297,16 +2296,14 @@ CREATE TABLE `comment` (
   `parent_comment_seq` int(11) DEFAULT NULL,
   `content` text NOT NULL,
   `user_seq` varchar(100) NOT NULL,
-  `likes` int(11) NOT NULL DEFAULT 0,
   `is_delete` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`seq`),
   KEY `article_seq` (`article_seq`),
   KEY `idx_comment_author` (`user_seq`),
-  KEY `idx_comment_likes` (`likes`),
   CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`article_seq`) REFERENCES `article` (`seq`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2316,46 +2313,51 @@ CREATE TABLE `comment` (
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
 INSERT INTO `comment` VALUES
-(1,3,NULL,'댓글 테스트 입니다.','1',0,0,'2023-12-02 14:34:37','2023-12-02 14:34:46'),
-(2,3,1,'대댓글','2',0,0,'2023-12-02 14:35:42','2023-12-02 14:35:42'),
-(3,5,NULL,'댓글 테스트 입니다.2','2',0,0,'2023-12-02 14:35:42','2023-12-02 14:36:35'),
-(4,3,1,'대댓글2','1',0,0,'2023-12-02 14:35:58','2023-12-02 14:41:47'),
-(5,4,NULL,'댓글 테스트 입니다.3','2',0,0,'2023-12-02 14:35:58','2023-12-02 14:35:58'),
-(6,3,NULL,'댓글 테스트 입니다.4','2',0,0,'2023-12-02 14:37:55','2023-12-02 14:37:55'),
-(7,3,1,'대댓글3','1',0,0,'2023-12-02 14:37:55','2023-12-02 14:37:55'),
-(8,11,NULL,'<p>ㅎㅎ</p>','1',0,0,'2023-12-02 15:50:44','2023-12-02 15:50:44'),
-(9,11,NULL,'<p>ㅎㅎㅎ</p>','1',0,0,'2023-12-02 15:53:02','2023-12-02 15:53:02'),
-(10,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/226c8a0c-3558-4643-9aef-ad67461c7b47.png\" width=\"486\" height=\"480.5027043012622\" style=\"cursor: nwse-resize;\">ㅎㅎㅎ</p>','1',0,0,'2023-12-02 15:55:27','2023-12-02 15:55:27'),
-(11,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/a7d6322a-600f-4cd1-830b-78a8cfaa3c56.png\" width=\"275\" height=\"196.05489366478955\" style=\"cursor: nwse-resize;\"></p>','1',0,0,'2023-12-02 16:00:30','2023-12-02 16:00:30'),
-(12,11,NULL,'<p>gggg<img src=\"http://192.168.0.100:8080/file/img/26f83316-8d0b-4f7b-a0df-bd2f0b8cd332.png\" width=\"292\" height=\"288.6970980575485\" style=\"cursor: nwse-resize;\"></p>','1',0,0,'2023-12-02 16:02:37','2023-12-02 16:02:37'),
-(13,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/bb82518c-19a6-49a6-9045-bb37a7ccba35.png\"></p>','1',0,0,'2023-12-02 16:06:15','2023-12-02 16:06:15'),
-(14,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/0c92c701-2bba-4f86-a604-9edd72733f8a.png\" width=\"67\" height=\"86.18999946645174\" style=\"\"></p>','1',0,0,'2023-12-02 16:07:05','2023-12-02 16:07:05'),
-(15,22,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/eba19c49-5dc3-44f9-a3bd-173278624d49.png\" width=\"1108\" height=\"1428.9379040158688\" style=\"\"></p>','1',0,0,'2023-12-02 20:56:43','2023-12-02 20:56:43'),
-(16,22,NULL,'<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/xORSOaPKenM?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" width=\"478\" height=\"239\" style=\"\"></iframe><p><br></p>','1',0,0,'2023-12-02 21:02:16','2023-12-02 21:02:16'),
-(17,21,NULL,'<p>테스트</p>','1',0,0,'2023-12-02 21:06:43','2023-12-02 21:06:43'),
-(18,21,NULL,'ㅎㅎ','1',0,0,'2023-12-02 21:10:28','2023-12-02 21:10:28'),
-(19,11,NULL,'멍청이http://192.168.0.100:8080/file/img/253c0cb5-ec09-48fb-8a08-f18489d05a77.png','1',0,0,'2023-12-02 21:10:42','2023-12-02 21:10:42'),
-(20,11,12,'빠아아아안?<img src=\"http://192.168.0.100:8080/file/img/2b82b643-fec1-4bc9-8826-ca6450556c7a.png\" alt=\"대댓글 이미지\">','1',0,0,'2023-12-02 21:13:50','2023-12-02 21:13:50'),
-(21,22,15,'가운데임😅😅😆😆http://192.168.0.100:8080/file/img/711fa65e-b021-45a2-a796-486874ec81e7.png','1',0,0,'2023-12-02 21:15:04','2023-12-02 21:15:04'),
-(22,22,21,'가운데22 임😀😀😀😉😚😚<img src=\"http://192.168.0.100:8080/file/img/4be867e6-57a4-4972-af3a-c61393db5faf.png\" alt=\"대댓글 이미지\">','1',0,0,'2023-12-02 21:15:31','2023-12-02 21:15:31'),
-(23,13,NULL,'<p>1</p>','1',0,0,'2023-12-02 21:17:35','2023-12-02 21:17:35'),
-(24,13,NULL,'<p>2</p>','1',0,0,'2023-12-02 21:17:37','2023-12-02 21:17:37'),
-(25,13,NULL,'<p>3</p>','1',0,0,'2023-12-02 21:17:39','2023-12-02 21:17:39'),
-(26,13,24,'ㅎㅎ<img src=\"http://192.168.0.100:8080/file/img/f7dc8fc7-a55f-4354-a029-ecf226f041e6.png\" alt=\"대댓글 이미지\">','1',0,0,'2023-12-02 21:17:46','2023-12-02 21:17:46'),
-(27,13,23,'대댓글 ㅋㅋ','1',0,0,'2023-12-02 21:25:52','2023-12-02 21:25:52'),
-(28,13,23,'대대대대댓글 ㅋㅋ','1',0,0,'2023-12-02 21:25:58','2023-12-02 21:25:58'),
-(29,13,23,'ㅋㅋㅋ','1',0,0,'2023-12-02 21:28:08','2023-12-02 21:28:08'),
-(30,13,23,'ㅋㅋㅋㅋㅋ','1',0,0,'2023-12-02 21:28:11','2023-12-02 21:28:11'),
-(31,13,23,'ㅎㅎ<img src=\"http://192.168.0.100:8080/file/img/daae25f9-789f-4d9a-9b29-a6d23bd94fa4.png\" alt=\"대댓글 이미지\">','1',0,0,'2023-12-02 21:28:34','2023-12-02 21:28:34'),
-(32,21,17,'대댓긇','1',150000,0,'2023-12-02 22:00:48','2023-12-02 22:02:38'),
-(33,7,NULL,'<p>한솔이 이삐다<img src=\"http://localhost:8080/file/img/7e62a398-a4c0-4f55-ac00-217fde246e82.jpeg\" width=\"443\" height=\"590.6605852191999\" style=\"\"></p>','1',0,0,'2023-12-03 15:47:14','2023-12-03 15:47:14'),
-(34,7,33,'한솔이의 실체를 고발합니다!😫<img src=\"http://localhost:8080/file/img/56b979dd-9f17-465e-887c-70a765228620.jpeg\" alt=\"대댓글 이미지\">','1',0,0,'2023-12-03 15:48:11','2023-12-03 15:48:11'),
-(35,23,NULL,'<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/QTbQfXDltX0?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\"></iframe><p><br></p>','1',0,0,'2023-12-03 15:49:17','2023-12-03 15:49:17'),
-(36,26,NULL,'<p><img src=\"http://localhost:8080/file/img/0adb495f-9b4a-4e29-905c-80a1e455f820.jpeg\"></p>','1',0,0,'2023-12-03 17:47:00','2023-12-03 17:47:00'),
-(37,26,NULL,'<p><img src=\"http://localhost:8080/file/img/e8ba3f4d-f18d-4c24-93b6-94b6dd58b851.jpeg\" width=\"129\" height=\"96.7493225216898\" style=\"\"></p>','1',0,0,'2023-12-03 17:47:20','2023-12-03 17:47:20'),
-(38,13,30,'테스트','1',0,0,'2023-12-03 17:56:18','2023-12-03 17:56:18'),
-(39,13,26,'ㅋㅋ','1',0,0,'2023-12-03 17:56:28','2023-12-03 17:56:28'),
-(40,13,30,'ㅋㅋㅋㅋ 위에 댓글달기','1',0,0,'2023-12-03 21:09:58','2023-12-03 21:09:58');
+(1,3,NULL,'댓글 테스트 입니다.','1',0,'2023-12-02 14:34:37','2023-12-02 14:34:46'),
+(2,3,1,'대댓글','2',0,'2023-12-02 14:35:42','2023-12-02 14:35:42'),
+(3,5,NULL,'댓글 테스트 입니다.2','2',0,'2023-12-02 14:35:42','2023-12-02 14:36:35'),
+(4,3,1,'대댓글2','1',0,'2023-12-02 14:35:58','2023-12-02 14:41:47'),
+(5,4,NULL,'댓글 테스트 입니다.3','2',0,'2023-12-02 14:35:58','2023-12-02 14:35:58'),
+(6,3,NULL,'댓글 테스트 입니다.4','2',0,'2023-12-02 14:37:55','2023-12-02 14:37:55'),
+(7,3,1,'대댓글3','1',0,'2023-12-02 14:37:55','2023-12-02 14:37:55'),
+(8,11,NULL,'<p>ㅎㅎ</p>','1',0,'2023-12-02 15:50:44','2023-12-02 15:50:44'),
+(9,11,NULL,'<p>ㅎㅎㅎ</p>','1',0,'2023-12-02 15:53:02','2023-12-02 15:53:02'),
+(10,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/226c8a0c-3558-4643-9aef-ad67461c7b47.png\" width=\"486\" height=\"480.5027043012622\" style=\"cursor: nwse-resize;\">ㅎㅎㅎ</p>','1',0,'2023-12-02 15:55:27','2023-12-02 15:55:27'),
+(11,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/a7d6322a-600f-4cd1-830b-78a8cfaa3c56.png\" width=\"275\" height=\"196.05489366478955\" style=\"cursor: nwse-resize;\"></p>','1',0,'2023-12-02 16:00:30','2023-12-02 16:00:30'),
+(12,11,NULL,'<p>gggg<img src=\"http://192.168.0.100:8080/file/img/26f83316-8d0b-4f7b-a0df-bd2f0b8cd332.png\" width=\"292\" height=\"288.6970980575485\" style=\"cursor: nwse-resize;\"></p>','1',0,'2023-12-02 16:02:37','2023-12-02 16:02:37'),
+(13,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/bb82518c-19a6-49a6-9045-bb37a7ccba35.png\"></p>','1',0,'2023-12-02 16:06:15','2023-12-02 16:06:15'),
+(14,11,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/0c92c701-2bba-4f86-a604-9edd72733f8a.png\" width=\"67\" height=\"86.18999946645174\" style=\"\"></p>','1',0,'2023-12-02 16:07:05','2023-12-02 16:07:05'),
+(15,22,NULL,'<p><img src=\"http://192.168.0.100:8080/file/img/eba19c49-5dc3-44f9-a3bd-173278624d49.png\" width=\"1108\" height=\"1428.9379040158688\" style=\"\"></p>','1',0,'2023-12-02 20:56:43','2023-12-02 20:56:43'),
+(16,22,NULL,'<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/xORSOaPKenM?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\" width=\"478\" height=\"239\" style=\"\"></iframe><p><br></p>','1',0,'2023-12-02 21:02:16','2023-12-02 21:02:16'),
+(17,21,NULL,'<p>테스트</p>','1',0,'2023-12-02 21:06:43','2023-12-02 21:06:43'),
+(18,21,NULL,'ㅎㅎ','1',0,'2023-12-02 21:10:28','2023-12-02 21:10:28'),
+(19,11,NULL,'멍청이http://192.168.0.100:8080/file/img/253c0cb5-ec09-48fb-8a08-f18489d05a77.png','1',0,'2023-12-02 21:10:42','2023-12-02 21:10:42'),
+(20,11,12,'빠아아아안?<img src=\"http://192.168.0.100:8080/file/img/2b82b643-fec1-4bc9-8826-ca6450556c7a.png\" alt=\"대댓글 이미지\">','1',0,'2023-12-02 21:13:50','2023-12-02 21:13:50'),
+(21,22,15,'가운데임😅😅😆😆http://192.168.0.100:8080/file/img/711fa65e-b021-45a2-a796-486874ec81e7.png','1',0,'2023-12-02 21:15:04','2023-12-02 21:15:04'),
+(22,22,21,'가운데22 임😀😀😀😉😚😚<img src=\"http://192.168.0.100:8080/file/img/4be867e6-57a4-4972-af3a-c61393db5faf.png\" alt=\"대댓글 이미지\">','1',0,'2023-12-02 21:15:31','2023-12-02 21:15:31'),
+(23,13,NULL,'<p>1</p>','1',0,'2023-12-02 21:17:35','2023-12-02 21:17:35'),
+(24,13,NULL,'<p>2</p>','1',0,'2023-12-02 21:17:37','2023-12-02 21:17:37'),
+(25,13,NULL,'<p>3</p>','1',0,'2023-12-02 21:17:39','2023-12-02 21:17:39'),
+(26,13,24,'ㅎㅎ<img src=\"http://192.168.0.100:8080/file/img/f7dc8fc7-a55f-4354-a029-ecf226f041e6.png\" alt=\"대댓글 이미지\">','1',0,'2023-12-02 21:17:46','2023-12-02 21:17:46'),
+(27,13,23,'대댓글 ㅋㅋ','1',0,'2023-12-02 21:25:52','2023-12-02 21:25:52'),
+(28,13,23,'대대대대댓글 ㅋㅋ','1',0,'2023-12-02 21:25:58','2023-12-02 21:25:58'),
+(29,13,23,'ㅋㅋㅋ','1',0,'2023-12-02 21:28:08','2023-12-02 21:28:08'),
+(30,13,23,'ㅋㅋㅋㅋㅋ','1',0,'2023-12-02 21:28:11','2023-12-02 21:28:11'),
+(31,13,23,'ㅎㅎ<img src=\"http://192.168.0.100:8080/file/img/daae25f9-789f-4d9a-9b29-a6d23bd94fa4.png\" alt=\"대댓글 이미지\">','1',0,'2023-12-02 21:28:34','2023-12-02 21:28:34'),
+(32,21,17,'대댓긇','1',0,'2023-12-02 22:00:48','2023-12-02 22:02:38'),
+(33,7,NULL,'<p>한솔이 이삐다<img src=\"http://localhost:8080/file/img/7e62a398-a4c0-4f55-ac00-217fde246e82.jpeg\" width=\"443\" height=\"590.6605852191999\" style=\"\"></p>','1',0,'2023-12-03 15:47:14','2023-12-03 15:47:14'),
+(34,7,33,'한솔이의 실체를 고발합니다!😫<img src=\"http://localhost:8080/file/img/56b979dd-9f17-465e-887c-70a765228620.jpeg\" alt=\"대댓글 이미지\">','1',0,'2023-12-03 15:48:11','2023-12-03 15:48:11'),
+(35,23,NULL,'<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/QTbQfXDltX0?showinfo=0\" data-blot-formatter-unclickable-bound=\"true\"></iframe><p><br></p>','1',0,'2023-12-03 15:49:17','2023-12-03 15:49:17'),
+(36,26,NULL,'<p><img src=\"http://localhost:8080/file/img/0adb495f-9b4a-4e29-905c-80a1e455f820.jpeg\"></p>','1',0,'2023-12-03 17:47:00','2023-12-03 17:47:00'),
+(37,26,NULL,'<p><img src=\"http://localhost:8080/file/img/e8ba3f4d-f18d-4c24-93b6-94b6dd58b851.jpeg\" width=\"129\" height=\"96.7493225216898\" style=\"\"></p>','1',0,'2023-12-03 17:47:20','2023-12-03 17:47:20'),
+(38,13,30,'테스트','1',0,'2023-12-03 17:56:18','2023-12-03 17:56:18'),
+(39,13,26,'ㅋㅋ','1',0,'2023-12-03 17:56:28','2023-12-03 17:56:28'),
+(40,13,30,'ㅋㅋㅋㅋ 위에 댓글달기','1',0,'2023-12-03 21:09:58','2023-12-03 21:09:58'),
+(41,26,NULL,'<p>qwe</p>','1',0,'2023-12-04 16:33:23','2023-12-04 16:33:23'),
+(42,22,NULL,'<p>ㅎㅎ</p>','1',0,'2023-12-04 16:54:21','2023-12-04 16:54:21'),
+(43,22,16,'ㅂㅂ','1',0,'2023-12-04 16:54:28','2023-12-04 16:54:28'),
+(44,27,NULL,'<p>테스트 댓글</p>','1',0,'2023-12-04 20:32:11','2023-12-04 20:32:11'),
+(45,27,NULL,'<p>다른 계정 댓글</p>','2',0,'2023-12-04 20:33:48','2023-12-04 20:33:48');
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2473,15 +2475,15 @@ INSERT INTO `friend` VALUES
 UNLOCK TABLES;
 
 --
--- Table structure for table `like`
+-- Table structure for table `likes`
 --
 
-DROP TABLE IF EXISTS `like`;
+DROP TABLE IF EXISTS `likes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `like` (
-  `content_seq` int(11) DEFAULT NULL,
+CREATE TABLE `likes` (
   `mode` varchar(100) NOT NULL,
+  `content_seq` int(11) DEFAULT NULL,
   `user_seq` int(11) NOT NULL,
   `is_up` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp()
@@ -2489,12 +2491,12 @@ CREATE TABLE `like` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `like`
+-- Dumping data for table `likes`
 --
 
-LOCK TABLES `like` WRITE;
-/*!40000 ALTER TABLE `like` DISABLE KEYS */;
-/*!40000 ALTER TABLE `like` ENABLE KEYS */;
+LOCK TABLES `likes` WRITE;
+/*!40000 ALTER TABLE `likes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `likes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2847,4 +2849,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 15:06:45
+-- Dump completed on 2023-12-04 21:38:37
