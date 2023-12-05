@@ -9,6 +9,10 @@ export const useUserStore = defineStore({
         userInfo: null,
         dataResponse: null,
         friendList: [],
+        token: {
+            access: null,
+            refresh: null,
+        },
     }),
     getters: {
         username() {
@@ -27,11 +31,15 @@ export const useUserStore = defineStore({
             })
             .then(response => {
                 if (response.status === 200) {
-                    if(response.data.status !== 'UNVERIFIED')
-                        this.isLoggedIn = true;
+                    if(response.headers['accessToken']){
+                        localStorage.setItem('accessToken', response.headers['accessToken']);
+                        localStorage.setItem('refreshToken', response.headers['refreshToken']);
+                        if(response.data.status !== 'UNVERIFIED')
+                            this.isLoggedIn = true;
 
+                        this.userInfo = response.data;
+                    }
                     this.dataResponse = response;
-                    this.userInfo = response.data;
                 }
             })
             .catch(error => {
@@ -41,6 +49,8 @@ export const useUserStore = defineStore({
 
         async logout() {
             try {
+                localStorage.setItem('accessToken', null);
+                localStorage.setItem('refreshToken', null);
                 this.isLoggedIn = false;
                 this.userInfo = null;
                 if (router.currentRoute.value.path === '/') {

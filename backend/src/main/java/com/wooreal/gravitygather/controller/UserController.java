@@ -6,6 +6,8 @@ import com.wooreal.gravitygather.service.FileUploadService;
 import com.wooreal.gravitygather.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,8 @@ public class UserController {
 
     private final FileUploadService fileUploadService;
 
+
+
     public UserController(UserService userService, FileUploadService fileUploadService) {
         this.userService = userService;
         this.fileUploadService = fileUploadService;
@@ -31,8 +35,8 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "로그인 액션 Api", notes = "아이디, 비밀번호를 이용하여 로그인 합니다.")
-    public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest) {
-        User user = userService.login(userRequest);
+    public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest, HttpServletResponse httpServletResponse) {
+        User user = userService.login(userRequest, httpServletResponse);
         return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
     }
 
@@ -105,6 +109,13 @@ public class UserController {
     @ApiOperation(value = "친구 삭제하는 api")
     public ResponseEntity<?> deleteFriends(@RequestBody Friend friend) {
         userService.deleteFriend(friend);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/refreshAccessToken")
+    @ApiOperation(value = "액세스 토큰 재발급 api")
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        userService.refreshAccessToken(request, response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -5,7 +5,10 @@ import com.wooreal.gravitygather.dto.user.*;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
+import com.wooreal.gravitygather.utils.JwtTokenUtil;
 import com.wooreal.gravitygather.utils.SHA256Util;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,24 +31,30 @@ public class UserService {
 
     private final WebSocketHandler webSocketHandler;
 
+    private final JwtTokenUtil jwtTokenUtil;
+
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
 
 
-    public UserService(UserMapper userMapper, MailService mailService, RedisService redisService, WebSocketHandler webSocketHandler) {
+    public UserService(UserMapper userMapper, MailService mailService, RedisService redisService, WebSocketHandler webSocketHandler, JwtTokenUtil jwtTokenUtil) {
         this.userMapper = userMapper;
         this.mailService = mailService;
         this.redisService = redisService;
         this.webSocketHandler = webSocketHandler;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public User login(UserRequest userRequest){
+    public User login(UserRequest userRequest, HttpServletResponse httpServletResponse){
         User user = userMapper.login(userRequest);
         if (user == null || user.getStatus().equals("DELETED"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "아이디와 비밀번호를 확인해 주세요.");
 
         if (user.getStatus().equals("LOCK"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "정지된 계정입니다. 관리자에게 문의해 주세요.");
+
+        httpServletResponse.setHeader("accessToken", jwtTokenUtil.generateToken(user.getSeq(), 0));
+        httpServletResponse.setHeader("refreshToken", jwtTokenUtil.generateToken(user.getSeq(), 1));
         return userMapper.login(userRequest);
     }
 
@@ -155,4 +164,14 @@ public class UserService {
         return userMapper.deleteFriend(friend);
     }
 
+    public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response){
+        String refreshToken = request.getHeader("refreshToken");
+        if(jwtTokenUtil.validateToken(refreshToken)){
+            int seq = jwtTokenUtil.getUserSeqFromToken(refreshToken);
+            response.setHeader("accessToken", jwtTokenUtil.generateToken(seq, 0));
+            response.setHeader("refreshToken", jwtTokenUtil.generateToken(seq, 1));
+        }else{
+            throw new BusinessLogicException(HttpStatus.valueOf(401), "로그인이 만료되었습니다.");
+        }
+    }
 }

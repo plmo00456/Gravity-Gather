@@ -116,9 +116,9 @@
                 A.parent_comment_seq,
                 A.content,
                 A.user_seq,
-                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
                 <if test="user_seq != null">
-                    (select AA.is_up from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+                    (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
                 </if>
                 A.is_delete,
                 A.created_at,
@@ -144,9 +144,9 @@
                 A.parent_comment_seq,
                 A.content,
                 A.user_seq,
-                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
                 <if test="user_seq != null">
-                    (select AA.is_up from likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+                    (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
                 </if>
                 A.is_delete,
                 A.created_at,

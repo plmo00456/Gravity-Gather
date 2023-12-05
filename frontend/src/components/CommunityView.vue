@@ -296,19 +296,19 @@ export default {
                                     <span class="mr-1">
                                         <font-awesome-icon icon="fa-regular fa-comment-dots"/>
                                     </span>
-                                    <span>{{ article.comment_count }}</span>
+                                    <span>{{ utils.numberCommas(article.comment_count) }}</span>
                                 </div>
                                 <div class="flex mr-2">
                                     <span class="mr-1">
                                         <font-awesome-icon icon="fa-regular fa-eye"/>
                                     </span>
-                                    <span>{{ article.view_count }}</span>
+                                    <span>{{ utils.numberCommas(article.view_count) }}</span>
                                 </div>
                                 <div class="flex">
                                     <span class="mr-1">
                                         <font-awesome-icon icon="fa-regular fa-heart"/>
                                     </span>
-                                    <span>{{ article.likes }}</span>
+                                    <span>{{ utils.numberCommas(article.likes) }}</span>
                                 </div>
                             </div>
                         </div>

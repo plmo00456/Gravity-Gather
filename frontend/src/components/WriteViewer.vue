@@ -38,7 +38,7 @@
                           <span class="mr-1">
                             <font-awesome-icon icon="fa-regular fa-eye"/>
                           </span>
-                          <span>{{ article.view_count }}</span>
+                          <span>{{ utils.numberCommas(article.view_count) }}</span>
                         </div>
                       </div>
                     </div>
@@ -49,13 +49,13 @@
                     <span class="mr-1">
                         <font-awesome-icon icon="fa-regular fa-comment-dots"/>
                     </span>
-                    <span>{{ article.comment_count }}</span>
+                    <span>{{ utils.numberCommas(article.comment_count) }}</span>
                   </div>
                   <div class="flex">
                     <span class="mr-1 h-[1.5rem]">
                         <font-awesome-icon icon="fa-regular fa-heart"/>
                     </span>
-                    <span>{{ article.likes }}</span>
+                    <span>{{ utils.numberCommas(article.likes) }}</span>
                   </div>
 
                   <div v-if=" article.user_seq == user.seq " class="flex items-center">

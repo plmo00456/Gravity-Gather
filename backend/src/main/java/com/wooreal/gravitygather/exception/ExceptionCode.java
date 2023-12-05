@@ -9,7 +9,16 @@ public class ExceptionCode {
     private HttpStatus httpStatus;
 
     @Getter
+    private String error;
+
+    @Getter
     private String message;
+
+    ExceptionCode(HttpStatus httpStatus, String error, String message) {
+        this.httpStatus = httpStatus;
+        this.error = error;
+        this.message = message;
+    }
 
     ExceptionCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
