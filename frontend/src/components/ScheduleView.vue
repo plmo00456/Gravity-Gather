@@ -456,9 +456,7 @@ export default {
     },
     async openShare() {
       const userStore = useUserStore();
-      await userStore.getFriends({
-        user_seq: this.user.seq,
-      });
+      await userStore.getFriends();
       this.share.team = userStore.friendList;
 
       this.share.tmpFriendSeq = this.share.friend_seq;

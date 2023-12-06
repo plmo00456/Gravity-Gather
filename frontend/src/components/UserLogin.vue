@@ -82,7 +82,6 @@ export default {
                 try {
                     await userStore.login(loginUser);
                     this.dataResponse = userStore.dataResponse;
-                    console.log(this.dataResponse);
                     if(this?.dataResponse?.status === 200){
                         if(this?.dataResponse?.data?.status === 'UNVERIFIED') {
                             this.$router.push({
@@ -93,8 +92,7 @@ export default {
                             });
                             return;
                         }
-
-                      this.$router.push({name : 'MainView'});
+                        this.$router.push({name : 'MainView'});
                     }else{
                         this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
                     }

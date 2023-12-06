@@ -507,7 +507,6 @@ export default {
               formData.append('password', this.myInfoValue.password);
               formData.append('newPassword', this.myInfoValue.newPassword);
             }
-            formData.append("seq", this.user.seq);
             formData.append("name", this.myInfoValue.name);
             formData.append("nickname", this.myInfoValue.nickname);
             formData.append("roomCharacter", this.roomCharacterValue.roomCharacter);
@@ -515,7 +514,7 @@ export default {
 
             await userStore.userInfoUpdate(formData);
             if (userStore?.dataResponse.status === 200) {
-              await userStore.userInfoStateUpdate(this.user.seq);
+              await userStore.userInfoStateUpdate();
               this.utils.notify.success("내 정보가 변경되었습니다.", "변경 완료!");
               this.myInfoShow = false;
             } else {

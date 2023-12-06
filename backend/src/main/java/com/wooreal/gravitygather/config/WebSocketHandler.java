@@ -13,6 +13,7 @@ import com.wooreal.gravitygather.service.UserService;
 import com.wooreal.gravitygather.utils.comUtil;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -177,17 +178,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public void updateUserMsg(int userSeq) throws IOException {
+    public void updateUserMsg() throws IOException {
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Gson gson = new Gson();
-        UserResponse user = new UserResponse(userService.getUserBySeq(userSeq));
+        UserResponse user = new UserResponse(userService.getUserBySeq());
         JsonObject jo = new JsonObject();
         jo.addProperty("type1", "room");
         jo.addProperty("type2", "updateUserMsg");
-        jo.addProperty("seq", userSeq);
+        jo.addProperty("seq", seq);
         jo.add("userInfo", gson.toJsonTree(user));
         jo.addProperty("datetime", new Date().getTime());
 //        sendMessageToAll(jo.toString());
-        sendMessageToUserSeqInRoom(userSeq, jo);
+        sendMessageToUserSeqInRoom(seq, jo);
     }
 
     public void sendMessageToUserSeqInRoom(Integer userSeq, JsonObject jo){

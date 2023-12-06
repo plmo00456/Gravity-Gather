@@ -583,9 +583,7 @@ export default {
         async friendTab(){
             this.rightCurrentTab = 'friend';
             const userStore = useUserStore();
-            await userStore.getFriends({
-                user_seq: this.user.seq,
-            });
+            await userStore.getFriends();
             this.friend.list = userStore.friendList;
 
             console.log(this.friend.list);
@@ -624,7 +622,6 @@ export default {
 
                 try {
                     await userStore.getFriends({
-                        user_seq : this.user.seq,
                         friend_seq : this.participantTabSetting.context.currentClickUser.seq
                     });
                 } catch (error) {
@@ -643,7 +640,6 @@ export default {
                 const userStore = useUserStore();
 
                 const friend = {
-                    user_seq : this.user.seq,
                     friend_seq : this.participantTabSetting.context.currentClickUser.seq
                 }
                 await userStore.addFriend(friend);
@@ -663,7 +659,6 @@ export default {
                 const userStore = useUserStore();
 
                 const friend = {
-                    user_seq : this.user.seq,
                     friend_seq : this.participantTabSetting.context.currentClickUser.seq
                 }
                 await userStore.deleteFriend(friend);

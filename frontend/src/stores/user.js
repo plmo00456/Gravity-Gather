@@ -26,14 +26,17 @@ export const useUserStore = defineStore({
         async login(credentials) {
             return http.post('/user/login', credentials, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'test':'aa'
                 }
             })
             .then(response => {
                 if (response.status === 200) {
-                    if(response.headers['accessToken']){
-                        localStorage.setItem('accessToken', response.headers['accessToken']);
-                        localStorage.setItem('refreshToken', response.headers['refreshToken']);
+                    console.log(response.headers.toJSON());
+                    console.log(response.headers['authorization']);
+                    if(response.headers['authorization']){
+                        this.token.access = response.headers['authorization'];
+                        this.token.refresh = response.headers['refresh'];
                         if(response.data.status !== 'UNVERIFIED')
                             this.isLoggedIn = true;
 
@@ -49,8 +52,8 @@ export const useUserStore = defineStore({
 
         async logout() {
             try {
-                localStorage.setItem('accessToken', null);
-                localStorage.setItem('refreshToken', null);
+                localStorage.setItem('authorization', null);
+                localStorage.setItem('refresh', null);
                 this.isLoggedIn = false;
                 this.userInfo = null;
                 if (router.currentRoute.value.path === '/') {
@@ -97,8 +100,8 @@ export const useUserStore = defineStore({
             });
         },
 
-        async userInfoStateUpdate(seq) {
-            return http.get(`/user/${seq}/info`, {
+        async userInfoStateUpdate() {
+            return http.post(`/user/info`, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

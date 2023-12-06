@@ -3,7 +3,6 @@ package com.wooreal.gravitygather.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
@@ -15,7 +14,6 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${spring.jwt.secretkey}")
     private String SECRET_KEY;
 
     @Value("${spring.jwt.explain.access}")
@@ -24,7 +22,14 @@ public class JwtTokenUtil {
     @Value("${spring.jwt.explain.refresh}")
     private long REFRESH_EXPLAIN;
 
-    SecretKey secret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
+    SecretKey secret;
+
+    public JwtTokenUtil(@Value("${spring.jwt.secretkey}") String SECRET_KEY){
+        String salt = SHA256Util.generateSalt();
+        String hash = SHA256Util.generateHashWithSalt(SECRET_KEY, salt);
+        this.SECRET_KEY = hash;
+        this.secret = Keys.hmacShaKeyFor(hash.getBytes());
+    }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()

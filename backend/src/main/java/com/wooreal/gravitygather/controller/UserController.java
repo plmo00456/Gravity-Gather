@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.controller;
 
+import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.file.FileVO;
 import com.wooreal.gravitygather.dto.user.*;
 import com.wooreal.gravitygather.service.FileUploadService;
@@ -35,8 +36,8 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "로그인 액션 Api", notes = "아이디, 비밀번호를 이용하여 로그인 합니다.")
-    public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest, HttpServletResponse httpServletResponse) {
-        User user = userService.login(userRequest, httpServletResponse);
+    public ResponseEntity<?> loginAction(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse httpServletResponse) {
+        User user = userService.login(userRequest,request, httpServletResponse);
         return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
     }
 
@@ -54,11 +55,11 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //인증
-    @GetMapping("/{seq}/info")
-    @ApiOperation(value = "공개 가능한 유저 정보")
-    public ResponseEntity<?> getUserInfo(@PathVariable("seq") int seq) {
-        UserResponse userInfo = new UserResponse(userService.getUserBySeq(seq));
+    @LoginRequired
+    @PostMapping("/info")
+    @ApiOperation(value = "유저 정보")
+    public ResponseEntity<?> getUserInfo() {
+        UserResponse userInfo = new UserResponse(userService.getUserBySeq());
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
@@ -69,7 +70,6 @@ public class UserController {
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
-    //인증
     @PostMapping("/update")
     @ApiOperation(value = "유저 정보 변경 api")
     public ResponseEntity<?> userUpdate(UserRequest userRequest,
@@ -88,7 +88,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //인증
     @PostMapping("/friend/get")
     @ApiOperation(value = "친구 가져오는 api")
     public ResponseEntity<?> getFriends(@RequestBody Friend friend) {
@@ -96,7 +95,6 @@ public class UserController {
         return new ResponseEntity<>(friends, HttpStatus.OK);
     }
 
-    //인증
     @PostMapping("/friend/add")
     @ApiOperation(value = "친구 삭제하는 api")
     public ResponseEntity<?> addFriends(@RequestBody Friend friend) {
@@ -104,7 +102,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //인증
     @PostMapping("/friend/delete")
     @ApiOperation(value = "친구 삭제하는 api")
     public ResponseEntity<?> deleteFriends(@RequestBody Friend friend) {

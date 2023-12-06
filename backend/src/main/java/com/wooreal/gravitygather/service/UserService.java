@@ -7,10 +7,14 @@ import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.JwtTokenUtil;
 import com.wooreal.gravitygather.utils.SHA256Util;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -45,7 +49,7 @@ public class UserService {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public User login(UserRequest userRequest, HttpServletResponse httpServletResponse){
+    public User login(UserRequest userRequest, HttpServletRequest request, HttpServletResponse httpServletResponse){
         User user = userMapper.login(userRequest);
         if (user == null || user.getStatus().equals("DELETED"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "아이디와 비밀번호를 확인해 주세요.");
@@ -53,8 +57,14 @@ public class UserService {
         if (user.getStatus().equals("LOCK"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "정지된 계정입니다. 관리자에게 문의해 주세요.");
 
-        httpServletResponse.setHeader("accessToken", jwtTokenUtil.generateToken(user.getSeq(), 0));
-        httpServletResponse.setHeader("refreshToken", jwtTokenUtil.generateToken(user.getSeq(), 1));
+        httpServletResponse.setHeader("authorization", jwtTokenUtil.generateToken(user.getSeq(), 0));
+        httpServletResponse.setHeader("refresh", jwtTokenUtil.generateToken(user.getSeq(), 1));
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+            user.getSeq(), null, new ArrayList<>());
+        usernamePasswordAuthenticationToken
+            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
         return userMapper.login(userRequest);
     }
 
@@ -106,6 +116,11 @@ public class UserService {
         return userMapper.setUserActive(email);
     }
 
+    public User getUserBySeq(){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userMapper.getUserBySeq(seq);
+    }
+
     public User getUserBySeq(int seq){
         return userMapper.getUserBySeq(seq);
     }
@@ -124,7 +139,7 @@ public class UserService {
     }
 
     public void userUpdate(UserRequest userRequest) throws IOException {
-        User ur = getUserBySeq(userRequest.getSeq());
+        User ur = getUserBySeq();
 
         if(userRequest.getPassword() != null && !userRequest.getPassword().equals("")){
             String oriPassword = ur.getPassword();
@@ -149,27 +164,43 @@ public class UserService {
             throw new BusinessLogicException(HttpStatus.valueOf(500), "내 정보 변경 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
 
-        webSocketHandler.updateUserMsg(userRequest.getSeq());
+        webSocketHandler.updateUserMsg();
     }
 
     public List<Friend> getFriends(Friend friend){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("SEQ : " + seq);
+        friend.setUser_seq(seq);
         return userMapper.getFriends(friend);
     }
 
-    public int addFriend(Friend friend){
-        return userMapper.addFriend(friend);
+    public void addFriend(Friend friend){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        friend.setUser_seq(seq);
+        if(userMapper.addFriend(friend) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "친구 추가 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
     }
 
-    public int deleteFriend(Friend friend){
-        return userMapper.deleteFriend(friend);
+    public void deleteFriend(Friend friend){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        friend.setUser_seq(seq);
+        if(userMapper.deleteFriend(friend) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "친구 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+        }
     }
 
     public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response){
-        String refreshToken = request.getHeader("refreshToken");
-        if(jwtTokenUtil.validateToken(refreshToken)){
-            int seq = jwtTokenUtil.getUserSeqFromToken(refreshToken);
-            response.setHeader("accessToken", jwtTokenUtil.generateToken(seq, 0));
-            response.setHeader("refreshToken", jwtTokenUtil.generateToken(seq, 1));
+        String refresh = request.getHeader("refresh");
+        if(jwtTokenUtil.validateToken(refresh)){
+            int seq = jwtTokenUtil.getUserSeqFromToken(refresh);
+            response.setHeader("authorization", jwtTokenUtil.generateToken(seq, 0));
+            response.setHeader("refresh", jwtTokenUtil.generateToken(seq, 1));
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                seq, null, new ArrayList<>());
+            usernamePasswordAuthenticationToken
+                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }else{
             throw new BusinessLogicException(HttpStatus.valueOf(401), "로그인이 만료되었습니다.");
         }
