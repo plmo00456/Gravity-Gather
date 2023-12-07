@@ -8,6 +8,7 @@
             seq,
             id,
             password,
+            password_salt,
             photo,
             name,
             nickname,
@@ -31,6 +32,7 @@
             seq,
             id,
             password,
+            password_salt,
             photo,
             name,
             nickname,
@@ -45,6 +47,28 @@
             users
         WHERE
             email = #{email}
+    </select>
+
+    <select id="getUserById" resultType="com.wooreal.gravitygather.dto.user.User">
+        SELECT
+            seq,
+            id,
+            password,
+            password_salt,
+            photo,
+            name,
+            nickname,
+            email,
+            status,
+            room_character,
+            room_map,
+            fail_login_cnt as failLoginCnt,
+            created_at,
+            updated_at
+        FROM
+            users
+        WHERE
+            id = #{id}
     </select>
 
     <update id="setUserActive">
@@ -150,4 +174,22 @@
         WHERE user_seq = #{user_seq}
         and friend_seq = #{friend_seq}
     </delete>
+
+    <insert id="register">
+        INSERT INTO users(
+            id,
+            password,
+            password_salt,
+            name,
+            nickname,
+            email
+        ) VALUES (
+            #{id},
+            #{password},
+            #{passwordSalt},
+            #{name},
+            #{nickname},
+            #{email}
+        )
+    </insert>
 </mapper>

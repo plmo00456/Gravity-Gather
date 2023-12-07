@@ -12,6 +12,7 @@ import com.wooreal.gravitygather.mapper.RoomMapper;
 import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.SHA256Util;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,8 @@ public class RoomService {
     }
 
     public void createRoom(RoomRequest roomRequest){
+        Integer ownerSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        roomRequest.setOwnerSeq(ownerSeq);
         List<Room> rooms = getRooms(roomRequest);
         if(rooms.size() >= 3){
             throw new BusinessLogicException(HttpStatus.INTERNAL_SERVER_ERROR, "방 생성 개수는 최대 3개 입니다.");
@@ -59,9 +62,6 @@ public class RoomService {
             String oriPassword = roomRequest.getPassword();
             String salt = SHA256Util.generateSalt();
             String encPassword = SHA256Util.generateHashWithSalt(oriPassword, salt);
-            System.out.println("salt : " + salt);
-            System.out.println("encPassword : " + encPassword);
-            System.out.println("oriPassword : " + oriPassword);
 
             roomRequest.setPassword(encPassword);
             roomRequest.setPasswordSalt(salt);
@@ -90,6 +90,11 @@ public class RoomService {
     }
 
     public void deleteRoom(int roomId){
+        Room roomInfo = getRoomBySeq(roomId);
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(roomInfo == null || !roomInfo.getOwner_seq().equals(seq)){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
+        }
         int result = roomMapper.deleteRoom(roomId);
         if(result == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
@@ -149,9 +154,6 @@ public class RoomService {
 
         String redisAuthCode = redisService.getValues("InviteCode " + roomRequest.getUserSeq() + " " + roomRequest.getSeq());
         boolean authResult = redisService.checkExistsValue(redisAuthCode);
-        System.out.println("InviteCode " + roomRequest.getUserSeq() + " " + roomRequest.getSeq());
-        System.out.println(redisAuthCode);
-        System.out.println(authResult);
         if(authResult) return currentRoom;
 
         if(currentRoom.getIs_locked()){

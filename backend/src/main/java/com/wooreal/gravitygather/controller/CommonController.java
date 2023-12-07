@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.controller;
 
+import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.file.FileVO;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
@@ -9,6 +10,7 @@ import com.wooreal.gravitygather.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,20 +32,20 @@ public class CommonController {
         this.fileUploadService = fileUploadService;
     }
 
-    // 인증
-    @PostMapping("/alarm/get/{userId}")
+    @LoginRequired
+    @PostMapping("/alarm/get")
     @ApiOperation(value = "알람 가져오는 api")
-    public ResponseEntity<?> getAlarm(@PathVariable("userId") int userId) {
-        List<Alarm> alarms = commonService.getAlarm(userId);
+    public ResponseEntity<?> getAlarm() {
+        List<Alarm> alarms = commonService.getAlarm();
         return new ResponseEntity<>(alarms, HttpStatus.OK);
     }
 
-    // 인증
-    @PostMapping("/alarm/read/{userId}")
+    @LoginRequired
+    @PostMapping("/alarm/read")
     @ApiOperation(value = "알람 읽음처리 api")
-    public ResponseEntity<?> readAlarm(@PathVariable("userId") int userId
-        , @RequestBody(required = false) Alarm alarm) {
-        commonService.readAlarm(userId, alarm == null ? 0 : alarm.getSeq());
+    public ResponseEntity<?> readAlarm(@RequestBody(required = false) Alarm alarm) {
+        System.out.println(alarm);
+        commonService.readAlarm(alarm.getSeq() == null ? 0 : alarm.getSeq());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -52,13 +54,10 @@ public class CommonController {
     public ResponseEntity<?> imageUpload(
         @RequestParam(name = "imageFile") MultipartFile imageFile)
         throws IOException {
-        System.out.println(imageFile);
-        System.out.println(imageFile == null);
         FileVO file = null;
         if (imageFile != null && !imageFile.isEmpty()) {
             file = fileUploadService.singleFileUpload(imageFile, "img/");
         }
-        System.out.println(file.getImage_path());
         return new ResponseEntity<>(file.getImage_path(), HttpStatus.OK);
     }
 

@@ -50,7 +50,12 @@ public class UserService {
     }
 
     public User login(UserRequest userRequest, HttpServletRequest request, HttpServletResponse httpServletResponse){
+        User tmp = userMapper.getUserById(userRequest.getId());
+        String salt = tmp.getPassword_salt();
+        String password = SHA256Util.generateHashWithSalt(userRequest.getPassword(), salt);
+        userRequest.setPassword(password);
         User user = userMapper.login(userRequest);
+
         if (user == null || user.getStatus().equals("DELETED"))
             throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "아이디와 비밀번호를 확인해 주세요.");
 
@@ -139,6 +144,9 @@ public class UserService {
     }
 
     public void userUpdate(UserRequest userRequest) throws IOException {
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        userRequest.setSeq(userSeq);
+
         User ur = getUserBySeq();
 
         if(userRequest.getPassword() != null && !userRequest.getPassword().equals("")){
@@ -168,8 +176,8 @@ public class UserService {
     }
 
     public List<Friend> getFriends(Friend friend){
+        if(friend == null) friend = new Friend();
         Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("SEQ : " + seq);
         friend.setUser_seq(seq);
         return userMapper.getFriends(friend);
     }
@@ -203,6 +211,39 @@ public class UserService {
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }else{
             throw new BusinessLogicException(HttpStatus.valueOf(401), "로그인이 만료되었습니다.");
+        }
+    }
+
+    public void checkEmailDuplication(User user){
+        String email = user.getEmail();
+        user = userMapper.getUserByEmail(email);
+        if (user != null) {
+            throw new BusinessLogicException(HttpStatus.OK,"true" ,"중복된 이메일 입니다.");
+        }else{
+            throw new BusinessLogicException(HttpStatus.OK,"false" , "");
+        }
+    }
+
+    public boolean checkIdDuplication(User user){
+        String id = user.getId();
+        user = userMapper.getUserById(id);
+        if (user != null) {
+            throw new BusinessLogicException(HttpStatus.OK,"true" ,"중복된 아이디 입니다.");
+        }else{
+            throw new BusinessLogicException(HttpStatus.OK,"false" , "");
+        }
+    }
+
+    public void register(UserRequest user){
+        if(user.getPassword() != null && !user.getPassword().equals("")){
+            String salt = SHA256Util.generateSalt();
+
+            user.setPassword(SHA256Util.generateHashWithSalt(user.getPassword(), salt));
+            user.setPasswordSalt(salt);
+        }
+
+        if(userMapper.register(user) == 0){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "계정 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
     }
 }

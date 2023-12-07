@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.controller;
 
+import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.task.Category;
 import com.wooreal.gravitygather.dto.task.Task;
@@ -27,11 +28,11 @@ public class TaskController {
 
     // 인증
     /**
-     * @param map   int user_seq                        required
-     *              int startDatetime    // 1698764400
+     * @param map   int startDatetime    // 1698764400
      *              int endDatetime      // 1701356400
      * @return new ResponseEntity<>(tasks, HttpStatus.OK)
      */
+    @LoginRequired
     @PostMapping("/get")
     @ApiOperation(value = "일정 가져오는 api")
     public ResponseEntity<?> getTasks(@RequestBody Map<String, Object> map) {
@@ -39,7 +40,7 @@ public class TaskController {
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/category/get")
     @ApiOperation(value = "일정 카테고리 가져오는 api")
     public ResponseEntity<?> getCategories(@RequestBody Category category) {
@@ -47,7 +48,7 @@ public class TaskController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/add")
     @ApiOperation(value = "일정 등록 api")
     public ResponseEntity<?> addTesk(@RequestBody Task task) {
@@ -55,7 +56,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/category/add")
     @ApiOperation(value = "일정 카테고리 등록 api")
     public ResponseEntity<?> addCategory(@RequestBody Category category) {
@@ -63,7 +64,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/update")
     @ApiOperation(value = "일정 수정 api")
     public ResponseEntity<?> updateTesk(@RequestBody Task task) {
@@ -71,7 +72,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/category/update")
     @ApiOperation(value = "일정 카테고리 수정 api")
     public ResponseEntity<?> updateCategory(@RequestBody Category category) {
@@ -79,6 +80,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/category/update/order")
     @ApiOperation(value = "일정 카테고리 수정 api")
     public ResponseEntity<?> updateCategoryOrder(@RequestBody Category category) {
@@ -86,6 +88,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/category/delete")
     @ApiOperation(value = "일정 카테고리 삭제 api")
     public ResponseEntity<?> deleteCategory(@RequestBody Category category) {
@@ -93,6 +96,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/delete")
     @ApiOperation(value = "일정 삭제 api")
     public ResponseEntity<?> deleteTask(@RequestBody Task task) {

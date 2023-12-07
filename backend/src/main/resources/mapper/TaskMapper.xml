@@ -37,6 +37,9 @@
             (A.user_seq = #{user_seq} or B.user_seq = #{user_seq})
             and (select AA.is_Delete from task_category AA where AA.seq = A.CATEGORY_SEQ) = false
             and A.is_delete = false
+            <if test="seq != null">
+               and A.seq = #{seq}
+            </if>
             <if test="startDatetime != null">
                 and	UNIX_TIMESTAMP(CONCAT(A.start_date, ' ', IFNULL(A.start_time, '00:00:00'))) <![CDATA[>=]]> #{startDatetime}
             </if>
@@ -74,6 +77,9 @@
         WHERE
             user_seq = #{user_seq}
         AND is_delete = false
+        <if test="seq != null">
+            AND seq = #{seq}
+        </if>
         ORDER BY
             task_order
     </select>

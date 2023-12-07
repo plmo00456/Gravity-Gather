@@ -9,6 +9,7 @@ import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.CommunityMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,6 +49,8 @@ public class CommunityService {
     }
 
     public void articleWrite(Article article){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        article.setUser_seq(seq+"");
         if(communityMapper.articleWrite(article) == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "게시물 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
@@ -57,16 +60,29 @@ public class CommunityService {
     }
 
     public void addComment(Comment comment){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        comment.setUser_seq(seq+"");
         if(communityMapper.addComment(comment) == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "댓글 등록 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
 
     public void updateArticle(Article article){
+        Article articleInfo = getArticle(article.getSeq());
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(articleInfo == null || !articleInfo.getUser_seq().equals(seq+"")){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
+        }
+
         if(communityMapper.updateArticle(article) == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "게시글 수정 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
 
     public void deleteArticle(Article article){
+        Article articleInfo = getArticle(article.getSeq());
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(articleInfo == null || !articleInfo.getUser_seq().equals(seq+"")){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
+        }
         if(communityMapper.deleteArticle(article) == 0)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "게시글 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
     }
@@ -97,6 +113,9 @@ public class CommunityService {
     }
 
     public Like likeArticle(Like like){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        like.setUser_seq(seq);
+
         like.setMode("article");
         Like tmp = getLike(like);
         if(tmp != null){
@@ -112,6 +131,9 @@ public class CommunityService {
     }
 
     public Like likeComment(Like like){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        like.setUser_seq(seq);
+
         like.setMode("comment");
         Like tmp = getLike(like);
         if(tmp != null){

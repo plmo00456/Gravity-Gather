@@ -13,6 +13,8 @@ public interface UserMapper {
     User login(UserRequest userRequest);
     User getUserByEmail(String email);
 
+    User getUserById(String email);
+
     User getUserBySeq(Integer seq);
 
     List<User> getUserBySeqs(List<Integer> seqs);
@@ -26,4 +28,6 @@ public interface UserMapper {
     int addFriend(Friend friend);
 
     int deleteFriend(Friend friend);
+
+    int register(UserRequest user);
 }

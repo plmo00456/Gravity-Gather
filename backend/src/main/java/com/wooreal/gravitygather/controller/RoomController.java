@@ -1,6 +1,6 @@
 package com.wooreal.gravitygather.controller;
 
-import com.wooreal.gravitygather.config.WebSocketHandler;
+import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
 import com.wooreal.gravitygather.dto.room.RoomResponse;
@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
 public class RoomController {
 
     private final RoomService roomService;
-    private final WebSocketHandler webSocketHandler;
 
-    public RoomController(RoomService roomService, WebSocketHandler webSocketHandler) {
+    public RoomController(RoomService roomService) {
         this.roomService = roomService;
-        this.webSocketHandler = webSocketHandler;
     }
 
     @PostMapping("/get")
@@ -41,13 +39,15 @@ public class RoomController {
         return new ResponseEntity<>(roomResponses, HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/enter")
     @ApiOperation(value = "방 입장 api")
-    public ResponseEntity<?> canEnterRoom( @RequestBody RoomRequest roomRequest) {
+    public ResponseEntity<?> canEnterRoom( @RequestBody RoomRequest roomRequest ) {
         RoomResponse room = new RoomResponse(roomService.canEnterRoom(roomRequest));
         return new ResponseEntity<>(room, HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/create")
     @ApiOperation(value = "방 생성 api")
     public ResponseEntity<?> createRoom(@RequestBody RoomRequest roomRequest) {
@@ -63,19 +63,12 @@ public class RoomController {
         return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 
-    // 인증
+    @LoginRequired
     @PostMapping("/{roomId}/delete")
     @ApiOperation(value = "방 삭제 api")
     public ResponseEntity<?> deleteRoom(@PathVariable("roomId") int roomId) {
         roomService.deleteRoom(roomId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public void test(@RequestParam String test) throws IOException {
-        String salt = SHA256Util.generateSalt();
-        String hashed = SHA256Util.generateHashWithSalt(test, salt);
-        System.out.println(hashed);
     }
 
 }

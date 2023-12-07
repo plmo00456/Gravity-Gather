@@ -12,6 +12,7 @@ import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.SHA256Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,11 +31,13 @@ public class CommonService {
         this.commonMapper = commonMapper;
     }
 
-    public List<Alarm> getAlarm(int userId){
-        return commonMapper.getAlarm(userId);
+    public List<Alarm> getAlarm(){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return commonMapper.getAlarm(seq);
     }
 
-    public void readAlarm(int userId, int alarmSeq){
+    public void readAlarm(int alarmSeq){
+        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         commonMapper.readAlarm(userId, alarmSeq);
     }
 

@@ -70,6 +70,7 @@ public class UserController {
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/update")
     @ApiOperation(value = "유저 정보 변경 api")
     public ResponseEntity<?> userUpdate(UserRequest userRequest,
@@ -88,13 +89,15 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/friend/get")
     @ApiOperation(value = "친구 가져오는 api")
-    public ResponseEntity<?> getFriends(@RequestBody Friend friend) {
+    public ResponseEntity<?> getFriends(@RequestBody(required = false) Friend friend) {
         List<Friend> friends = userService.getFriends(friend);
         return new ResponseEntity<>(friends, HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/friend/add")
     @ApiOperation(value = "친구 삭제하는 api")
     public ResponseEntity<?> addFriends(@RequestBody Friend friend) {
@@ -102,6 +105,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/friend/delete")
     @ApiOperation(value = "친구 삭제하는 api")
     public ResponseEntity<?> deleteFriends(@RequestBody Friend friend) {
@@ -113,6 +117,27 @@ public class UserController {
     @ApiOperation(value = "액세스 토큰 재발급 api")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         userService.refreshAccessToken(request, response);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login/checkEmailDuplication")
+    @ApiOperation(value = "이메일 중복 확인 api")
+    public ResponseEntity<?> checkEmailDuplication(@RequestBody User user) {
+        userService.checkEmailDuplication(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login/checkIdDuplication")
+    @ApiOperation(value = "아이디 중복 확인 api")
+    public ResponseEntity<?> checkIdDuplication(@RequestBody User user) {
+        userService.checkIdDuplication(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login/register")
+    @ApiOperation(value = "회원가입 api")
+    public ResponseEntity<?> register(@RequestBody UserRequest user) {
+        userService.register(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

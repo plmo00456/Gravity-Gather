@@ -1,5 +1,6 @@
 package com.wooreal.gravitygather.controller;
 
+import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
@@ -55,6 +56,7 @@ public class CommunityController {
         return new ResponseEntity<>(getArticle, HttpStatus.OK);
     }
 
+    @LoginRequired
     @PostMapping("/article/write")
     @ApiOperation(value = "게시글 작성 api")
     public ResponseEntity<?> articleWrite(@RequestBody Article article) {
@@ -70,15 +72,15 @@ public class CommunityController {
     }
 
 
-    //인증
+    @LoginRequired
     @PostMapping("/article/comment/add")
-    @ApiOperation(value = "게시글 댓글 가져오는 api")
+    @ApiOperation(value = "게시글 댓글 추가 api")
     public ResponseEntity<?> addComment(@RequestBody Comment comment) {
         communityService.addComment(comment);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //인증
+    @LoginRequired
     @PostMapping("/article/update")
     @ApiOperation(value = "게시글 수정 api")
     public ResponseEntity<?> updateArticle(@RequestBody Article article) {
@@ -86,7 +88,7 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //인증
+    @LoginRequired
     @PostMapping("/article/delete")
     @ApiOperation(value = "게시글 삭제 api")
     public ResponseEntity<?> deleteArticle(@RequestBody Article article) {
@@ -95,7 +97,7 @@ public class CommunityController {
     }
 
     @PostMapping("/article/like/get")
-    @ApiOperation(value = "좋아요 가져오는 api")
+    @ApiOperation(value = "좋아요 단일 가져오는 api")
     public ResponseEntity<?> getLike(@RequestBody Like like) {
         Like data = communityService.getLike(like);
         return new ResponseEntity<>(data, HttpStatus.OK);
@@ -108,7 +110,7 @@ public class CommunityController {
         return new ResponseEntity<>(likes,  HttpStatus.OK);
     }
 
-    //인증
+    @LoginRequired
     @PostMapping("/article/like")
     @ApiOperation(value = "게시글 좋아요 api")
     public ResponseEntity<?> likeArticle(@RequestBody Like like) {
@@ -116,7 +118,7 @@ public class CommunityController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
-    //인증
+    @LoginRequired
     @PostMapping("/article/comment/like")
     @ApiOperation(value = "게시글 댓글 좋아요 api")
     public ResponseEntity<?> likeComment(@RequestBody Like like) {

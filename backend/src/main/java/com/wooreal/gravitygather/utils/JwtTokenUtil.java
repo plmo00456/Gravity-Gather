@@ -1,12 +1,16 @@
 package com.wooreal.gravitygather.utils;
 
+import com.wooreal.gravitygather.exception.BusinessLogicException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -72,7 +76,23 @@ public class JwtTokenUtil {
         }
     }
 
+    public Integer getUserSeqFromHttpServletRequest(HttpServletRequest request){
+        final String requestTokenHeader = request.getHeader("Authorization");
+        String jwtToken = requestTokenHeader.substring(7);
+        return getUserSeqFromToken(jwtToken);
+    }
+
     public Integer getUserSeqFromToken(String token){
         return Integer.parseInt(extractAllClaims(token).getSubject());
+    }
+
+    public Integer getUserSeqFromSecurityContext(){
+        try {
+            Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+            return seq;
+        }catch (Exception e){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
+        }
     }
 }

@@ -40,13 +40,17 @@ public class JwtRequestFilter extends HandlerInterceptorAdapter {
         if (loginRequired != null && loginRequired.value().equals("true")) {
             final String requestTokenHeader = request.getHeader("Authorization");
 
-            Integer userSeq = null;
-            String jwtToken = null;
+            String jwtToken;
 
             if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
                 jwtToken = requestTokenHeader.substring(7);
                 try {
-                    userSeq = jwtTokenUtil.getUserSeqFromToken(jwtToken);
+                    int seq = jwtTokenUtil.getUserSeqFromToken(jwtToken);
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        seq, null, new ArrayList<>());
+                    usernamePasswordAuthenticationToken
+                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 } catch (SignatureException | IllegalArgumentException e) {
                     System.out.println("Unable to get JWT Token");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
