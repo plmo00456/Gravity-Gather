@@ -9,6 +9,7 @@ import writeView from "@/components/WriteView.vue";
 import scheduleView from "@/components/ScheduleView.vue";
 import communityView from "@/components/CommunityView.vue";
 import writeViewer from "@/components/WriteViewer.vue";
+import userRegister from "@/components/UserRegister.vue";
 
 const routes = [
     {
@@ -36,6 +37,24 @@ const routes = [
             hideMenu: true,
         },
         component: userLogin,
+        beforeEnter(to, from, next) {
+            const userStore = useUserStore();
+
+            if (userStore.isLoggedIn) {
+                next({name: "MainView"});
+            } else {
+                next();
+            }
+        },
+    },
+    {
+        path: '/user/register',
+        name: 'RegisterView',
+        meta: {
+            title: '끌림 - 회원가입',
+            hideMenu: true,
+        },
+        component: userRegister,
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
 

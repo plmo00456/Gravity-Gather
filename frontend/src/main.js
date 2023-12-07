@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import {router} from "@/router";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -218,9 +219,10 @@ async function init(){
 
     app.config.globalProperties.utils.tippy = tippy;
     app.config.globalProperties.utils.tooltips = tooltips;
-
+    const pinia = createPinia();
+    pinia.use(piniaPluginPersistedstate);
     app.provide("utils", app.config.globalProperties.utils);
-    app.use(createPinia())
+    app.use(pinia)
         .use(router)
         .use(ContextMenu)
         .use(ElementPlus, { size: 'small', zIndex: 3000, locale: langKR, })

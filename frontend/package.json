@@ -28,6 +28,7 @@
     "interactjs": "^1.10.23",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "quill-blot-formatter": "^1.0.5",
     "quill-image-compress": "^1.2.30",
     "quill-image-drop-module": "^1.0.3",

@@ -1,6 +1,8 @@
 import axios from "axios";
 import BACKEND_API_URL from "./backend";
 import {useUserStore} from '@/stores/user';
+import {router} from "@/router";
+import Swal from 'sweetalert2'
 
 const api = axios.create({
   baseURL: BACKEND_API_URL,
@@ -33,6 +35,15 @@ api.interceptors.response.use((response) => {
     userStore.token.access = accessToken;
     originalRequest.headers['authorization'] = 'Bearer ' + accessToken;
     return api(originalRequest);
+  }else if(error.response.status === 401 && error.response.data.error === 'NotAuthorization'){
+    const option  = {
+      icon: 'error',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#3c82f6',
+      text: '로그인이 만료되었습니다.',
+    };
+    Swal.fire(option);
+    router.push('/user/login');
   }
   return Promise.reject(error);
 });
@@ -48,6 +59,17 @@ async function refreshAccessToken() {
   .then(result => {
     userStore.token.access = result.headers['authorization'];
     userStore.token.refresh = result.headers['refresh'];
+  }).catch((error) => {
+    const option  = {
+      icon: 'error',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#3c82f6',
+      text: error,
+    };
+    Swal.fire(option);
+    router.push({
+      name: 'LoginView',
+    })
   })
 
 }

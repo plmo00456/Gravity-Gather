@@ -197,9 +197,7 @@ export default {
 
     const getCategories = async () => {
       try {
-        await taskStore.getCategory({
-          user_seq: user.seq,
-        });
+        await taskStore.getCategory();
         taskCategory.value = taskStore.taskCategoryList;
       } catch (error) {
         console.error(error);
@@ -217,7 +215,6 @@ export default {
         endDate = new Date(endDate.getTime() + (endDate.getTimezoneOffset() * 60000));
 
         const data = {
-          user_seq: user.seq,
           startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
           endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate),
         }
@@ -368,7 +365,6 @@ export default {
       });
       data.shared_user_seq = shareUserSeq;
       data.caption = this.share.caption;
-      data.user_seq = this.user.seq;
       data.category_seq = this.category.currentTab;
 
       this.task.value.start_date_time = Math.floor(this.task.value.date_time[0].getTime() / 1000);
@@ -402,7 +398,6 @@ export default {
       });
       data.shared_user_seq = shareUserSeq;
       data.caption = this.share.caption;
-      data.user_seq = this.user.seq;
       data.is_delete = false;
       data.seq = this.task.value.seq;
 
@@ -488,9 +483,7 @@ export default {
     async addCategory() {
       try {
         const taskStore = useTaskStore();
-        await taskStore.addCategory({
-          user_seq: this.user.seq
-        });
+        await taskStore.addCategory();
         if (taskStore?.dataResponse.status === 200) {
           await this.getCategories();
         } else {

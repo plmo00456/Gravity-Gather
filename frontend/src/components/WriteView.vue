@@ -146,7 +146,6 @@ export default {
       const communityStore = useCommunityStore();
       try {
         this.value.master_seq = this.articleMaster.seq;
-        this.value.user_seq = this.user.seq;
 
         await communityStore.writeArticle(this.value);
         if (communityStore?.dataResponse.status === 200) {
@@ -173,7 +172,6 @@ export default {
       }
 
       if(flag) return;
-
 
       const communityStore = useCommunityStore();
       try {

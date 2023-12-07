@@ -387,8 +387,6 @@ export default {
     },
     async createRoom() {
       const roomStore = useRoomStore();
-      const userStore = useUserStore();
-      const user = userStore.userInfo;
       if (!this.createRoomTitle) this.isCreateRoomTitle = true;
       if (!this.createRoomTopic) this.isCreateRoomTopic = true;
       if (this.createRoomTitle && this.createRoomTopic) {
@@ -398,7 +396,6 @@ export default {
           maxParticipant: this.maxParticipantValue.maxParticipant,
           isLocked: this.toggleState,
           password: this.createRoomPassword,
-          ownerSeq: user.seq,
         }
 
         try {

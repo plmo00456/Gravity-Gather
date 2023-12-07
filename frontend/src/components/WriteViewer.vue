@@ -286,13 +286,11 @@ export default {
             parent_comment_seq: null,
             content: null,
             imageUrl: null,
-            user_seq: null,
           },
         },
         value: {
           article_seq: null,
           content: null,
-          user_seq: null,
         },
       },
       setting: {
@@ -544,7 +542,6 @@ export default {
       const communityStore = useCommunityStore();
       const data = {
         content_seq: this.article.seq,
-        user_seq: this.user.seq,
         is_up: isUp,
       };
       communityStore.likeHandle(data)
@@ -558,7 +555,6 @@ export default {
       const data = {
         mode: 'comment',
         content_seq: item.seq,
-        user_seq: this.user.seq,
         is_up: isUp,
       };
       communityStore.likeHandle(data)
@@ -606,7 +602,6 @@ export default {
         this.comment.reply.value.content += emoji.i;
     },
     clickCommentBtn(){
-      this.comment.value.user_seq = this.user.seq;
       this.comment.value.article_seq = this.article.seq;
       const communityStore = useCommunityStore();
       communityStore.addComment(this.comment.value)
@@ -622,7 +617,6 @@ export default {
       });
     },
     clickReplyAddBtn(){
-      this.comment.reply.value.user_seq = this.user.seq;
       this.comment.reply.value.article_seq = this.article.seq;
       const communityStore = useCommunityStore();
       communityStore.addComment(this.comment.reply.value)

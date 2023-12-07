@@ -14,6 +14,7 @@ export const useUserStore = defineStore({
             refresh: null,
         },
     }),
+    persist: true,
     getters: {
         username() {
             return this.userInfo ? this.userInfo.username : '';
@@ -27,13 +28,10 @@ export const useUserStore = defineStore({
             return http.post('/user/login', credentials, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'test':'aa'
                 }
             })
             .then(response => {
                 if (response.status === 200) {
-                    console.log(response.headers.toJSON());
-                    console.log(response.headers['authorization']);
                     if(response.headers['authorization']){
                         this.token.access = response.headers['authorization'];
                         this.token.refresh = response.headers['refresh'];
@@ -52,8 +50,6 @@ export const useUserStore = defineStore({
 
         async logout() {
             try {
-                localStorage.setItem('authorization', null);
-                localStorage.setItem('refresh', null);
                 this.isLoggedIn = false;
                 this.userInfo = null;
                 if (router.currentRoute.value.path === '/') {
@@ -186,6 +182,54 @@ export const useUserStore = defineStore({
                 if (response.status === 200) {
                     this.dataResponse = response;
                     this.friendList = response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async checkEmailDuplication(user){
+            return http.post(`/user/login/checkEmailDuplication`, user, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async checkIdDuplication(user){
+            return http.post(`/user/login/checkIdDuplication`, user, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async register(user){
+            return http.post(`/user/login/register`, user, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
                 }
             })
             .catch(error => {

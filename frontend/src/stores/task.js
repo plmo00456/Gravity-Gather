@@ -95,8 +95,8 @@ export const useTaskStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
-        async getCategory(task){
-            return http.post(`/task/category/get/`, task, {
+        async getCategory(){
+            return http.post(`/task/category/get/`,  {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -141,8 +141,8 @@ export const useTaskStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
-        async addCategory(task){
-            return http.post(`/task/category/add`, task, {
+        async addCategory(){
+            return http.post(`/task/category/add`,  {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -157,8 +157,8 @@ export const useTaskStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
-        async updateCategory(categoty){
-            return http.post(`/task/category/update`, categoty, {
+        async updateCategory(category){
+            return http.post(`/task/category/update`, category, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

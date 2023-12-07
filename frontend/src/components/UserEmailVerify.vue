@@ -149,9 +149,12 @@ export default {
               this.showError = true;
               return;
             }
-            this.$router.push('LoginView');
+            this.utils.notify.success("계정이 생성 되었습니다.", "생성 완료!");
+            this.$router.push({
+                name: 'LoginView'
+            });
           }else{
-            this.utils.msgError(this.dataResponse.data || this.normalErrorMsg);
+            this.utils.msgError(this.utils.normalErrorMsg);
           }
         } catch (error) {
           console.error(error);

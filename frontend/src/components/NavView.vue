@@ -401,9 +401,9 @@ export default {
 
       const commonStore = useCommonStore();
       if (this.alarmList && this.alarmList.length > 0) {
-        commonStore.readAlarm(this.user.seq, this.alarmList[0].seq);
+        commonStore.readAlarm(this.alarmList[0].seq);
       } else {
-        commonStore.readAlarm(this.user.seq);
+        commonStore.readAlarm();
       }
     },
     profileClick(e) {

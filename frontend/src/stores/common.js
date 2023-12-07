@@ -8,8 +8,8 @@ export const useCommonStore = defineStore({
         dataResponse: null,
     }),
     actions: {
-        async getAlarm(userId){
-            return http.post(`/common/alarm/get/`+userId, {
+        async getAlarm(){
+            return http.post(`/common/alarm/get`, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -24,23 +24,23 @@ export const useCommonStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
-        async readAlarm(userId, alarmSeq){
+        async readAlarm(alarmSeq){
             const data = {
                 'seq' : alarmSeq,
             }
-            return http.post(`/common/alarm/read/`+userId, data, {
+            return http.post(`/common/alarm/read`, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         },
         async imageUpload(userInfo){
             return http.post(`/common/image/upload`, userInfo, {

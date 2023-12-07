@@ -1,8 +1,11 @@
 <template>
     <div class="flex flex-col items-center justify-center h-screen bg-login_background bg-cover">
-        <div class="bg-white p-10 rounded shadow-md w-full max-w-xs">
+        <div class="bg-white p-10 rounded shadow-md w-1/5 glass">
             <form @submit.prevent="submitForm">
                 <div class="flex flex-col space-y-0">
+                    <div class="flex justify-center mb-8">
+                        <img class="w-4/6" src="@/assets/image/logo.png" alt="로고">
+                    </div>
                     <div class="relative">
                         <input type="text" v-model.trim.lazy="id" placeholder="아이디" @focus="handleFocus('id', true)"
                                @blur="handleFocus('id', false)"
@@ -34,12 +37,14 @@
                 </button>
             </form>
         </div>
-        <div class="mt-3 w-full text-gray-400 text-xs">
-            <span class="hover:text-gray-300">비밀번호 찾기</span>
+        <div class="mt-3 w-full text-gray-200 text-xs">
+            <span class="hover:text-gray-300 cursor-pointer">비밀번호 찾기</span>
             <span class="px-3">|</span>
-            <span class="hover:text-gray-300">아이디 찾기</span>
+            <span class="hover:text-gray-300 cursor-pointer">아이디 찾기</span>
             <span class="px-3">|</span>
-            <span class="hover:text-gray-300">회원가입</span>
+            <span class="hover:text-gray-300 cursor-pointer">
+                <router-link to="/user/register">회원가입</router-link>
+            </span>
         </div>
     </div>
 </template>
@@ -50,8 +55,8 @@ import {useUserStore} from '@/stores/user';
 export default {
     data() {
         return {
-            id: 'id',
-            password: 'qwe',
+            id: null,
+            password: null,
             idFocused: false,
             passwordFocused: false,
             showError: false,
