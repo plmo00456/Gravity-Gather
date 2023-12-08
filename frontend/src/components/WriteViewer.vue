@@ -1,7 +1,7 @@
 <template>
   <div id="main-view" class="flex flex-col items-center bg-main_background bg-cover text-black h-[93%]">
     <div class="flex flex-col items-center w-full h-full bg-gray-300 bg-opacity-30">
-      <div class="flex flex-col items-center bg-white w-[70%] h-full overflow-y-auto rounded">
+      <div id="content-wrap" class="flex flex-col items-center bg-white w-[70%] h-full overflow-y-auto rounded">
         <div class="flex w-[85%] h-full inset-0">
           <div class="flex h-full flex-col w-full">
             <div class="flex items-center relative w-full h-[2rem] mt-10">
@@ -12,7 +12,12 @@
               </div>
             </div>
             <div class="flex text-start justify-start text-xl w-full font-bold mt-[2rem] mb-5">
-              {{ article.title }}
+              <span class="w-[94%]">{{ article.title }}</span>
+              <span class="flex justify-between items-center w-[6%] text-[1.5rem] text-gray-400 select-none">
+                <font-awesome-icon @click="startPrint('content-wrap')" class="hover:text-blue-500 cursor-pointer" icon="fa-print"/>
+                <font-awesome-icon @click="scrap" v-if="article.scrap" class="hover:text-blue-500 cursor-pointer text-blue-600" icon="fa-bookmark"/>
+                <font-awesome-icon @click="scrap" v-if="!article.scrap" class="hover:text-blue-500 cursor-pointer" icon="fa-regular fa-bookmark"/>
+              </span>
             </div>
             <div class="flex items-center text-gray-500 pb-5 border-b border-gray-300 relative">
               <div class="flex w-full h-[3rem]">
@@ -254,7 +259,6 @@
 
 
 <script>
-
 import {useRoute} from "vue-router";
 import {useCommunityStore} from "@/stores/community";
 import {getCurrentInstance, nextTick, onMounted, ref} from "vue";
@@ -275,6 +279,8 @@ export default {
   },
   data() {
     return {
+      prtContent: null,
+      initBody: null,
       isLike: null,
       comment: {
         reply: {
@@ -697,6 +703,27 @@ export default {
         console.log(error);
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
       });
+    },
+    startPrint (div_id) {
+      this.prtContent = document.getElementById(div_id);
+      window.onbeforeprint = this.beforePrint;
+      window.onafterprint = this.afterPrint;
+      window.print();
+    },
+    beforePrint(){
+      this.initBody = document.body.innerHTML;
+      document.body.innerHTML = this.prtContent.innerHTML;
+    },
+    afterPrint(){
+      document.body.innerHTML = this.initBody;
+    },
+    async scrap(){
+      const communityStore = useCommunityStore();
+      await communityStore.scrap({
+        seq: this.article.seq
+      }).then(result => {
+        this.article.scrap = result;
+      })
     },
 
   }

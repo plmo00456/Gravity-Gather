@@ -36,7 +36,7 @@ export const useTaskStore = defineStore({
     }),
     actions: {
         async getTasks(data){
-            return http.post(`/task/get/`, data, {
+            return http.post(`/task/get`, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -96,7 +96,7 @@ export const useTaskStore = defineStore({
             });
         },
         async getCategory(){
-            return http.post(`/task/category/get/`,  {
+            return http.post(`/task/category/get`,  {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -112,7 +112,7 @@ export const useTaskStore = defineStore({
             });
         },
         async addTask(task){
-            return http.post(`/task/add/`, task, {
+            return http.post(`/task/add`, task, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -127,7 +127,7 @@ export const useTaskStore = defineStore({
             });
         },
         async updateTask(task){
-            return http.post(`/task/update/`, task, {
+            return http.post(`/task/update`, task, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

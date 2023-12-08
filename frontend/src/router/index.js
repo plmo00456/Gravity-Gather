@@ -10,6 +10,7 @@ import scheduleView from "@/components/ScheduleView.vue";
 import communityView from "@/components/CommunityView.vue";
 import writeViewer from "@/components/WriteViewer.vue";
 import userRegister from "@/components/UserRegister.vue";
+import scrapedView from "@/components/ScrapedView.vue";
 
 const routes = [
     {
@@ -114,6 +115,14 @@ const routes = [
             title: '끌림 - 커뮤니티',
         },
         component: communityView,
+    },
+    {
+        path: '/scraped',
+        name: 'scrapedView',
+        meta: {
+            title: '끌림 - 스크랩',
+        },
+        component: scrapedView,
     },
     {
         path: '/community/:seq',

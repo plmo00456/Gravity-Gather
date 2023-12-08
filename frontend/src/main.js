@@ -176,23 +176,29 @@ async function init(){
         const option = {
             message: message,
             type: 'success',
-            position: 'top',
+            position: 'top-left',
         };
         if(title){
             option.title = title;
         }
-        await Eggy(option);
+        await Eggy(option)
+        .then(() => {
+            // .closest(".eggy.top").style.zIndex = 99999;
+        });
     }
     app.config.globalProperties.utils.notify.error = async (message, title) => {
         const option = {
             message: message,
             type: 'error',
-            position: 'top',
+            position: 'top-left',
         };
         if(title){
             option.title = title;
         }
-        await Eggy(option);
+        await Eggy(option)
+        .then(() => {
+            // .closest(".eggy.top").style.zIndex = 99999;
+        });
     }
 
     app.config.globalProperties.utils.notify.info = async (message, title) => {

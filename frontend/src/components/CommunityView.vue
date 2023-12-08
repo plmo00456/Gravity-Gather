@@ -263,7 +263,8 @@ export default {
                     <template v-else>
                         <div v-for="( article, index ) in communityStore.articleList" :key="article.seq"
                              :class="{ 'border-b border-gray-300': index < communityStore.articleList.length - 1 }"
-                             class="flex justify-between w-full h-[5.5rem] py-3">
+                             class="flex justify-between w-full h-[5.5rem] py-3 relative">
+                            <span v-if="articleCondition.master_seq === 0" class="text-xs px-2 py-0.5 bg-blue-400 text-white rounded-3xl absolute top-3 right-1">{{ article.master_title }}</span>
                             <div class="w-[80%] flex flex-col pl-2">
                                 <div class="flex items-center text-gray-500">
                                     <div class="w-7 h-7 rounded-full overflow-hidden mr-2">

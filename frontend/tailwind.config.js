@@ -20,6 +20,7 @@ module.exports = {
         'room_3_background': "url('@/assets/background/room_bg_3.jpg')",
         'pattern_1': "url('@/assets/image/pattern_1.png')",
         'pattern_2': "url('@/assets/image/pattern_2.jpeg')",
+        'pattern_3': "url('@/assets/image/pattern_3.jpg')",
       },
       animation:{
         'shake': 'shake 0.62s cubic-bezier(.36,.07,.19,.97) both',

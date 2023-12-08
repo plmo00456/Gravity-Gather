@@ -63,6 +63,14 @@ export default {
             dataResponse: '',
         }
     },
+  setup(){
+      const userStore = useUserStore();
+      const user = userStore;
+    return{
+      user,
+      userStore
+    }
+  },
     methods: {
         handleFocus(ele, on) {
             // on : focus 유무

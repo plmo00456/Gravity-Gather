@@ -325,6 +325,8 @@ export default {
         end.setHours(23, 59, 0, 0);
         this.task.value.date_time[0] = start;
         this.task.value.date_time[1] = end;
+      }else{
+        this.utils.notify.error('카테고리를 선택해 주세요.', '오류!');
       }
     },
     handleDatePicker() {

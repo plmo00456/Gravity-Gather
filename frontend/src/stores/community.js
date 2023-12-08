@@ -193,7 +193,22 @@ export const useCommunityStore = defineStore({
             .catch(error => {
                 this.dataResponse = error.response;
             });
-        }
-
+        },
+        async scrap(article){
+            return http.post(`/community/article/scrap`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
     }
 })

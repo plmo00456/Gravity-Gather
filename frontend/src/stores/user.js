@@ -14,7 +14,12 @@ export const useUserStore = defineStore({
             refresh: null,
         },
     }),
-    persist: true,
+    persist: {
+        key: 'token',
+        storage: sessionStorage,
+        path: ['token.access', 'token.refresh', 'isLoggedIn'],
+
+    },
     getters: {
         username() {
             return this.userInfo ? this.userInfo.username : '';
@@ -52,6 +57,9 @@ export const useUserStore = defineStore({
             try {
                 this.isLoggedIn = false;
                 this.userInfo = null;
+                this.token.access = null;
+                this.token.refresh = null;
+
                 if (router.currentRoute.value.path === '/') {
                     await router.go();
                 } else {

@@ -6,6 +6,7 @@ export const useCommonStore = defineStore({
     state: () => ({
         alarmList: [],
         dataResponse: null,
+        scrapList: [],
     }),
     actions: {
         async getAlarm(){
@@ -46,6 +47,39 @@ export const useCommonStore = defineStore({
             return http.post(`/common/image/upload`, userInfo, {
                 headers: {
                     // 'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async getScraps(article) {
+            return http.post(`/common/scrap/get`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    this.scrapList = response.data;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async getScrapsAllCnt(article) {
+            return http.post(`/common/scrap/get/count`, article,{
+                headers: {
+                    'Content-Type': 'application/json'
                 }
             })
             .then(response => {

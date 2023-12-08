@@ -28,16 +28,20 @@
       </div>
       <div class="flex w-2/6 h-full justify-end">
         <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full">
-          <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400"
-                             icon="fa-regular fa-bookmark"></font-awesome-icon>
-          <span
-              :class="{'animate-bounce': (alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick}"
-              class="flex items-center relative" @click="alarmClick" id="alarm-wrap">
+          <span class="flex items-center relative h-full">
+            <router-link class="flex items-center" to="/scraped">
+              <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400"
+                                 icon="fa-regular fa-bookmark"></font-awesome-icon>
+            </router-link>
+          </span>
+          <span :class="{'animate-bounce': (alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick}"
+              class="flex items-center relative h-full"
+                @click.prevent="alarmClick" id="alarm-wrap">
                     <font-awesome-icon class="text-white p-3 text-xl hover:text-blue-400"
                                        icon="fa-regular fa-bell"/>
-                    <b v-if="(alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick"
-                       class="absolute right-2.5 top-3.5 w-2 h-2 rounded-full bg-red-500"></b>
-                  </span>
+              <b v-if="(alarmList && alarmList.length > 0 && alarmList[0] && !alarmList[0].is_check) && !firstClick"
+                 class="absolute right-2.5 top-3.5 w-2 h-2 rounded-full bg-red-500"></b>
+          </span>
         </div>
         <div class="flex p-3 text-white justify-end items-center cursor-pointer z-10 h-full"
              @click="profileClick" id="profile-wrap">
@@ -64,16 +68,18 @@
               <div class="border-b-2 h-[2rem] flex">
                 <span class="text-black font-bold">알림</span>
               </div>
-              <div class="h-[calc(100%-2rem)] flex flex-col">
+              <div class="h-[calc(100%-2rem)] flex flex-col overflow-y-auto">
 
                 <div v-for="alarm in alarmList" :key="alarm.seq"
                      :class="{'text-black': !alarm.is_check, 'text-gray-400': alarm.is_check}"
                      class="flex px-2 py-4 hover:bg-gray-300 w-full max-h-[5rem] border-b border-gray-400 border-opacity-10 cursor-pointer">
                   <div class="flex justify-center items-center pr-2 w-[3rem]">
-                    <div class="w-7 h-7 rounded-full relative">
+                    <div class="w-8 h-8 rounded-full relative">
                       <img class="w-full h-full object-cover rounded-full"
                            :src="`${$env.protocol}${$env.serverIP}:${$env.port}${alarm.sender_photo}`"
                            alt="프로필 사진" v-if="alarm.sender_photo">
+                      <span class="rounded-full w-full h-full flex justify-center items-center font-bold text-lg bg-green-700 text-white"
+                            v-if="!alarm.sender_photo">{{ alarm.sender_nickname[0] }}</span>
                       <div v-if="!alarm.is_check"
                            class="absolute w-2 h-2 bg-red-500 rounded-full right-0 top-0 animate-bounce"></div>
                     </div>
@@ -310,10 +316,13 @@ import Multiselect from 'vue-multiselect'
 import _ from 'lodash';
 import {nextTick, ref, watch} from "vue";
 import {useCommonStore} from "@/stores/common";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "NavView",
-  components: {PopupWindow, ContextMenuSeparator, ContextMenuItem, ContextMenu, Multiselect,},
+  components: {
+    FontAwesomeIcon,
+    PopupWindow, ContextMenuSeparator, ContextMenuItem, ContextMenu, Multiselect,},
   data() {
     return {
       topSetting: {

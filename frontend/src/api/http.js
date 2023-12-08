@@ -43,6 +43,8 @@ api.interceptors.response.use((response) => {
       text: '로그인이 만료되었습니다.',
     };
     Swal.fire(option);
+    const userStore = useUserStore();
+    await userStore.logout();
     router.push('/user/login');
   }
   return Promise.reject(error);
