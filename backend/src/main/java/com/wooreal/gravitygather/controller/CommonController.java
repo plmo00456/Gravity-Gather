@@ -2,15 +2,14 @@ package com.wooreal.gravitygather.controller;
 
 import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.common.Alarm;
+import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.file.FileVO;
-import com.wooreal.gravitygather.dto.room.RoomRequest;
-import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.service.CommonService;
 import com.wooreal.gravitygather.service.FileUploadService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
 import java.io.IOException;
-import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
-@Api(tags = "Common Controller", description = "공동 컨트롤러")
+@OpenAPIDefinition(info = @Info(title = "Common Controller", version = "v1", description = "공동 컴트롤러"))
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/v1/common")
@@ -34,7 +33,7 @@ public class CommonController {
 
     @LoginRequired
     @PostMapping("/alarm/get")
-    @ApiOperation(value = "알람 가져오는 api")
+    @Operation(summary = "알람 가져오는 api")
     public ResponseEntity<?> getAlarm() {
         List<Alarm> alarms = commonService.getAlarm();
         return new ResponseEntity<>(alarms, HttpStatus.OK);
@@ -42,7 +41,7 @@ public class CommonController {
 
     @LoginRequired
     @PostMapping("/alarm/read")
-    @ApiOperation(value = "알람 읽음처리 api")
+    @Operation(summary = "알람 읽음처리 api")
     public ResponseEntity<?> readAlarm(@RequestBody(required = false) Alarm alarm) {
         System.out.println(alarm);
         commonService.readAlarm(alarm.getSeq() == null ? 0 : alarm.getSeq());
@@ -50,7 +49,7 @@ public class CommonController {
     }
 
     @PostMapping("/image/upload")
-    @ApiOperation(value = "이미지 업로드 및 url 호출 api")
+    @Operation(summary = "이미지 업로드 및 url 호출 api")
     public ResponseEntity<?> imageUpload(
         @RequestParam(name = "imageFile") MultipartFile imageFile)
         throws IOException {
@@ -59,6 +58,21 @@ public class CommonController {
             file = fileUploadService.singleFileUpload(imageFile, "img/");
         }
         return new ResponseEntity<>(file.getImage_path(), HttpStatus.OK);
+    }
+
+    @LoginRequired
+    @PostMapping("/scrap/get")
+    @Operation(summary = "스크랩들 가져오는 api")
+    public ResponseEntity<?> getScraps(@RequestBody Article article) {
+        List<Article> scraps = commonService.getScraps(article);
+        return new ResponseEntity<>(scraps, HttpStatus.OK);
+    }
+
+    @PostMapping("/scrap/get/count")
+    @Operation(summary = "스크랩들 개수 가져오는 api")
+    public ResponseEntity<?> getScrapCnt(@RequestBody Article article) {
+        Article cnt = commonService.getScrapsAllCnt(article);
+        return new ResponseEntity<>(cnt, HttpStatus.OK);
     }
 
 }

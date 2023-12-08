@@ -1,11 +1,9 @@
 package com.wooreal.gravitygather.service;
 
 import com.wooreal.gravitygather.exception.BusinessLogicException;
-import com.wooreal.gravitygather.exception.ExceptionCode;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;

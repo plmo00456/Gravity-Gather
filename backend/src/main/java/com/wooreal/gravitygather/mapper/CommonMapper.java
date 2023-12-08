@@ -1,6 +1,7 @@
 package com.wooreal.gravitygather.mapper;
 
 import com.wooreal.gravitygather.dto.common.Alarm;
+import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,5 +15,9 @@ public interface CommonMapper {
 
     void readAlarm(int userId, int alarmSeq);
 
-    int sendAlarm(int receive_seq, int sender_seq, String msg);
+    int sendAlarm(int receive_seq, int sender_seq, String msg, String code);
+
+    List<Article> getScraps(Article article);
+
+    Article getScrapsAllCnt(Article article);
 }

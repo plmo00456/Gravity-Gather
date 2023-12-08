@@ -1,7 +1,7 @@
 package com.wooreal.gravitygather.dto.file;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

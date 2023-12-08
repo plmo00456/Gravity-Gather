@@ -43,4 +43,8 @@ public interface CommunityMapper {
     int deleteLike(Like like);
 
     int deleteComment(Like like);
+
+    int deleteScrap(Article article);
+
+    int addScrap(Article article);
 }

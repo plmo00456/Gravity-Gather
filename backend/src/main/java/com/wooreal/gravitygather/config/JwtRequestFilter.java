@@ -5,24 +5,21 @@ import com.wooreal.gravitygather.dto.common.ErrorResponse;
 import com.wooreal.gravitygather.utils.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import java.util.Objects;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-public class JwtRequestFilter extends HandlerInterceptorAdapter {
+public class JwtRequestFilter implements HandlerInterceptor {
 
     private final JwtTokenUtil jwtTokenUtil;
 

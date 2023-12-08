@@ -84,7 +84,7 @@ public class TaskService {
                 if (title.length() > 15) {
                     title = title.substring(0, 12) + "...";
                 }
-                commonService.sendAlarm(seq, task.getUser_seq(), "\"" + title + "\" 일정이 공유되었습니다.");
+                commonService.sendAlarm(seq, task.getUser_seq(), "\"" + title + "\" 일정이 공유되었습니다.", "05");
             }
 
             if(result == 0){

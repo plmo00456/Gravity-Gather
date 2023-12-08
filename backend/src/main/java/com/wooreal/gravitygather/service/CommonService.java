@@ -2,6 +2,7 @@ package com.wooreal.gravitygather.service;
 
 import com.wooreal.gravitygather.config.WebSocketHandler;
 import com.wooreal.gravitygather.dto.common.Alarm;
+import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserRequest;
@@ -10,6 +11,7 @@ import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.SHA256Util;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,10 +43,28 @@ public class CommonService {
         commonMapper.readAlarm(userId, alarmSeq);
     }
 
-    public void sendAlarm(int receive_seq, int sender_seq, String msg){
+    public void sendAlarm(int receive_seq, int sender_seq, String msg, String code){
         try{
-            commonMapper.sendAlarm(receive_seq, sender_seq, msg);
+            commonMapper.sendAlarm(receive_seq, sender_seq, msg, code);
         }catch (Exception e){}
+    }
+
+    public List<Article> getScraps(Article article){
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        article.setUser_seq(userSeq+"");
+        return commonMapper.getScraps(article);
+    }
+
+    public Article getScrap(Article article){
+        List<Article> scraps = commonMapper.getScraps(article);
+        if(scraps == null || scraps.size() == 0) return null;
+        else return scraps.get(0);
+    }
+
+    public Article getScrapsAllCnt(Article article){
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        article.setUser_seq(userSeq+"");
+        return commonMapper.getScrapsAllCnt(article);
     }
 
 }

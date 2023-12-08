@@ -5,6 +5,7 @@ import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
 import com.wooreal.gravitygather.dto.community.Comment;
 import com.wooreal.gravitygather.dto.community.Like;
+import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.CommunityMapper;
@@ -18,9 +19,13 @@ import java.util.List;
 public class CommunityService {
 
     private final CommunityMapper communityMapper;
+    private final CommonService commonService;
+    private final UserService userService;
 
-    public CommunityService(CommunityMapper communityMapper) {
+    public CommunityService(CommunityMapper communityMapper, CommonService commonService, UserService userService) {
         this.communityMapper = communityMapper;
+        this.commonService = commonService;
+        this.userService = userService;
     }
 
     public List<ArticleMaster> getArticleMasters(){
@@ -28,6 +33,8 @@ public class CommunityService {
     }
 
     public List<Article> getArticles(Article article){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        article.setUser_seq(seq+"");
         return communityMapper.getArticles(article);
     }
 
@@ -109,6 +116,18 @@ public class CommunityService {
     }
 
     public void addLike(Like like){
+        User userInfo = userService.getUserBySeq();
+
+        if(like.getMode().equals("article")){
+            Article article = getArticle(like.getContent_seq());
+            if(article.getUser_seq().equals(like.getUser_seq()+"")) return;
+            commonService.sendAlarm(Integer.parseInt(article.getUser_seq()), like.getUser_seq(), userInfo.getNickname() + "님께서 \"" + article.getTitle() + "\"게시글에 좋아요를 눌렀습니다.", "01");
+        }else if(like.getMode().equals("comment")){
+            Comment comment = getComment(like.getContent_seq());
+            if(comment.getUser_seq().equals(like.getUser_seq()+"")) return ;
+            commonService.sendAlarm(Integer.parseInt(comment.getUser_seq()), like.getUser_seq(), userInfo.getNickname() + "님께서 댓글에 좋아요를 눌렀습니다.", "02");
+        }
+
         communityMapper.addLike(like);
     }
 
@@ -152,4 +171,19 @@ public class CommunityService {
         communityMapper.deleteLike(like);
     }
 
+    public boolean scrap(Article article){
+        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        article.setUser_seq(seq+"");
+        Article scrap = commonService.getScrap(article);
+        if(scrap != null){
+            communityMapper.deleteScrap(article);
+            return false;
+        }else{
+            communityMapper.addScrap(article);
+            Article oriArticle = getArticle(article.getSeq());
+            User userInfo = userService.getUserBySeq();
+            commonService.sendAlarm(Integer.parseInt(oriArticle.getUser_seq()), seq, userInfo.getNickname() + "님께서 \"" + oriArticle.getTitle() + "\"글을 스크랩 했습니다.", "04");
+            return true;
+        }
+    }
 }

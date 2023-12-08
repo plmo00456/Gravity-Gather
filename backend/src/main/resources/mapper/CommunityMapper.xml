@@ -38,6 +38,7 @@
         SELECT
             A.seq,
             A.master_seq,
+            (select AA.title from articlemaster AA where AA.seq = A.master_seq) as master_title,
             A.title,
             A.content,
             A.user_seq,
@@ -48,6 +49,9 @@
             B.nickname,
             B.photo,
             (select count(*) from comment AA where AA.article_seq = A.seq and AA.is_delete = false) as comment_count
+            <if test="user_seq != null">
+                , IFNULL((select true from scrap AA where AA.article_seq = A.seq and AA.user_seq = 6), false) as scrap
+            </if>
         from
             article A
         LEFT JOIN users B
@@ -242,5 +246,22 @@
         and user_seq = #{user_seq}
         and content_seq = #{content_seq}
     </delete>
+
+    <delete id="deleteScrap">
+        delete from scrap
+        where
+            article_seq = #{seq}
+        and user_seq = #{user_seq}
+    </delete>
+
+    <insert id="addScrap">
+        insert into scrap(
+            article_seq,
+            user_seq
+        ) values (
+            #{seq},
+            #{user_seq}
+        )
+    </insert>
 
 </mapper>

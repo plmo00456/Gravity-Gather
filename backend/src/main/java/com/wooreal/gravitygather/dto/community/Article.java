@@ -8,7 +8,7 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.sql.Timestamp;
 
 @Getter
@@ -47,6 +47,7 @@ public class Article {
     private int likes;
     private Timestamp created_at;
     private Timestamp updated_at;
+    private Boolean scrap;
 
     private String nickname;
     private String photo;
@@ -58,6 +59,9 @@ public class Article {
     private int lastPage;
     private int offset;
     private int allCnt;
+
+    private int article_seq;
+    private String master_title;
 
     public String getPhoto(){
         if(this.photo != null && staticFileUploadDir != null && staticFileMappingDir != null) {

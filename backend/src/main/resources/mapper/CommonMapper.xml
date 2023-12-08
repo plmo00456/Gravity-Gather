@@ -47,4 +47,47 @@
             #{msg}
         )
     </insert>
+
+    <select id="getScrapsAllCnt">
+        SELECT
+            count(*) as allCnt,
+            TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1 as lastPage
+        from scrap
+        <where>
+            user_seq = #{user_seq}
+        </where>
+    </select>
+
+    <select id="getScraps">
+        SELECT
+            B.seq,
+            B.master_seq,
+            (select BB.title from articlemaster BB where BB.seq = B.master_seq) as master_title,
+            B.title,
+            B.content,
+            B.user_seq,
+            B.view_count,
+            IFNULL((select SUM(IF(BB.is_up, 1, -1)) from likes BB where BB.mode = 'article' and BB.content_seq = B.seq), 0) as likes,
+            A.created_at,
+            B.updated_at,
+            C.nickname,
+            C.photo,
+            (select count(*) from comment BB where BB.article_seq = B.seq and BB.is_delete = false) as comment_count
+        from scrap A
+        inner join article B
+        ON A.article_seq = B.seq
+        LEFT JOIN users C
+        ON B.user_seq = C.seq
+        <where>
+            A.user_seq = #{user_seq}
+            <if test="seq != null">
+                AND A.article_seq = #{seq}
+            </if>
+            AND B.is_delete = false
+            <if test="search != null and search != ''">
+                AND (B.title like '%${search}%' or B.content like '%${search}%')
+            </if>
+        </where>
+        LIMIT #{viewPageCnt} OFFSET #{offset}
+    </select>
 </mapper>
