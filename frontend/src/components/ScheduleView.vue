@@ -547,7 +547,7 @@ export default {
               this.utils.notify.success("삭제되었습니다.", "삭제 완료!");
               await this.getTasks();
             } else {
-              this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+              this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
             }
           } catch (error) {
             this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -621,7 +621,7 @@ export default {
               this.utils.notify.success("삭제되었습니다.", "삭제 완료!");
               await this.getTasks();
             } else {
-              this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+              this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
             }
           } catch (error) {
             console.log(error);

@@ -1,14 +1,13 @@
 package com.wooreal.gravitygather.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
 
 @Getter
 @Setter
@@ -35,6 +34,7 @@ public class UserResponse {
     }
 
     private int seq;
+    private int roomSeq;
     private String id;
     private String photo;
     private String name;

@@ -14,6 +14,8 @@ public class ExceptionCode {
     @Getter
     private String message;
 
+    private final Boolean custom = true;
+
     ExceptionCode(HttpStatus httpStatus, String error, String message) {
         this.httpStatus = httpStatus;
         this.error = error;

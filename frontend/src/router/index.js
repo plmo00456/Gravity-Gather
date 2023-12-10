@@ -11,6 +11,7 @@ import communityView from "@/components/CommunityView.vue";
 import writeViewer from "@/components/WriteViewer.vue";
 import userRegister from "@/components/UserRegister.vue";
 import scrapedView from "@/components/ScrapedView.vue";
+import {useRoomStore} from "@/stores/room";
 
 const routes = [
     {
@@ -22,10 +23,28 @@ const routes = [
         component: homeView,
         beforeEnter(to, from, next) {
             const userStore = useUserStore();
+            if (userStore.isLoggedIn && userStore.token.access && userStore.token.refresh) {
+                const roomStore = useRoomStore();
+                roomStore.isInTheRoom()
+                .then(result => {
+                    if(result){
+                        roomStore.getSingleRoom(result.roomSeq)
+                        .then(roomInfo => {
+                            next({
+                                path: `/room/${result.roomSeq}`,
+                                state: {roomInfo: JSON.stringify(roomInfo)},
+                                params: {id: roomInfo.roomSeq}
+                            });
+                        })
+                    }else{
+                        next();
+                    }
+                })
 
-            if (userStore.isLoggedIn) {
-                next();
             } else {
+                userStore.token = {};
+                userStore.userInfo = null
+                userStore.isLoggedIn = false;
                 next({name: "LoginView"});
             }
         },

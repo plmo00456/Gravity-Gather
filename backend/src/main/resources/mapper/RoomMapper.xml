@@ -22,20 +22,21 @@
     </resultMap>
 
     <select id="getRooms" resultMap="RoomResultMap">
-        SELECT A.seq,
-        A.title,
-        A.topic,
-        A.is_locked,
-        A.is_delete,
-        A.password,
-        A.password_salt,
-        A.max_participant,
-        A.current_participant,
-        A.owner_seq,
-        A.created_at,
-        IF(A.current_participant = A.max_participant, true, false) as is_full,
-        B.nickname,
-        B.photo
+        SELECT
+            A.seq,
+            A.title,
+            A.topic,
+            A.is_locked,
+            A.is_delete,
+            A.password,
+            A.password_salt,
+            A.max_participant,
+            (select count(*) from roomuser AA where AA.seq = A.seq) as current_participant,
+            A.owner_seq,
+            A.created_at,
+            IF((select count(*) from roomuser AA where AA.seq = A.seq) = A.max_participant, true, false) as is_full,
+            B.nickname,
+            B.photo
         FROM rooms A
         inner join users B
         on A.owner_seq = B.seq
@@ -55,10 +56,10 @@
                A.password,
                A.password_salt,
                A.max_participant,
-               A.current_participant,
+               (select count(*) from roomuser AA where AA.seq = A.seq) as current_participant,
                A.owner_seq,
                A.created_at,
-               IF(A.current_participant = A.max_participant, true, false) as is_full,
+               IF((select count(*) from roomuser AA where AA.seq = A.seq) = A.max_participant, true, false) as is_full,
                B.nickname,
                B.photo
         FROM rooms A
@@ -162,4 +163,62 @@
             now()
         )
     </insert>
+
+    <select id="isInTheRooms">
+        SELECT
+            A.seq as roomSeq,
+            A.user_seq as seq,
+            A.status,
+            A.created_at,
+            B.photo,
+            B.nickname,
+            B.room_character as roomCharacter,
+            B.room_map as roomMap
+        from roomuser A
+        inner join users B
+        on A.user_seq = B.seq
+        <where>
+            B.status = 'ACTIVE'
+            <if test="seq != null">
+                AND A.seq = #{seq}
+            </if>
+            <if test="userSeq != null">
+                AND A.user_seq = #{userSeq}
+            </if>
+        </where>
+    </select>
+
+    <insert id="inTheRoom">
+        INSERT INTO roomuser (
+            seq,
+            user_seq,
+            status
+        ) VALUES (
+            #{seq},
+            #{userSeq},
+            'enter'
+        )
+        ON DUPLICATE KEY UPDATE
+            status = 'enter'
+    </insert>
+
+    <update id="leaveTheRoom">
+        UPDATE roomuser SET
+            status = 'leave'
+        WHERE
+            seq = #{seq}
+        and user_seq = #{userSeq}
+    </update>
+
+    <delete id="outTheRoom">
+        DELETE FROM roomuser
+        <where>
+            <if test="seq != null">
+                AND seq = #{seq}
+            </if>
+            <if test="userSeq != null">
+                AND user_seq = #{userSeq}
+            </if>
+        </where>
+    </delete>
 </mapper>

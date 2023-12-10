@@ -1,39 +1,34 @@
 package com.wooreal.gravitygather.service;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wooreal.gravitygather.config.WebSocketHandler;
-import com.wooreal.gravitygather.dto.room.*;
+import com.wooreal.gravitygather.dto.room.ChatLog;
+import com.wooreal.gravitygather.dto.room.Room;
+import com.wooreal.gravitygather.dto.room.RoomRequest;
+import com.wooreal.gravitygather.dto.room.RoomResponse;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.RoomMapper;
 import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.SHA256Util;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
 
     private final RedisService redisService;
     private final RoomMapper roomMapper;
-    private final UserMapper userMapper;
+    private final UserService userService;
 
     private final WebSocketHandler webSocketHandler;
 
-    public RoomService(RoomMapper roomMapper, UserMapper userMapper, WebSocketHandler webSocketHandler, RedisService redisService) {
+    public RoomService(RoomMapper roomMapper, UserService userService, WebSocketHandler webSocketHandler, RedisService redisService) {
         this.roomMapper = roomMapper;
-        this.userMapper = userMapper;
+        this.userService = userService;
         this.webSocketHandler = webSocketHandler;
         this.redisService = redisService;
     }
@@ -50,7 +45,7 @@ public class RoomService {
         return roomMapper.getRoomBySeq(seq);
     }
 
-    public void createRoom(RoomRequest roomRequest){
+    public RoomResponse createRoom(RoomRequest roomRequest){
         Integer ownerSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         roomRequest.setOwnerSeq(ownerSeq);
         List<Room> rooms = getRooms(roomRequest);
@@ -71,6 +66,8 @@ public class RoomService {
         if(seq == 0) {
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+        roomRequest.setUserSeq(ownerSeq);
+        inTheRoom(roomRequest);
         insChatLog("create", seq, null, roomRequest.getOwnerSeq());
 
         try {
@@ -79,9 +76,11 @@ public class RoomService {
             e.printStackTrace();
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+        return new RoomResponse(getRoomBySeq(seq));
     }
 
-    public int enterRoom(RoomRequest roomRequest){
+    public int enterRoom(RoomRequest roomRequest)
+    {
         return roomMapper.enterRoom(roomRequest);
     }
 
@@ -99,30 +98,15 @@ public class RoomService {
         if(result == 0){
             throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
+        RoomRequest roomRequest = new RoomRequest();
+        roomRequest.setSeq(roomId);
+        outTheRoom(roomRequest);
     }
 
     public List<UserResponse> getRoomParticipants(int roomId){
-        Map<String, Set<RoomSession>> rooms = webSocketHandler.getMeetrooms();
-        Set<RoomSession> roomSession = rooms.get(roomId+"");
-        List<Integer> seqs = new ArrayList<>();
-        for (RoomSession session : roomSession) {
-            seqs.add(session.getSenderSeq());
-        }
-
-        List<User> participant = userMapper.getUserBySeqs(seqs);
-        List<UserResponse> participants = participant.stream()
-                .map(UserResponse::new)
-                .map(user -> {
-                    UserResponse ur = new UserResponse();
-                    ur.setSeq(user.getSeq());
-                    ur.setNickname(user.getNickname());
-                    ur.setPhoto(user.getPhoto());
-                    ur.setRoomMap(user.getRoomMap());
-                    ur.setRoomCharacter(user.getRoomCharacter());
-                    return ur;
-                })
-                .collect(Collectors.toList());
-        return participants;
+        RoomRequest room = new RoomRequest();
+        room.setSeq(roomId);
+        return roomMapper.isInTheRooms(room);
     }
 
     public int updateRooms(List<RoomRequest> list){
@@ -166,5 +150,63 @@ public class RoomService {
         return currentRoom;
     }
 
+    public List<UserResponse> isInTheRooms(){
+        RoomRequest roomRequest = new RoomRequest();
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        roomRequest.setUserSeq(userSeq);
+        return roomMapper.isInTheRooms(roomRequest);
+    }
+
+    public UserResponse isInTheRoom(){
+        RoomRequest roomRequest = new RoomRequest();
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        roomRequest.setUserSeq(userSeq);
+        List<UserResponse> rooms = roomMapper.isInTheRooms(roomRequest);
+        return rooms == null || rooms.size() == 0 ? null : rooms.get(0);
+    }
+
+    public void inTheRoom(RoomRequest roomRequest){
+        roomMapper.inTheRoom(roomRequest);
+    }
+
+    public void leaveTheRoom(RoomRequest roomRequest){
+        roomMapper.leaveTheRoom(roomRequest);
+    }
+
+    public void outTheRoom(RoomRequest roomRequest){
+        roomMapper.outTheRoom(roomRequest);
+    }
+    public void outTheRoom(){
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        RoomRequest roomRequest = new RoomRequest();
+        roomRequest.setUserSeq(userSeq);
+        roomMapper.outTheRoom(roomRequest);
+    }
+
+    public void kick(RoomRequest roomRequest){
+        Integer roomSeq = roomRequest.getSeq();
+        // 방장인지 확인
+        Room room = getRoomBySeq(roomSeq);
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(room.getOwner_seq().equals(userSeq)){
+            User kickUser = userService.getUserBySeq(roomRequest.getUserSeq());
+            outTheRoom(roomRequest);
+            JsonObject jo = new JsonObject();
+            String type1 = "room";
+            String type2 = "kick";
+            String roomId = roomSeq+"";
+            String receiveSeq = roomRequest.getUserSeq()+"";
+            jo.addProperty("type1", type1);
+            jo.addProperty("type2", type2);
+            jo.addProperty("roomId",roomId);
+            jo.addProperty("receiveSeq",receiveSeq);
+            jo.addProperty("receiveNickname",kickUser != null ? kickUser.getNickname() : "[알수없음]");
+            try{
+                webSocketHandler.sendMessageToRoom(roomRequest.getSeq(), jo);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

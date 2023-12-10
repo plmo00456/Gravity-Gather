@@ -1,12 +1,11 @@
 package com.wooreal.gravitygather.dto.task;
 
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
-
-import java.sql.Timestamp;
 
 @Getter
 @Setter

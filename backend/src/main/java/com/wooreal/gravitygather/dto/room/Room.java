@@ -1,11 +1,10 @@
 package com.wooreal.gravitygather.dto.room;
 
 import com.wooreal.gravitygather.dto.user.User;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.sql.Timestamp;
 
 @Getter
 @ToString
@@ -24,5 +23,6 @@ public class Room {
     private Integer owner_seq;
     private Boolean is_full;
     private Timestamp created_at;
+    private String status;
     private User user;
 }

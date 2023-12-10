@@ -1,11 +1,10 @@
 package com.wooreal.gravitygather.dto.user;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.sql.Timestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

@@ -31,6 +31,22 @@ export const useRoomStore = defineStore({
                 this.dataResponse = error.response;
             });
         },
+        async getSingleRoom(roomId) {
+            return http.post(`/room/${roomId}/get`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
         async getRoomParticipants(roomId) {
             return http.post('/room/'+roomId+'/participants', {
                 headers: {
@@ -56,6 +72,7 @@ export const useRoomStore = defineStore({
             .then(response => {
                 if (response.status === 200) {
                     this.dataResponse = response;
+                    return response.data;
                 }
             })
             .catch(error => {
@@ -93,6 +110,54 @@ export const useRoomStore = defineStore({
                     console.log(error);
                     this.dataResponse = error.response;
                 });
+        },
+        async isInTheRoom() {
+            return http.post('/room/isInTheRoom', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                this.dataResponse = error.response;
+            });
+        },
+        async kick(user){
+            return http.post('/room/kick', user,{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return response.data;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async outRoom(){
+            return http.post('/room/out', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
         }
     }
 })

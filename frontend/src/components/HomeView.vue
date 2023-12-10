@@ -200,13 +200,17 @@ export default {
     return {
       slideShow: false,
       currentWindow: null,
-      maxParticipantValue: {name: '5명', maxParticipant: 5},
+      maxParticipantValue: {name: '2명', maxParticipant: 2},
       maxParticipant: [
-        {name: '1명', maxParticipant: 1, $isDisabled: true},
         {name: '2명', maxParticipant: 2},
         {name: '3명', maxParticipant: 3},
         {name: '4명', maxParticipant: 4},
         {name: '5명', maxParticipant: 5},
+        {name: '6명', maxParticipant: 6},
+        {name: '7명', maxParticipant: 7},
+        {name: '8명', maxParticipant: 8},
+        {name: '9명', maxParticipant: 9},
+        {name: '10명', maxParticipant: 10}
       ],
       createRoomTitle: null,
       createRoomTopic: null,
@@ -404,13 +408,19 @@ export default {
             roomInfo.password = null;
             this.toggleState = false;
           }
-          await roomStore.createRoom(roomInfo);
-          this.dataResponse = roomStore.dataResponse;
-          if (this?.dataResponse?.status === 200) {
+          roomStore.createRoom(roomInfo)
+          .then(result => {
+            console.log(result);
             this.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
-          } else {
-            this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
-          }
+            this.$router.push({
+              name: 'room',
+              state: {roomInfo: JSON.stringify(result)},
+              params: {id: result.seq}
+            });
+          }).catch(error => {
+            console.log(error);
+            this.utils.msgError(error.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
+          })
           this.slideShow = false;
         } catch (error) {
           console.error(error);

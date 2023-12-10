@@ -1,9 +1,9 @@
 package com.wooreal.gravitygather.dto.room;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

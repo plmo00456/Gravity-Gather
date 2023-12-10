@@ -2,7 +2,11 @@ package com.wooreal.gravitygather.controller;
 
 import com.wooreal.gravitygather.config.LoginRequired;
 import com.wooreal.gravitygather.dto.file.FileVO;
-import com.wooreal.gravitygather.dto.user.*;
+import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
+import com.wooreal.gravitygather.dto.user.Friend;
+import com.wooreal.gravitygather.dto.user.User;
+import com.wooreal.gravitygather.dto.user.UserRequest;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.service.FileUploadService;
 import com.wooreal.gravitygather.service.UserService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -12,13 +16,19 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @OpenAPIDefinition(info = @Info(title = "User Controller", version = "v1", description = "사용자 컴트롤러"))
 @CrossOrigin(origins = {"*"})

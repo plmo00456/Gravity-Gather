@@ -1,13 +1,11 @@
 package com.wooreal.gravitygather.mapper;
 
-import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
 import com.wooreal.gravitygather.dto.community.Comment;
 import com.wooreal.gravitygather.dto.community.Like;
-import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface CommunityMapper {

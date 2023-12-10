@@ -70,7 +70,7 @@
             IFNULL((select SUM(IF(BB.is_up, 1, -1)) from likes BB where BB.mode = 'article' and BB.content_seq = B.seq), 0) as likes,
             A.created_at,
             B.updated_at,
-            C.nickname,
+            IFNULL(C.nickname, '탈퇴유저') as nickname,
             C.photo,
             (select count(*) from comment BB where BB.article_seq = B.seq and BB.is_delete = false) as comment_count
         from scrap A

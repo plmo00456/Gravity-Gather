@@ -1,28 +1,30 @@
 package com.wooreal.gravitygather.service;
 
 import com.wooreal.gravitygather.config.WebSocketHandler;
-import com.wooreal.gravitygather.dto.user.*;
+import com.wooreal.gravitygather.dto.user.EmailVerificationResult;
+import com.wooreal.gravitygather.dto.user.Friend;
+import com.wooreal.gravitygather.dto.user.User;
+import com.wooreal.gravitygather.dto.user.UserRequest;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
-import com.wooreal.gravitygather.exception.ExceptionCode;
 import com.wooreal.gravitygather.mapper.UserMapper;
 import com.wooreal.gravitygather.utils.JwtTokenUtil;
 import com.wooreal.gravitygather.utils.SHA256Util;
-import java.util.ArrayList;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.util.List;
-import java.util.Random;
 
 @Service
 public class UserService {
@@ -51,6 +53,9 @@ public class UserService {
 
     public User login(UserRequest userRequest, HttpServletRequest request, HttpServletResponse httpServletResponse){
         User tmp = userMapper.getUserById(userRequest.getId());
+        if(tmp == null)
+            throw new BusinessLogicException(HttpStatus.UNAUTHORIZED, "아이디와 비밀번호를 확인해 주세요.");
+
         String salt = tmp.getPassword_salt();
         String password = SHA256Util.generateHashWithSalt(userRequest.getPassword(), salt);
         userRequest.setPassword(password);

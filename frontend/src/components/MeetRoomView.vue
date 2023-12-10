@@ -22,10 +22,11 @@
                              :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
                     </div>
                     <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-3 text-sm">
-                            <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
-                                               icon="fa-solid fa-crown"/>
-                            {{ participant.nickname }}
-                        </span>
+                        <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
+                                           icon="fa-solid fa-crown"/>
+                        {{ participant.nickname }}
+                        <b :id="`character-nickname-${participant.seq}`" v-if="participant.status === 'leave'" class="text-red-500"> [자리비움]</b>
+                    </span>
                 </div>
             </div>
         </div>
@@ -46,7 +47,7 @@
                         <div v-else-if="chat.senderSeq == user.seq" class="you break-words"
                              :class="{'first_chat': chats[index - 1].type2 !== 'chat' || chats[index - 1].senderSeq !== chat.senderSeq}">
                             <span class="content text-start mr-2">{{ chat.content }}</span>
-                            <span class="datetime text-xs text-gray-200"
+                            <span class="datetime text-xs text-gray-200 mr-1"
                                   v-if="index === chats.length - 1 ||
                                     chat.senderSeq !== chats[index + 1].senderSeq ||
                                     !isSameMinute(chat.oriDatetime, chats[index + 1].oriDatetime)">{{
@@ -82,7 +83,7 @@
                                    class="w-5/6 py-2 pl-3 pr-9 text-black rounded-3xl" maxlength="500"
                                    placeholder="채팅을 입력하세요.">
                             <font-awesome-icon
-                                class="absolute select-none right-14 bottom-3 text-blue-300 cursor-pointer hover:text-blue-400 active:text-blue-500"
+                                class="absolute select-none right-[4rem] bottom-3 text-blue-300 cursor-pointer hover:text-blue-400 active:text-blue-500"
                                 icon="fa-solid fa-paper-plane" v-on:click="chatSend"/>
                         </div>
                     </form>
@@ -92,10 +93,10 @@
                     </div>
                 </div>
                 <div class="participant-list flex flex-col overflow-x-hidden overflow-y-auto h-[calc(100%-3rem)] pr-3"
-                     v-if="rightCurrentTab === 'participant'">
+                     v-show="rightCurrentTab === 'participant'">
                     <div v-for="participant in participants" :key="participant.seq">
                         <div
-                            @click="participantTabSetting.context.currentClickUser = participant; participantUserClick($event)"
+                            @click.self="participantTabSetting.context.currentClickUser = participant; participantUserClick($event)"
                             :class="{'cursor-pointer' : user.seq !== participant.seq}"
                             class="flex items-center justify-between py-3 border-b border-b-gray-400">
                             <div class="flex items-center">
@@ -109,12 +110,26 @@
                                     <span class="w-full h-full flex justify-center items-center font-bold text-lg bg-green-700 text-white"
                                           v-if="!participant.photo">{{ participant.nickname[0] }}</span>
                                 </div>
-                                <span>{{ participant.nickname }}</span>
+                                <span>
+                                    {{ participant.nickname }}
+                                    <b :id="`participant-nickname-${participant.seq}`"
+                                        :class="{'text-red-500': participant.status === 'leave', 'text-green-500': participant.status === 'enter'}"
+                                        class="ml-1 font-bold">
+                                        [{{participant.status === 'enter' ? '접속중' : '자리비움'}}]
+                                    </b>
+                                </span>
                             </div>
                             <font-awesome-icon
                                 v-if="roomInfo.ownerSeq == participant.seq"
                                 class="text-2xl text-yellow-300 mr-2"
                                 icon="fa-solid fa-crown"/>
+                            <button v-else-if="roomInfo.ownerSeq === user.seq"
+                                    type="button"
+                                    class="flex items-center px-3 py-1 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
+                                    @click="kick(participant.seq)">
+                                <font-awesome-icon class="text-sm mr-2" icon="arrow-right-from-bracket"/>
+                                추방하기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -174,18 +189,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="user.seq === roomInfo.ownerSeq"
-                             class="h-1/6 flex justify-end">
+                        <div class="h-1/6 flex justify-end">
                             <div class="flex justify-end items-center content-center">
-                                      <span class="flex justify-end pr-3 font-bold w-full">
-                                            <button type="button"
-                                                    class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
-                                                    @click="deleteRoom">
-                                              <font-awesome-icon class="text-xl mr-2"
-                                                                 icon="fa-solid fa-trash-can"></font-awesome-icon>
-                                              미팅 방 삭제하기
-                                            </button>
-                                      </span>
+                                  <span class="flex justify-end pr-3 font-bold w-full">
+                                        <button type="button"
+                                                v-if="user.seq === roomInfo.ownerSeq"
+                                                class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
+                                                @click="deleteRoom">
+                                          <font-awesome-icon class="text-xl mr-2"
+                                                             icon="fa-solid fa-trash-can"></font-awesome-icon>
+                                          미팅 방 삭제하기
+                                        </button>
+                                        <button type="button" v-else
+                                              class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
+                                              @click="outRoom">
+                                          <font-awesome-icon class="text-xl mr-2" icon="arrow-right-from-bracket"></font-awesome-icon>
+                                          나가기
+                                        </button>
+                                  </span>
                             </div>
                         </div>
                     </div>
@@ -250,6 +271,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {useRoomStore} from "@/stores/room";
 import ToggleSwitch from "@/components/ToggleSwitch.vue";
 import {ContextMenu, ContextMenuItem, ContextMenuSeparator} from "@imengyu/vue3-context-menu";
+import {router} from "@/router";
 
 export default {
     name: "MeetRoomView",
@@ -304,7 +326,12 @@ export default {
             try {
                 await roomStore.getRoomParticipants(roomInfo.seq);
                 if (roomStore?.dataResponse.status === 200) {
+                    participants.value = participants.value.filter(participant => {
+                        return roomStore.currentRoomParticipants.some(data => data.seq === participant.seq);
+                    });
+
                     const sortArr = roomStore.currentRoomParticipants;
+                    console.log(sortArr);
                     sortArr.forEach(data => {
                         if (participants.value.every(participant => participant.seq !== data.seq)) {
                             const xy = randomCharacterLocation();
@@ -326,6 +353,7 @@ export default {
                                         participant.x = ori_x;
                                         participant.y = ori_y;
                                     }
+                                    participant.status = data.status;
                                 }
                                 return participant;
                             })
@@ -379,7 +407,7 @@ export default {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type1 === 'room') {
-                if (data.type2 === 'chat' || data.type2 === 'enter' || data.type2 === 'leave') {
+                if (data.type2 === 'chat' || data.type2 === 'enter' || data.type2 === 'leave' || data.type2 === 'out') {
                     data.oriDatetime = data.datetime;
                     if (data.datetime) {
                         var dateObj = new Date(data.datetime);
@@ -387,12 +415,29 @@ export default {
                         let options = {hour: 'numeric', minute: 'numeric', hour12: true};
                         data.datetime = date.toLocaleTimeString('ko-KR', options);
                     }
-                    if (data.type2 === 'enter' || data.type2 === 'leave') {
+                    if (data.type2 === 'enter' || data.type2 === 'leave' || data.type2 === 'out') {
                         const seq = "seq" + data.senderSeq;
+                        const nickElement = document.querySelector("#character-nickname-" + data.senderSeq);
+                        const participantElement = document.querySelector("#participant-nickname-" + data.senderSeq);
                         if (data.type2 === 'leave') {
+                            if(nickElement)
+                                nickElement.innerText = " [자리비움]";
+                            if(participantElement) {
+                                participantElement.classList.add("text-red-500");
+                                participantElement.classList.remove("text-green-500");
+                                participantElement.innerHTML = " [자리비움]";
+                            }
+                        } else if(data.type2 === 'out'){
                             participants.value = participants.value.filter(participant => participant.seq != data.senderSeq);
                             delete (participantsCharacter[seq]);
                         } else {
+                            if(participantElement) {
+                                participantElement.classList.remove("text-red-500");
+                                participantElement.classList.add("text-green-500");
+                                participantElement.innerHTML = " [접속중]";
+                            }
+                            if(nickElement)
+                                nickElement.innerText = "";
                             const chatElement = document.querySelector("#character-chat-" + data.senderSeq);
                             participantsCharacter[seq] = {
                                 text: data.content,
@@ -433,6 +478,17 @@ export default {
                         }, participantsCharacter.showTextMs);
                     }
                     chats.value.push(data);
+                }
+
+                if (data.type2 === 'kick'){
+                    if(data.receiveSeq == user.seq){
+                        router.push({
+                            name: 'MainView',
+                        });
+                    }else{
+                        getRoomParticipants();
+                        instance.appContext.config.globalProperties.utils.notify.success(`${data.receiveNickname}님이 추방 당하였습니다.`, '추방 안내');
+                    }
                 }
 
                 if (data.type2 === 'updateUserMsg') {
@@ -560,7 +616,7 @@ export default {
                                 name: 'MainView',
                             });
                         } else {
-                            this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+                            this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
                         }
                     } catch (error) {
                         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -672,6 +728,23 @@ export default {
                 this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
             }
         },
+        kick(userSeq){
+            const roomStore = useRoomStore();
+            roomStore.kick({
+                userSeq: userSeq,
+                seq: this.roomInfo.seq
+            })
+        },
+        async outRoom(){
+            const roomStore = useRoomStore();
+            roomStore.outRoom()
+            .then(() => {
+                this.chatSocketSend('out');
+                this.$router.push({
+                    name: 'MainView',
+                });
+            })
+        }
     },
 }
 </script>
@@ -741,7 +814,7 @@ export default {
 
 .right-menu .chat-log .other .datetime {
     position: absolute;
-    bottom: 10px;
+    bottom: 2px;
     right: -55px;
 }
 
@@ -755,8 +828,8 @@ export default {
 
 .right-menu .chat-log .you .datetime {
     position: absolute;
-    bottom: 10px;
-    left: -55px;
+    bottom: 2px;
+    left: -60px;
 }
 
 .right-menu .chat-log .other.first_chat .content::after {

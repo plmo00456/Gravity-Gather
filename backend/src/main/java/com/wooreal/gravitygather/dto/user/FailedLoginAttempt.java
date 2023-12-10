@@ -1,10 +1,9 @@
 package com.wooreal.gravitygather.dto.user;
 
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.sql.Timestamp;
 
 @Getter
 @ToString

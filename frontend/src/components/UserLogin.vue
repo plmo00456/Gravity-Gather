@@ -91,7 +91,6 @@ export default {
                     id: this.id,
                     password: this.password,
                 }
-
                 try {
                     await userStore.login(loginUser);
                     this.dataResponse = userStore.dataResponse;
@@ -107,7 +106,7 @@ export default {
                         }
                         this.$router.push({name : 'MainView'});
                     }else{
-                        this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+                        this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
                     }
                 } catch (error) {
                     console.error(error);

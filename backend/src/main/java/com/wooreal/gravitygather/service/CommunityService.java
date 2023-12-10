@@ -1,19 +1,16 @@
 package com.wooreal.gravitygather.service;
 
-import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
 import com.wooreal.gravitygather.dto.community.ArticleMaster;
 import com.wooreal.gravitygather.dto.community.Comment;
 import com.wooreal.gravitygather.dto.community.Like;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.exception.BusinessLogicException;
-import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.CommunityMapper;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CommunityService {

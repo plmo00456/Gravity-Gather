@@ -11,6 +11,15 @@ import com.wooreal.gravitygather.service.RedisService;
 import com.wooreal.gravitygather.service.RoomService;
 import com.wooreal.gravitygather.service.UserService;
 import com.wooreal.gravitygather.utils.comUtil;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +28,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Getter
@@ -96,7 +100,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
                         RoomRequest rr = new RoomRequest();
                         rr.setSeq(Integer.parseInt(roomId));
                         rr.setOwnerSeq(Integer.parseInt(senderSeq));
-                        roomService.enterRoom(rr);
+                        rr.setUserSeq(Integer.parseInt(senderSeq));
+                        roomService.inTheRoom(rr);
                         updateRoomMsg(rr.getSeq());
                     }
 
@@ -106,15 +111,27 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 case "chat":
                     break;
                 case "leave":
+                    //잠시 자리 비움
                     if(!comUtil.isNullChk(roomId, "").equals("") && !comUtil.isNullChk(senderSeq, "").equals("")){
                         RoomRequest rr = new RoomRequest();
                         rr.setSeq(Integer.parseInt(roomId));
                         rr.setOwnerSeq(Integer.parseInt(senderSeq));
-                        roomService.leaveRoom(rr);
+                        rr.setUserSeq(Integer.parseInt(senderSeq));
+                        roomService.leaveTheRoom(rr);
+                    }
+                    break;
+                case "out":
+                    // 방을 나감
+                    if(!comUtil.isNullChk(roomId, "").equals("") && !comUtil.isNullChk(senderSeq, "").equals("")){
+                        RoomRequest rr = new RoomRequest();
+                        rr.setSeq(Integer.parseInt(roomId));
+                        rr.setOwnerSeq(Integer.parseInt(senderSeq));
+                        rr.setUserSeq(Integer.parseInt(senderSeq));
+                        roomService.outTheRoom(rr);
                         updateRoomMsg(rr.getSeq());
                     }
 
-                    leaveRoom(roomId, session);
+                    outRoom(roomId, session);
                     content = sender + "님이 방을 떠났습니다.";
                     break;
                 case "invite":
@@ -156,7 +173,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         Set<RoomSession> roomSession = meetrooms.get(roomId);
     }
 
-    private void leaveRoom(String roomId, WebSocketSession session) {
+    private void outRoom(String roomId, WebSocketSession session) {
         Set<RoomSession> room = meetrooms.getOrDefault(roomId, new HashSet<>());
         room.stream()
                 .filter(userSession -> userSession.getSession().equals(session))

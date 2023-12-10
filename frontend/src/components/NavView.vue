@@ -527,7 +527,7 @@ export default {
               this.utils.notify.success("내 정보가 변경되었습니다.", "변경 완료!");
               this.myInfoShow = false;
             } else {
-              this.utils.msgError(this.dataResponse.data || this.utils.normalErrorMsg);
+              this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
             }
           } catch (error) {
             this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);

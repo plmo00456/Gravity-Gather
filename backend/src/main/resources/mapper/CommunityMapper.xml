@@ -46,11 +46,11 @@
             IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'article' and AA.content_seq = A.seq), 0) as likes,
             A.created_at,
             A.updated_at,
-            B.nickname,
+            IFNULL(B.nickname, '탈퇴유저') as nickname,
             B.photo,
             (select count(*) from comment AA where AA.article_seq = A.seq and AA.is_delete = false) as comment_count
             <if test="user_seq != null">
-                , IFNULL((select true from scrap AA where AA.article_seq = A.seq and AA.user_seq = 6), false) as scrap
+                , IFNULL((select true from scrap AA where AA.article_seq = A.seq and AA.user_seq = #{user_seq}), false) as scrap
             </if>
         from
             article A
@@ -77,7 +77,7 @@
                     ORDER BY A.seq ASC
                 </when>
                 <when test="order == 'like'">
-                    ORDER BY A.likes DESC
+                    ORDER BY IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'article' and AA.content_seq = A.seq), 0) DESC
                 </when>
                 <when test="order == 'comment'">
                     ORDER BY (select count(*) from comment AA where AA.article_seq = A.seq and AA.is_delete = false) DESC

@@ -3,9 +3,10 @@ package com.wooreal.gravitygather.mapper;
 import com.wooreal.gravitygather.dto.room.ChatLog;
 import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.room.RoomRequest;
-import org.apache.ibatis.annotations.Mapper;
-
+import com.wooreal.gravitygather.dto.user.User;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface RoomMapper {
@@ -26,4 +27,12 @@ public interface RoomMapper {
     int deleteRoom(int roomId);
 
     void insChatLog(ChatLog cl);
+
+    List<UserResponse> isInTheRooms(RoomRequest roomRequest);
+
+    int inTheRoom(RoomRequest roomRequest);
+
+    int leaveTheRoom(RoomRequest roomRequest);
+
+    int outTheRoom(RoomRequest roomRequest);
 }

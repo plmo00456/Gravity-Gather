@@ -2,12 +2,11 @@ package com.wooreal.gravitygather.dto.community;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.PostConstruct;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
