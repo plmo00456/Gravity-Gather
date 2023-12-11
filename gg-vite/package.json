@@ -1,0 +1,53 @@
+{
+  "name": "gg-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-regular-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@fullcalendar/core": "^6.1.9",
+    "@fullcalendar/daygrid": "^6.1.9",
+    "@fullcalendar/interaction": "^6.1.9",
+    "@fullcalendar/timegrid": "^6.1.9",
+    "@fullcalendar/vue3": "^6.1.9",
+    "@imengyu/vue3-context-menu": "^1.3.3",
+    "@s-r0/eggy-js": "^1.3.4",
+    "@vuepic/vue-datepicker": "^7.2.2",
+    "@vueup/vue-quill": "^1.2.0",
+    "axios": "^1.5.1",
+    "element-plus": "^2.4.2",
+    "interactjs": "^1.10.23",
+    "lodash": "^4.17.21",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.0",
+    "quill-blot-formatter": "^1.0.5",
+    "quill-image-compress": "^1.2.30",
+    "quill-image-drop-module": "^1.0.3",
+    "quill-image-uploader": "^1.3.0",
+    "sass": "^1.69.5",
+    "sweetalert2": "^11.6.13",
+    "tippy.js": "^6.3.7",
+    "vue": "^3.3.8",
+    "vue-multiselect": "^3.0.0-beta.3",
+    "vue-router": "^4.2.5",
+    "vue3-emoji-picker": "^1.1.8",
+    "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.0"
+  }
+}
