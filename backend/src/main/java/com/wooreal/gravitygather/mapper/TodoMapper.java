@@ -2,19 +2,22 @@ package com.wooreal.gravitygather.mapper;
 
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
+import com.wooreal.gravitygather.dto.team.Todo;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface CommonMapper {
+public interface TodoMapper {
 
-    List<Alarm> getAlarm(int userId);
+    List<Todo> getTodos(int room_seq);
 
-    void readAlarm(int userId, int alarmSeq);
+    List<Todo> getTodosBySeqInRoom(int seq);
 
-    int sendAlarm(int receive_seq, int sender_seq, String msg, String code);
+    int addTodo(Todo todo);
 
-    List<Article> getScraps(Article article);
+    int updateTodo(Todo todo);
 
-    Article getScrapsAllCnt(Article article);
+    int updateCompleteTodo(Todo todo);
+
+    int deleteTodo(Todo todo);
 }

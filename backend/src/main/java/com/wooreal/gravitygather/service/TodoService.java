@@ -1,53 +1,109 @@
 package com.wooreal.gravitygather.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.wooreal.gravitygather.config.WebSocketHandler;
 import com.wooreal.gravitygather.dto.common.Alarm;
 import com.wooreal.gravitygather.dto.community.Article;
+import com.wooreal.gravitygather.dto.room.Room;
+import com.wooreal.gravitygather.dto.team.Todo;
+import com.wooreal.gravitygather.dto.user.User;
+import com.wooreal.gravitygather.dto.user.UserResponse;
 import com.wooreal.gravitygather.mapper.CommonMapper;
+import com.wooreal.gravitygather.mapper.RoomMapper;
+import com.wooreal.gravitygather.mapper.TodoMapper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CommonService {
+public class TodoService {
 
-    private final CommonMapper commonMapper;
+    private final TodoMapper todoMapper;
+    private final RoomService roomService;
+    private final WebSocketHandler webSocketHandler;
+    private final CommonService commonService;
+    private final UserService userService;
 
-    public CommonService(CommonMapper commonMapper) {
-        this.commonMapper = commonMapper;
+    public TodoService(TodoMapper todoMapper, RoomService roomService, WebSocketHandler webSocketHandler, CommonService commonService, UserService userService) {
+        this.todoMapper = todoMapper;
+        this.roomService = roomService;
+        this.webSocketHandler = webSocketHandler;
+        this.commonService = commonService;
+        this.userService = userService;
     }
 
-    public List<Alarm> getAlarm(){
-        Integer seq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return commonMapper.getAlarm(seq);
+    public List<Todo> getTodos(int room_seq){
+        UserResponse user = roomService.isInTheRoom();
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(user != null && user.getSeq() == userSeq)
+            return todoMapper.getTodos(room_seq);
+        else
+            return new ArrayList<>();
     }
 
-    public void readAlarm(int alarmSeq){
-        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        commonMapper.readAlarm(userId, alarmSeq);
+    // seq에 해당하는 방 안에 todo
+    public List<Todo> getTodosBySeqInRoom(int seq){
+        return todoMapper.getTodosBySeqInRoom(seq);
     }
 
-    public void sendAlarm(int receive_seq, int sender_seq, String msg, String code){
+    public void addTodo(Todo todo){
+        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        todo.setUser_seq(userSeq);
+        todoMapper.addTodo(todo);
+        if(todo.getReceive_seq() != null){
+            User userInfo = userService.getUserBySeq();
+            commonService.sendAlarm(todo.getReceive_seq(), userSeq, userInfo.getNickname() + "님께서 할 일을 부여 했습니다.", "06");
+        }
         try{
-            commonMapper.sendAlarm(receive_seq, sender_seq, msg, code);
-        }catch (Exception e){}
+            JsonObject jo = new JsonObject();
+            jo.addProperty("type1", "room");
+            jo.addProperty("type2", "todoUpdMsg");
+            jo.addProperty("todo", getTodos(todo.getRoom_seq()).toString());
+            webSocketHandler.sendMessageToRoom(todo.getRoom_seq(), jo);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public List<Article> getScraps(Article article){
-        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        article.setUser_seq(userSeq+"");
-        return commonMapper.getScraps(article);
+    public void updateTodo(Todo todo){
+        todoMapper.updateTodo(todo);
+        updateTodoMsg(todo.getSeq());
     }
 
-    public Article getScrap(Article article){
-        List<Article> scraps = commonMapper.getScraps(article);
-        if(scraps == null || scraps.size() == 0) return null;
-        else return scraps.get(0);
+    public void updateCompleteTodo(Todo todo){
+        todoMapper.updateCompleteTodo(todo);
+        updateTodoMsg(todo.getSeq());
     }
 
-    public Article getScrapsAllCnt(Article article){
-        Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        article.setUser_seq(userSeq+"");
-        return commonMapper.getScrapsAllCnt(article);
+    public void deleteTodo(Todo todo){
+        todoMapper.deleteTodo(todo);
+        updateTodoMsg(todo.getSeq());
     }
+
+    public void updateTodoMsg(int seq){
+        System.out.println(seq);
+        try{
+            List<Todo> list = getTodosBySeqInRoom(seq);
+            int roomSeq = 0;
+            if(list.size() == 1){
+                roomSeq = list.get(0).getRoom_seq();
+            }
+            if(roomSeq != 0){
+                JsonObject jo = new JsonObject();
+                jo.addProperty("type1", "room");
+                jo.addProperty("type2", "todoUpdMsg");
+                jo.addProperty("todo", list.toString());
+                webSocketHandler.sendMessageToRoom(roomSeq, jo);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
 }

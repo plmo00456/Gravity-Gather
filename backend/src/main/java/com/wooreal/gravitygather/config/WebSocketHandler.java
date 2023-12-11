@@ -231,6 +231,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     public void sendMessageToRoom(Integer roomId, JsonObject jo) throws IOException {
+        System.out.println("roomId : " + roomId);
+        System.out.println(meetrooms);
         for (RoomSession s : meetrooms.get(roomId+"")) {
             if(s.getSession().isOpen()){
                 s.getSession().sendMessage(new TextMessage(jo.toString()));

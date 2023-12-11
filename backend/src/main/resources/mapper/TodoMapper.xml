@@ -2,92 +2,92 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.wooreal.gravitygather.mapper.CommonMapper">
+<mapper namespace="com.wooreal.gravitygather.mapper.TodoMapper">
 
-    <select id="getAlarm">
-        SELECT
+    <select id="getTodos">
+        select
             A.seq,
+            A.user_seq,
             A.receive_seq,
-            A.sender_seq,
-            B.nickname as sender_nickname,
-            B.photo as sender_photo,
-            A.msg,
-            A.is_check,
-            A.dte_cde_val,
-            getCdeNm('A01', dte_cde_val) as dte_cde_nm,
-            A.cont_seq,
-            A.created_at
-        FROM alarms A
-        LEFT JOIN users B
-        ON sender_seq = B.seq
-        WHERE
-            A.receive_seq = #{userId}
-        ORDER BY A.created_at DESC
+            (select AA.nickname from users AA where A.user_seq = AA.seq) as user_nickname,
+            (select AA.nickname from users AA where A.receive_seq = AA.seq) as receive_nickname,
+            A.room_seq,
+            A.title,
+            A.content,
+            A.is_complete,
+            A.created_at,
+            A.updated_at
+        from todo A
+        <where>
+            A.is_delete = false
+            <if test="room_seq != null">
+                and A.room_seq = #{room_seq}
+            </if>
+        </where>
     </select>
 
-    <update id="readAlarm">
-        UPDATE alarms SET
-            is_check = true
-        WHERE
-            receive_seq = #{userId}
-        <if test="alarmSeq != 0">
-            AND seq <![CDATA[<=]]> #{alarmSeq}
-        </if>
-    </update>
+    <select id="getTodosBySeqInRoom">
+        select
+        A.seq,
+        A.user_seq,
+        A.receive_seq,
+        (select AA.nickname from users AA where A.user_seq = AA.seq) as user_nickname,
+        (select AA.nickname from users AA where A.receive_seq = AA.seq) as receive_nickname,
+        A.room_seq,
+        A.title,
+        A.content,
+        A.is_complete,
+        A.created_at,
+        A.updated_at
+        from todo A
+        <where>
+            A.is_delete = false
+            <if test="seq != null">
+                and A.room_seq = (select AA.room_seq from todo AA where AA.seq = #{seq})
+            </if>
+        </where>
+    </select>
 
-    <insert id="sendAlarm">
-        INSERT INTO alarms
-        (
+    <insert id="addTodo">
+        INSERT INTO todo(
+            user_seq,
             receive_seq,
-            sender_seq,
-            msg
+            room_seq,
+            title,
+            content
         ) VALUES (
+            #{user_seq},
             #{receive_seq},
-            #{sender_seq},
-            #{msg}
+            #{room_seq},
+            #{title},
+            #{content}
         )
     </insert>
 
-    <select id="getScrapsAllCnt">
-        SELECT
-            count(*) as allCnt,
-            TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1 as lastPage
-        from scrap
+    <update id="updateTodo">
+        UPDATE todo SET
+            receive_seq = #{receive_seq},
+            title = #{title},
+            content = #{content}
         <where>
-            user_seq = #{user_seq}
+            seq = #{seq}
         </where>
-    </select>
+    </update>
 
-    <select id="getScraps">
-        SELECT
-            B.seq,
-            B.master_seq,
-            (select BB.title from articlemaster BB where BB.seq = B.master_seq) as master_title,
-            B.title,
-            B.content,
-            B.user_seq,
-            B.view_count,
-            IFNULL((select SUM(IF(BB.is_up, 1, -1)) from likes BB where BB.mode = 'article' and BB.content_seq = B.seq), 0) as likes,
-            A.created_at,
-            B.updated_at,
-            IFNULL(C.nickname, '탈퇴유저') as nickname,
-            C.photo,
-            (select count(*) from comment BB where BB.article_seq = B.seq and BB.is_delete = false) as comment_count
-        from scrap A
-        inner join article B
-        ON A.article_seq = B.seq
-        LEFT JOIN users C
-        ON B.user_seq = C.seq
+    <update id="updateCompleteTodo">
+        UPDATE todo SET
+            is_complete = #{is_complete}
         <where>
-            A.user_seq = #{user_seq}
-            <if test="seq != null">
-                AND A.article_seq = #{seq}
-            </if>
-            AND B.is_delete = false
-            <if test="search != null and search != ''">
-                AND (B.title like '%${search}%' or B.content like '%${search}%')
-            </if>
+            seq = #{seq}
         </where>
-        LIMIT #{viewPageCnt} OFFSET #{offset}
-    </select>
+    </update>
+
+    <update id="deleteTodo">
+        UPDATE todo SET
+            is_delete = #{is_delete}
+        <where>
+            seq = #{seq}
+        </where>
+    </update>
+
 </mapper>
