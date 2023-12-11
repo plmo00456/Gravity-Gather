@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wooreal.gravitygather.mapper.CommonMapper">
+
+    <select id="getAlarm">
+        SELECT
+            A.seq,
+            A.receive_seq,
+            A.sender_seq,
+            B.nickname as sender_nickname,
+            B.photo as sender_photo,
+            A.msg,
+            A.is_check,
+            A.dte_cde_val,
+            getCdeNm('A01', dte_cde_val) as dte_cde_nm,
+            A.cont_seq,
+            A.created_at
+        FROM alarms A
+        LEFT JOIN users B
+        ON sender_seq = B.seq
+        WHERE
+            A.receive_seq = #{userId}
+        ORDER BY A.created_at DESC
+    </select>
+
+    <update id="readAlarm">
+        UPDATE alarms SET
+            is_check = true
+        WHERE
+            receive_seq = #{userId}
+        <if test="alarmSeq != 0">
+            AND seq <![CDATA[<=]]> #{alarmSeq}
+        </if>
+    </update>
+
+    <insert id="sendAlarm">
+        INSERT INTO alarms
+        (
+            receive_seq,
+            sender_seq,
+            msg
+        ) VALUES (
+            #{receive_seq},
+            #{sender_seq},
+            #{msg}
+        )
+    </insert>
+
+    <select id="getScrapsAllCnt">
+        SELECT
+            count(*) as allCnt,
+            TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1 as lastPage
+        from scrap
+        <where>
+            user_seq = #{user_seq}
+        </where>
+    </select>
+
+    <select id="getScraps">
+        SELECT
+            B.seq,
+            B.master_seq,
+            (select BB.title from articlemaster BB where BB.seq = B.master_seq) as master_title,
+            B.title,
+            B.content,
+            B.user_seq,
+            B.view_count,
+            IFNULL((select SUM(IF(BB.is_up, 1, -1)) from likes BB where BB.mode = 'article' and BB.content_seq = B.seq), 0) as likes,
+            A.created_at,
+            B.updated_at,
+            IFNULL(C.nickname, '탈퇴유저') as nickname,
+            C.photo,
+            (select count(*) from comment BB where BB.article_seq = B.seq and BB.is_delete = false) as comment_count
+        from scrap A
+        inner join article B
+        ON A.article_seq = B.seq
+        LEFT JOIN users C
+        ON B.user_seq = C.seq
+        <where>
+            A.user_seq = #{user_seq}
+            <if test="seq != null">
+                AND A.article_seq = #{seq}
+            </if>
+            AND B.is_delete = false
+            <if test="search != null and search != ''">
+                AND (B.title like '%${search}%' or B.content like '%${search}%')
+            </if>
+        </where>
+        LIMIT #{viewPageCnt} OFFSET #{offset}
+    </select>
+</mapper>
