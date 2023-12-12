@@ -64,10 +64,11 @@ export const useTaskStore = defineStore({
                             content += '<div>' + task.content + '</div>'
                         }
                         const tmp = task.title;
+
                         if(task.user_seq !== data.user_seq){
                             task.startEditable = false;
                             task.is_share = true;
-                            task.title = '<div class="flex items-center px-0.5"><div class="flex justify-center items-center rounded-full mr-0.5 bg-white w-[1rem] h-[1rem]"><img class="w-[0.6rem] h-[0.6rem]" src="' + getImageUrl('@/assets/image/share-icon.png') + '" alt="공유 아이콘"></div>' + tmp + "</div>";
+                            task.title = '<div class="flex items-center px-0.5"><div class="flex justify-center items-center rounded-full mr-0.5 bg-white w-[1rem] h-[1rem]"><img class="w-[0.6rem] h-[0.6rem]" src="' + getImageUrl('/src/assets/image/share-icon.png') + '" alt="공유 아이콘"></div>' + tmp + "</div>";
                             if(task.content){
                                 content += '<div class="my-2 border-b border-gray-300"></div>'
                             }
@@ -212,14 +213,33 @@ export const useTaskStore = defineStore({
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        this.dataResponse = response;
-                    }
-                })
-                .catch(error => {
-                    this.dataResponse = error.response;
-                });
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+            });
+        },
+        async importantTask(task) {
+            return http.post(`/task/important`, task, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.dataResponse = response;
+                    return true;
+                }else{
+                    return false;
+                }
+            })
+            .catch(error => {
+                this.dataResponse = error.response;
+                return false;
+            });
         }
     }
 })

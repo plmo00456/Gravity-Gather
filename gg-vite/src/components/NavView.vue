@@ -121,7 +121,7 @@
         :show="myInfoShow" @close="myInfoShow=false"
         :title="'내 정보 관리'"
         :widthClass="'w-[26rem]'"
-        :heightClass="'h-[45rem]'"
+        :heightClass="'h-[47rem]'"
         :alignClass="'justify-start'"
     >
       <form @submit.prevent="userUpdate">
@@ -196,7 +196,7 @@
             </p>
           </div>
 
-          <div class="flex w-full items-center h-[3.5rem] mb-6">
+          <div class="flex w-full items-center h-[3.5rem] mb-12">
             <p class="flex flex-col w-2/5 justify-center items-start">
               <span class="flex w-full items-center font-semibold">방 캐릭터</span>
             </p>
@@ -227,7 +227,7 @@
             </p>
           </div>
 
-          <div class="flex w-full items-center h-[3.5rem] mb-2">
+          <div class="flex w-full items-center h-[3.5rem] mb-6">
             <p class="flex flex-col w-2/5 justify-center items-start">
               <span class="flex w-full items-center font-semibold">방 테마</span>
             </p>
@@ -241,7 +241,18 @@
                   :multiple="false"
                   :options="roomMap"
                   :select-label="''"
-              />
+              >
+                <template v-slot:singleLabel="{ option }">
+                  <div class="w-full flex justify-center">
+                    <img class="option__image w-28 h-16 self-center" :src="option.img" alt="맵">
+                  </div>
+                </template>
+                <template v-slot:option="{ option }">
+                  <div class="w-full flex justify-center">
+                    <img class="option__image w-28 h-16 self-center" :src="option.img" alt="맵">
+                  </div>
+                </template>
+              </Multiselect>
             </p>
           </div>
 
@@ -351,11 +362,11 @@ export default {
         {roomCharacter: 4, img: this.getCharacterImage(4)},
         {roomCharacter: 5, img: this.getCharacterImage(5)},
       ],
-      roomMapValue: {name: '1번', roomMap: 1},
+      roomMapValue: {roomMap: this.getMapImage(1)},
       roomMap: [
-        {name: '1번', roomMap: 1},
-        {name: '2번', roomMap: 2},
-        {name: '3번', roomMap: 3},
+        {roomMap: 1, img: this.getMapImage(1)},
+        {roomMap: 2, img: this.getMapImage(2)},
+        {roomMap: 3, img: this.getMapImage(3)},
       ],
       myInfoValue: {
         photo: null,
@@ -407,6 +418,10 @@ export default {
       const images = import.meta.glob('/src/assets/image/character/*.png');
       return new URL(`/src/assets/image/character/c${roomCharacter}.png`, import.meta.url).href;
     },
+    getMapImage(roomCharacter) {
+      const images = import.meta.glob('/src/assets/background/room_bg*');
+      return new URL(`/src/assets/background/room_bg_${roomCharacter}.jpg`, import.meta.url).href;
+    },
     alarmClick(e) {
       this.firstClick = true;
 
@@ -451,8 +466,8 @@ export default {
       }
 
       this.roomMapValue = {
-        name: this.user.roomMap + '번',
-        roomMap: this.user.roomMap
+        roomMap: this.user.roomMap,
+        img: this.getMapImage(this.user.roomMap),
       }
 
       this.myInfoShow = true;

@@ -155,7 +155,7 @@ export default {
             name: 'communityView',
           });
         } else {
-          this.utils.msgError(communityStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(communityStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);

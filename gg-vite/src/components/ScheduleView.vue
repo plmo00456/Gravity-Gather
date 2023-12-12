@@ -217,6 +217,7 @@ export default {
         const data = {
           startDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(startDate),
           endDatetime: instance.appContext.config.globalProperties.utils.dateToUnix(endDate),
+          user_seq: user.seq,
         }
         if (instance.data.category.currentTab !== 'all') {
           data.category_seq = instance.data.category.currentTab;
@@ -380,7 +381,7 @@ export default {
           this.utils.notify.success("등록되었습니다.", "등록 완료!");
           await this.getTasks();
         } else {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -414,7 +415,7 @@ export default {
           this.utils.notify.success("등록되었습니다.", "등록 완료!");
           await this.getTasks();
         } else {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -430,7 +431,7 @@ export default {
           this.utils.notify.success("수정되었습니다.", "수정 완료!");
           await this.getTasks();
         } else {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
@@ -475,7 +476,7 @@ export default {
           seqs: this.taskCategory.map(item => item.seq)
         });
         if (taskStore?.dataResponse.status !== 200) {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         console.log(error);
@@ -489,7 +490,7 @@ export default {
         if (taskStore?.dataResponse.status === 200) {
           await this.getCategories();
         } else {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         console.log(error);
@@ -508,7 +509,7 @@ export default {
           this.category.editingTmpNm = null;
           this.utils.notify.success("수정되었습니다.", "수정 완료!");
         } else {
-          this.utils.msgError(taskStore.dataResponse.data || this.utils.normalErrorMsg);
+          this.utils.msgError(taskStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
         }
       } catch (error) {
         console.log(error);
@@ -632,6 +633,20 @@ export default {
         console.log(error);
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
       });
+    },
+    importantTask() {
+      const title = this.task.rightClickEvent._def.extendedProps.oriTitle;
+      const seq = this.task.rightClickEvent._def.extendedProps.seq;
+      const taskStore = useTaskStore();
+      taskStore.importantTask({
+        seq: seq,
+        is_delete: true,
+      })
+      .then(async result => {
+        if(result){
+          await this.getTasks();
+        }
+      })
     }
 
   }
@@ -919,6 +934,12 @@ export default {
         <template #icon>
           <font-awesome-icon class="fa-md font-bold text-gray-600"
                              icon="pen-to-square"></font-awesome-icon>
+        </template>
+      </context-menu-item>
+      <context-menu-item label="중요" @click="importantTask" class="cursor-pointer">
+        <template #icon>
+          <font-awesome-icon class="fa-md font-bold text-gray-600"
+                             icon="fa-regular fa-star"></font-awesome-icon>
         </template>
       </context-menu-item>
       <context-menu-item label="삭제" @click="deleteTask" class="cursor-pointer">

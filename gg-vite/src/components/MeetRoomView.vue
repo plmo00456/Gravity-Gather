@@ -2,31 +2,31 @@
     <div id="main-room-view" class="flex justify-center bg-right-top bg-cover text-white relative"
          v-bind:style="{ backgroundImage: `url(${getImageUrl('/src/assets/background/room_bg_' + user.roomMap + '.jpg')})` }">
         <div class="left-window absolute left-[1%] flex items-center justify-start w-2/6 h-full transition-transform z-10"
-             :class="{'translate-x-[-97%]': !isLeftSlide}">
+             :class="{'translate-x-[-97%]': isLeftSlide}">
             <div class="flex-col w-full h-5/6 text-black glass">
                 <div class="w-full h-[6%] flex justify-center items-center bg-white text-xl rounded-t border border-white">할 일 목록</div>
                 <font-awesome-icon v-if='todo.isLoading' class="fa-md text-blue-500 fa-spin" icon="fa-spinner"></font-awesome-icon>
                 <div v-if="!todo.isLoading" class="items flex flex-col h-[89%] overflow-y-auto">
                     <div v-for="(item, index) in todos" :key="index">
                         <span v-if="item.date" class="text-gray-200 text-xs mt-2">{{ item.date }}</span>
-                        <div v-else class="item flex flex-col" @click.prevent.stop="toggleTodoContent($event)">
+                        <div v-else class="item flex flex-col" @click.prevent.stop="toggleTodoContent($event, item.content)">
                             <div :class="{'brightness-95': item.is_complete}"
                                 class="w-[93%] min-h-[2rem] bg-white rounded-xl mt-2 m-auto p-3 cursor-pointer">
                                 <div class="flex justify-between items-center select-none">
                                     <span class="truncate" :class="{'line-through': item.is_complete }">{{ item.title }}</span>
-                                    <span class="text-gray-400 text-sm">[{{ item.user_nickname }}]</span>
+                                    <span class="text-gray-400 text-sm">[{{ item.receive_seq ? item.receive_nickname : item.user_nickname }}]</span>
                                 </div>
                                 <div class="content flex text-start w-full mt-1 border-t p-1 break-all text-gray-600 text-sm cursor-default bg-white overflow-y-hidden"
                                      v-html="item.content"
                                      @click.stop="">
                                 </div>
-                                <div v-if="item.user_seq === user.seq || user.seq === roomInfo.ownerSeq" class="flex justify-between pt-3">
+                                <div v-if="item.user_seq === user.seq || item.receive_seq === user.seq || user.seq === roomInfo.ownerSeq" class="flex justify-between pt-3">
                                     <span @click.stop="">
                                         <ToggleSwitch @change="completeTodo(item.seq, item.is_complete)" v-model="item.is_complete" class="flex -ml-2" size="sm"></ToggleSwitch>
                                     </span>
                                     <span @click.stop="">
-                                        <font-awesome-icon class="font-bold text-xl text-gray-400 hover:text-blue-500 mr-2" icon="fa-regular fa-pen-to-square"/>
-                                        <font-awesome-icon class="font-bold text-xl text-red-300 hover:text-red-500" icon="fa-regular fa-trash-can"/>
+                                        <font-awesome-icon @click="clickUpdateTodo(item)" class="font-bold text-xl text-gray-400 hover:text-blue-500 mr-2" icon="fa-regular fa-pen-to-square"/>
+                                        <font-awesome-icon @click="deleteTodo(item.seq, item.title)" class="font-bold text-xl text-red-300 hover:text-red-500" icon="fa-regular fa-trash-can"/>
                                     </span>
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                      v-bind:class="`animation-move-astronaut${characterRandomNum1}`"
                      v-for="participant in participants" :key="participant.seq">
                     <div :id="`character-chat-${participant.seq}`"
-                         class="shadow-hard w-fit absolute bottom-[100%] hidden chat-text break-words  bg-gray-100 text-black px-3 py-1 rounded-xl mb-3 border border-gray-500">
+                         class="shadow-hard w-fit absolute bottom-[100%] hidden chat-text break-words  bg-gray-100 text-black px-3 py-1 rounded-xl mb-3 border border-gray-500 z-10">
                         <span class="w-full max-w-[30rem]"></span>
                     </div>
                     <div class="character-img">
@@ -140,7 +140,7 @@
                      v-show="rightCurrentTab === 'participant'">
                     <div v-for="participant in participants" :key="participant.seq">
                         <div
-                            @click.self="participantTabSetting.context.currentClickUser = participant; participantUserClick($event)"
+                            @click="participantTabSetting.context.currentClickUser = participant; participantUserClick($event)"
                             :class="{'cursor-pointer' : user.seq !== participant.seq}"
                             class="flex items-center justify-between py-3 border-b border-b-gray-400">
                             <div class="flex items-center">
@@ -308,7 +308,7 @@
         <PopupWindow
             class="text-black"
             :show="todo.isShow != null"
-            :title="'할 일 생성'"
+            :title="`할 일 ${todo.isShow ? todo[todo.isShow].title : ''}`"
             :widthClass="'w-[50%]'"
             :heightClass="'h-[40rem]'"
             :alignClass="'justify-start'"
@@ -316,16 +316,18 @@
             <form ref="todoForm" @submit.prevent="addTodo">
                 <div class="flex flex-col items-center p-5 w-full h-full">
                     <div class="flex w-full mb-3">
-                        <div class="flex flex-col items-start w-[70%]">
+                        <div :class="{'w-[70%]': roomInfo.ownerSeq === user.seq, 'w-full': roomInfo.ownerSeq !== user.seq}"
+                            class="flex flex-col items-start">
                             <span class="text-lg">제목<b class="text-red-500">*</b></span>
                             <input
+                                maxlength="30"
                                 v-model="todo.value.title"
                                 placeholder="제목을 입력해주세요."
                                 class="rounded text-black px-3 py-1.5 text-xl border border-gray-300 w-full "
                                 type="text">
                         </div>
-                        <div class="flex flex-col items-start w-[30%] ml-2">
-                            <span class="text-lg">할 일 제공</span>
+                        <div v-if="roomInfo.ownerSeq === user.seq" class="flex flex-col items-start w-[30%] ml-2 relative">
+                            <span class="text-lg">할 일 부여</span>
                             <Multiselect
                                 v-model="todo.receiveSeq"
                                 track-by="seq"
@@ -336,6 +338,9 @@
                                 :options="participants"
                                 @select="isSelfSelect"
                             />
+                            <button type="button" @click="todo.receiveSeq = {}" class="absolute bottom-1 right-1.5 text-red-500">
+                              <font-awesome-icon class="p-1 bg-white" icon="xmark"/>
+                            </button>
                         </div>
                     </div>
                     <p class="flex w-full h-[25rem] mb-3 rounded">
@@ -400,6 +405,7 @@ export default {
                 update: {
                     title: '수정',
                     clickFn: this.updateTodo,
+                    seq: null,
                 },
                 receiveSeq: {},
             },
@@ -723,7 +729,7 @@ export default {
             console.log(box);
             const range = {
                 x_st: 0,
-                x_ed: box.clientWidth,
+                x_ed: box.clientWidth-100,
                 y_st: 300,
                 y_ed: box.clientHeight,
             }
@@ -863,7 +869,7 @@ export default {
                 if (userStore?.dataResponse.status === 200) {
                     this.utils.notify.success("친구 추가되었습니다.", "친구추가 완료!");
                 } else {
-                    this.utils.msgError(userStore.dataResponse.data || this.utils.normalErrorMsg);
+                    this.utils.msgError(userStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
                 }
             } catch (error) {
                 console.log(error);
@@ -881,7 +887,7 @@ export default {
                 if (userStore?.dataResponse.status === 200) {
                     this.utils.notify.success("친구 삭제되었습니다.", "친구삭제 완료!");
                 } else {
-                    this.utils.msgError(userStore.dataResponse.data || this.utils.normalErrorMsg);
+                    this.utils.msgError(userStore.dataResponse.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
                 }
             } catch (error) {
                 console.log(error);
@@ -905,25 +911,28 @@ export default {
                 });
             })
         },
-        toggleTodoContent(event){
+        toggleTodoContent(event, content){
+          console.log(content);
+          if(content && content.replaceAll(' ', '') !== '<p></p>'){
             const item = event.target.closest(".item").querySelector(".content");
             if(!item.classList.contains('open')) {
-                item.classList.add('open')
-                item.style.height = "auto"
+              item.classList.add('open')
+              item.style.height = "auto"
 
-                const height = item.clientHeight + "px"
+              const height = item.clientHeight + "px"
 
-                item.style.height = "0px"
+              item.style.height = "0px"
 
-                setTimeout(() => {
-                    item.style.height = height
-                }, 0)
+              setTimeout(() => {
+                item.style.height = height
+              }, 0)
             } else {
-                item.style.height = "0px"
-                item.addEventListener('transitionend', () => {
-                    item.classList.remove('open')
-                }, {once: true})
+              item.style.height = "0px"
+              item.addEventListener('transitionend', () => {
+                item.classList.remove('open')
+              }, {once: true})
             }
+          }
         },
         isSelfSelect(selectItem){
             if(selectItem.seq === this.user.seq){
@@ -934,16 +943,28 @@ export default {
         getImageUrl(imgUrl) {
             return new URL(`${imgUrl}`, import.meta.url).href;
         },
+        cancelTodo(){
+          this.todo.receiveSeq = {};
+          this.todo.update.seq = null;
+          this.todo.isShow = null;
+          this.todo.value =  {};
+        },
         addTodo(){
+            if(!this.todo.value.title){
+              this.utils.msgError("제목을 입력해주세요.");
+              return;
+            }
             const todoStore = useTodoStore();
             todoStore.addTodo({
+                title: this.todo.value.title,
                 content: this.todo.value.content,
                 room_seq: this.roomInfo.seq,
                 receive_seq: this.todo.receiveSeq.seq,
             }).then(result => {
-                if(result)
-                    this.utils.notify.success("일정을 등록했습니다.", "등록 완료!");
-                else
+                if(result) {
+                    this.utils.notify.success("할 일을 등록했습니다.", "등록 완료!");
+                    this.cancelTodo();
+                }else
                     this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
             }).catch(() => {
                 this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
@@ -960,7 +981,63 @@ export default {
             }).catch(() => {
                 this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
             })
-        }
+        },
+        deleteTodo(seq, title){
+            this.$swal.fire({
+                title: '일정 삭제',
+                html: `<b>[${title?title:''}]</b> 할 일을 삭제 하시겠습니까?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "삭제",
+                cancelButtonText: "취소"
+            }).then(async () => {
+                const todoStore = useTodoStore();
+                todoStore.deleteTodo({
+                    seq: seq
+                }).then(result => {
+                    if(result){
+                        this.utils.notify.success("삭제 되었습니다.", "삭제 완료!");
+                    }else{
+                      this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+                    }
+                }).catch(() => {
+                  this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+                });
+            }).catch(() => {
+              this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+            });
+        },
+        clickUpdateTodo(todo){
+            this.todo.receiveSeq = {
+              seq: todo.receive_seq,
+              nickname: todo.receive_nickname,
+            }
+            this.todo.update.seq = todo.seq;
+            this.todo.value.title = todo.title;
+            this.todo.value.content = todo.content;
+            this.todo.isShow = 'update';
+        },
+        updateTodo(){
+            if(!this.todo.value.title){
+              this.utils.msgError("제목을 입력해주세요.");
+              return;
+            }
+            const todoStore = useTodoStore();
+            todoStore.updateTodo({
+              seq: this.todo.update.seq,
+              title: this.todo.value.title,
+              content: this.todo.value.content,
+              receive_seq: this.todo.receiveSeq.seq,
+            }).then(result => {
+              if(result) {
+                this.utils.notify.success("수정되었습니다.", "수정 완료!");
+                this.cancelTodo();
+              }else
+                this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+            }).catch(() => {
+              this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+            })
+        },
     },
 }
 </script>

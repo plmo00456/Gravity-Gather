@@ -256,7 +256,6 @@ export default {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
       if (data.type1 === 'room') {
         if (data.type2 === 'delete') {
           this.chatRooms = this.chatRooms.filter(room => room.id !== data.chatRoomId);
@@ -359,7 +358,7 @@ export default {
               await roomStore.enterRoom(newRoomInfo);
 
               if (roomStore.dataResponse?.status !== 200) {
-                  instance.appContext.config.globalProperties.utils.msgError(roomStore.dataResponse?.data || instance.appContext.config.globalProperties.utils.normalErrorMsg);
+                  instance.appContext.config.globalProperties.utils.msgError(roomStore.dataResponse?.data.custom ? roomStore.dataResponse?.data.message : instance.appContext.config.globalProperties.utils.normalErrorMsg);
               } else {
                   const roomInfo = roomStore.dataResponse.data;
                   await router.push({
@@ -449,7 +448,7 @@ export default {
                     this.currentPasswordRoom.fail = true;
                 })
             }else{
-                this.utils.msgError(this.dataResponse?.data || this.utils.normalErrorMsg);
+                this.utils.msgError(this.dataResponse?.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
             }
 
         } else {
