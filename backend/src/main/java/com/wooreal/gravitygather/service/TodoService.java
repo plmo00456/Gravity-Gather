@@ -86,11 +86,10 @@ public class TodoService {
     }
 
     public void updateTodoMsg(int seq){
-        System.out.println(seq);
         try{
             List<Todo> list = getTodosBySeqInRoom(seq);
             int roomSeq = 0;
-            if(list.size() == 1){
+            if(list.size() > 0){
                 roomSeq = list.get(0).getRoom_seq();
             }
             if(roomSeq != 0){

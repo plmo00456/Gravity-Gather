@@ -84,7 +84,7 @@
 
     <update id="deleteTodo">
         UPDATE todo SET
-            is_delete = #{is_delete}
+            is_delete = true
         <where>
             seq = #{seq}
         </where>

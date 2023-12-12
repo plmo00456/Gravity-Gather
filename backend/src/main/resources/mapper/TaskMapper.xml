@@ -214,4 +214,13 @@
             seq = #{seq}
     </update>
 
+    <update id="importantTask">
+        UPDATE tasks SET
+        IS_IMPORTANT = !IS_IMPORTANT
+        <where>
+        <if test="seq != null">
+            seq = #{seq}
+        </if>
+        </where>
+    </update>
 </mapper>

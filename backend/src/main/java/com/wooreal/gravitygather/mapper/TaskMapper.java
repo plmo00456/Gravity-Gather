@@ -28,4 +28,6 @@ public interface TaskMapper {
     int updateCategoryOrder(Category category);
 
     int deleteCategory(Category category);
+
+    int importantTask(Task task);
 }

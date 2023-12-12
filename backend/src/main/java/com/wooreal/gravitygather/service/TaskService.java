@@ -142,5 +142,15 @@ public class TaskService {
         taskMapper.deleteTask(task);
     }
 
+    public void importantTask(Task task){
+        Map<String, Object> map = new HashMap<>();
+        map.put("seq", task.getSeq());
+
+        getTask(map);
+
+        if(taskMapper.importantTask(task) == 0)
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "일정 중요 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    }
+
 
 }

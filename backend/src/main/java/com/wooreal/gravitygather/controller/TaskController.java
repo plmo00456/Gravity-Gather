@@ -107,4 +107,12 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @LoginRequired
+    @PostMapping("/important")
+    @Operation(summary = "일정 중요 api")
+    public ResponseEntity<?> importantTask(@RequestBody Task task) {
+        taskService.importantTask(task);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

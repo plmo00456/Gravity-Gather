@@ -128,7 +128,7 @@
                 A.created_at,
                 A.updated_at,
                 B.photo,
-                B.nickname,
+                IFNULL(B.nickname, '탈퇴유저') as nickname,
                 A.seq AS root_seq
             FROM gravitygather.comment A
                  LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
@@ -156,7 +156,7 @@
                 A.created_at,
                 A.updated_at,
                 B.photo,
-                B.nickname,
+                IFNULL(B.nickname, '탈퇴유저') as nickname,
                 CH.root_seq
             FROM gravitygather.comment A
                  LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
