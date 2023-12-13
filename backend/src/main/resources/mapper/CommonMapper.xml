@@ -30,9 +30,6 @@
             is_check = true
         WHERE
             receive_seq = #{userId}
-        <if test="alarmSeq != 0">
-            AND seq <![CDATA[<=]]> #{alarmSeq}
-        </if>
     </update>
 
     <insert id="sendAlarm">

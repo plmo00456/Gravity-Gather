@@ -21,9 +21,9 @@ public class CommonService {
         return commonMapper.getAlarm(seq);
     }
 
-    public void readAlarm(int alarmSeq){
+    public void readAlarm(){
         Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        commonMapper.readAlarm(userId, alarmSeq);
+        commonMapper.readAlarm(userId);
     }
 
     public void sendAlarm(int receive_seq, int sender_seq, String msg, String code){

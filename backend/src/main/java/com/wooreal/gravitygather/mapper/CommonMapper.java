@@ -10,7 +10,7 @@ public interface CommonMapper {
 
     List<Alarm> getAlarm(int userId);
 
-    void readAlarm(int userId, int alarmSeq);
+    void readAlarm(int userId);
 
     int sendAlarm(int receive_seq, int sender_seq, String msg, String code);
 

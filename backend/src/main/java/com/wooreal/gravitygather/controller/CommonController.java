@@ -46,8 +46,8 @@ public class CommonController {
     @LoginRequired
     @PostMapping("/alarm/read")
     @Operation(summary = "알람 읽음처리 api")
-    public ResponseEntity<?> readAlarm(@RequestBody(required = false) Alarm alarm) {
-        commonService.readAlarm(alarm.getSeq() == null ? 0 : alarm.getSeq());
+    public ResponseEntity<?> readAlarm() {
+        commonService.readAlarm();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

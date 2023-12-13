@@ -242,7 +242,7 @@
                                                 @click="deleteRoom">
                                           <font-awesome-icon class="text-xl mr-2"
                                                              icon="fa-solid fa-trash-can"></font-awesome-icon>
-                                          미팅 방 삭제하기
+                                          미팅 룸 삭제하기
                                         </button>
                                         <button type="button" v-else
                                               class="flex items-center px-5 py-2 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
@@ -715,7 +715,7 @@ export default {
                 roomId: roomInfo.seq,
                 senderSeq: user.seq,
                 receiveSeq: friend.friend_seq,
-                content: user.nickname + '님이 "' + roomInfo.title + '" 미팅 방에 초대하였습니다.',
+                content: user.nickname + '님이 "' + roomInfo.title + '" 미팅 룸에 초대하였습니다.',
             }
             socket.send(JSON.stringify(msg));
             setTimeout(() => {
@@ -767,7 +767,7 @@ export default {
     methods: {
         deleteRoom() {
             this.$swal.fire({
-                title: "미팅 방을 삭제하시겠습니까?",
+                title: "미팅 룸을 삭제하시겠습니까?",
                 showCancelButton: true,
                 confirmButtonText: "확인",
                 cancelButtonText: "취소",
@@ -778,7 +778,7 @@ export default {
                     try {
                         await roomStore.deleteRoom(this.roomInfo.seq);
                         if (roomStore?.dataResponse.status === 200) {
-                            this.utils.notify.success("미팅 방이 삭제되었습니다.", "삭제 완료!");
+                            this.utils.notify.success("미팅 룸이 삭제되었습니다.", "삭제 완료!");
                             this.$router.push({
                                 name: 'MainView',
                             });

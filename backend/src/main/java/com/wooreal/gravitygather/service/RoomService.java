@@ -64,7 +64,7 @@ public class RoomService {
         roomMapper.createRoom(roomRequest);
         int seq = roomRequest.getSeq();
         if(seq == 0) {
-            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 룸 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
         roomRequest.setUserSeq(ownerSeq);
         inTheRoom(roomRequest);
@@ -74,7 +74,7 @@ public class RoomService {
             webSocketHandler.createRoomMsg(seq);
         }catch (Exception e){
             e.printStackTrace();
-            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 룸 생성 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
         return new RoomResponse(getRoomBySeq(seq));
     }
@@ -96,7 +96,7 @@ public class RoomService {
         }
         int result = roomMapper.deleteRoom(roomId);
         if(result == 0){
-            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 룸 삭제 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
         RoomRequest roomRequest = new RoomRequest();
         roomRequest.setSeq(roomId);
@@ -125,11 +125,11 @@ public class RoomService {
 
     public Room canEnterRoom(RoomRequest roomRequest){
         if(roomRequest == null || roomRequest.getSeq() == null || roomRequest.getSeq() == 0){
-            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 룸 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
         Room currentRoom = getRoomBySeq(roomRequest.getSeq());
         if(currentRoom == null || currentRoom.getSeq() == null || currentRoom.getSeq() == 0){
-            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 방 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "미팅 룸 입장 중 오류가 발생했습니다. 관리자에게 문의해 주세요.");
         }
 
         if(currentRoom.getCurrent_participant().equals(currentRoom.getMax_participant())){
@@ -190,6 +190,9 @@ public class RoomService {
         Integer userSeq = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(room.getOwner_seq().equals(userSeq)){
             User kickUser = userService.getUserBySeq(roomRequest.getUserSeq());
+            if(kickUser == null){
+                throw new BusinessLogicException(HttpStatus.valueOf(500), "추방 할 상대가 없습니다.");
+            }
             outTheRoom(roomRequest);
             JsonObject jo = new JsonObject();
             String type1 = "room";
@@ -206,6 +209,8 @@ public class RoomService {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }else{
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
         }
     }
 

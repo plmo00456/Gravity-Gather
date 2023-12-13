@@ -9,6 +9,7 @@ import com.wooreal.gravitygather.dto.room.Room;
 import com.wooreal.gravitygather.dto.team.Todo;
 import com.wooreal.gravitygather.dto.user.User;
 import com.wooreal.gravitygather.dto.user.UserResponse;
+import com.wooreal.gravitygather.exception.BusinessLogicException;
 import com.wooreal.gravitygather.mapper.CommonMapper;
 import com.wooreal.gravitygather.mapper.RoomMapper;
 import com.wooreal.gravitygather.mapper.TodoMapper;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,7 @@ public class TodoService {
         if(user != null && user.getSeq() == userSeq)
             return todoMapper.getTodos(room_seq);
         else
-            return new ArrayList<>();
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "권한이 없습니다.");
     }
 
     // seq에 해당하는 방 안에 todo

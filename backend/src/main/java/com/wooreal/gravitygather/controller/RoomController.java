@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@OpenAPIDefinition(info = @Info(title = "Room Controller", version = "v1", description = "미팅 방 컴트롤러"))
+@OpenAPIDefinition(info = @Info(title = "Room Controller", version = "v1", description = "미팅 룸 컴트롤러"))
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/v1/room")
@@ -33,7 +33,7 @@ public class RoomController {
     }
 
     @PostMapping("/get")
-    @Operation(summary = "미팅 방 점보 조회", description = "모든 미팅 방 을 조회합니다.")
+    @Operation(summary = "미팅 룸 점보 조회", description = "모든 미팅 방 을 조회합니다.")
     public ResponseEntity<?> getRoom() {
         List<Room> rooms = roomService.getRooms();
         List<RoomResponse> roomResponses = rooms.stream()

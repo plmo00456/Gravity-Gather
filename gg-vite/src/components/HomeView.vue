@@ -270,7 +270,7 @@ export default {
 
             if(data.receiveSeq == user.seq){
                 instance.appContext.config.globalProperties.$swal.fire({
-                    title: "미팅방 초대",
+                    title: "미팅룸 초대",
                     text: data.content,
                     timer: data.timer,
                     timerProgressBar: true,
@@ -411,7 +411,7 @@ export default {
           roomStore.createRoom(roomInfo)
           .then(result => {
             console.log(result);
-            this.utils.notify.success("미팅 방이 생성되었습니다.", "생성 완료!");
+            this.utils.notify.success("미팅 룸이 생성되었습니다.", "생성 완료!");
             this.$router.push({
               name: 'room',
               state: {roomInfo: JSON.stringify(result)},

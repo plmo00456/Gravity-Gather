@@ -341,7 +341,7 @@ export default {
       html.classList.toggle("dark");
 
       this.$swal.fire({
-        title: "미팅방 초대",
+        title: "미팅룸 초대",
         text: '테스트',
         timer: 10000,
         timerProgressBar: true,

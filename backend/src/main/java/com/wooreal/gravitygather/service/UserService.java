@@ -137,6 +137,9 @@ public class UserService {
 
     public UserResponse getPublicUserInfo(int seq) {
         User ur = getUserBySeq(seq);
+        if(ur == null || ur.getStatus().equals("DELETED")){
+            throw new BusinessLogicException(HttpStatus.valueOf(500), "존재하지 않는 사용자입니다.");
+        }
         UserResponse result = new UserResponse();
 
         result.setSeq(ur.getSeq());
