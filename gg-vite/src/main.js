@@ -19,6 +19,7 @@ import 'dayjs/locale/ko'
 import langKR from 'element-plus/dist/locale/ko'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import 'vue-multiselect/dist/vue-multiselect.css';
 
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'

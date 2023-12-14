@@ -58,17 +58,20 @@ export const useTaskStore = defineStore({
                         task.oriContent = task.content;
                         task.oriTitle = task.title;
                         let content = '';
-                        let categotyNM = (data.category_seq == null || data.category_seq === 'important' || data.category_seq === 'share') && task.category_nm ? ' [' + task.category_nm + ']' : '';
+                        let categotyNM = (data.category_seq == null || data.category_seq === 'important' || data.category_seq === 'share') && task.category_nm ? `<span class="font-bold text-blue-500">[ ${task.category_nm} ]</span><br>` : '';
                         if(task.content != null && task.content !== '' && task.content !== '<p></p>'){
-                            content += '<div class="font-bold">' + task.title + categotyNM + '</div>'
+                            content += categotyNM + '<div class="font-bold">' + task.title + '</div>'
                             content += '<div>' + task.content + '</div>'
+                        }else{
+                            content += categotyNM + '<div class="font-bold">' + task.title + '</div>'
                         }
                         const tmp = task.title;
-
+                        console.log(task.user_seq);
+                        console.log(data.user_seq);
                         if(task.user_seq !== data.user_seq){
                             task.startEditable = false;
                             task.is_share = true;
-                            task.title = '<div class="flex items-center px-0.5"><div class="flex justify-center items-center rounded-full mr-0.5 bg-white w-[1rem] h-[1rem]"><img class="w-[0.6rem] h-[0.6rem]" src="' + getImageUrl('/src/assets/image/share-icon.png') + '" alt="공유 아이콘"></div>' + tmp + "</div>";
+                            task.title = '<div class="flex items-center px-0.5 truncate"><div class="flex justify-center items-center rounded-full mr-0.5 bg-white w-[1rem] h-[1rem]"><img class="w-[0.6rem] h-[0.6rem]" src="' + getImageUrl('/src/assets/image/share-icon.png') + '" alt="공유 아이콘"></div>' + tmp + "</div>";
                             if(task.content){
                                 content += '<div class="my-2 border-b border-gray-300"></div>'
                             }
@@ -77,7 +80,7 @@ export const useTaskStore = defineStore({
                             if(task.caption)
                                 content += '<div class="text-gray-500 text-xs">' + task.caption + '</div>'
                         }else{
-                            task.title = '<div class="flex items-center px-0.5">' + tmp + '</div>';
+                            task.title = '<div class="flex items-center px-0.5"><span class="title-span">' + tmp + '</span></div>';
                         }
                         task.content = content;
                         task.allDay = true;
@@ -87,7 +90,6 @@ export const useTaskStore = defineStore({
                        }else{
                            let endDate = new Date(formatDate(task.end_date_time, "%Y-%m-%d %H:%M"));
                            endDate.setDate(endDate.getDate() + 1);
-                           console.log(endDate);
                            task.start = formatDate(task.start_date_time, "%Y-%m-%d %H:%M");
                            task.end = endDate;
                            task.oriEnd = task.end_date_time;

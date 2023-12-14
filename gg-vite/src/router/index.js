@@ -1,16 +1,16 @@
 import {createRouter, createWebHistory} from "vue-router";
 import homeView from "@/components/HomeView.vue";
-import userLogin from "@/components/UserLogin.vue";
-import userEmailVerify from "@/components/UserEmailVerify.vue";
+import userLogin from "@/components/user/UserLogin.vue";
+import userEmailVerify from "@/components/user/UserEmailVerify.vue";
 import {useUserStore} from "@/stores/user";
-import meetRoomView from "@/components/MeetRoomView.vue";
+import meetRoomView from "@/components/article/MeetRoomView.vue";
 import {useCommonStore} from "@/stores/common";
-import writeView from "@/components/WriteView.vue";
-import scheduleView from "@/components/ScheduleView.vue";
-import communityView from "@/components/CommunityView.vue";
-import writeViewer from "@/components/WriteViewer.vue";
-import userRegister from "@/components/UserRegister.vue";
-import scrapedView from "@/components/ScrapedView.vue";
+import writeView from "@/components/article/WriteView.vue";
+import scheduleView from "@/components/task/ScheduleView.vue";
+import communityView from "@/components/article/CommunityView.vue";
+import writeViewer from "@/components/article/WriteViewer.vue";
+import userRegister from "@/components/user/UserRegister.vue";
+import scrapedView from "@/components/common/ScrapedView.vue";
 import {useRoomStore} from "@/stores/room";
 
 const routes = [

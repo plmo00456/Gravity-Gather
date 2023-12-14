@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NavView from "@/components/NavView.vue";
+import NavView from "@/components/common/NavView.vue";
 
 export default {
   name: 'App',

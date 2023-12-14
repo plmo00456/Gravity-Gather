@@ -183,9 +183,9 @@
 import {useUserStore} from "@/stores/user";
 import {useRoomStore} from "@/stores/room";
 import {onBeforeUnmount, getCurrentInstance, ref, watch, computed, onMounted, watchEffect, nextTick} from "vue";
-import slideWindow from "@/components/SlideWindow.vue";
+import slideWindow from "@/components/common/SlideWindow.vue";
 import Multiselect from 'vue-multiselect'
-import ToggleSwitch from "@/components/ToggleSwitch.vue";
+import ToggleSwitch from "@/components/common/ToggleSwitch.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {router} from "@/router";
 
@@ -532,5 +532,3 @@ export default {
   max-width: 9rem;
 }
 </style>
-
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
