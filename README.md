@@ -3,7 +3,7 @@
 ![끌림](https://github.com/plmo00456/Gravity-Gather/blob/main/gg-vite/src/assets/image/logo.png?raw=true)
 
 ## 목차 (Table Of Content)
-0. [🗓프로젝트 진행 기간](#프로젝트-진행-기간)
+0. [프로젝트 진행 기간](#프로젝트-진행-기간)
 1. [서비스 기획 배경](#서비스-기획-배경)
 2. [서비스 개요](#서비스-개요)
 3. [서비스 화면](#서비스-화면)
