@@ -67,6 +67,22 @@ public class JwtRequestFilter implements HandlerInterceptor {
             }
 
             return true;
+        }else{
+            final String requestTokenHeader = request.getHeader("Authorization");
+            try {
+                String jwtToken;
+                jwtToken = requestTokenHeader.substring(7);
+                int seq = jwtTokenUtil.getUserSeqFromToken(jwtToken);
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                    seq, null, new ArrayList<>());
+                usernamePasswordAuthenticationToken
+                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext()
+                    .setAuthentication(usernamePasswordAuthenticationToken);
+            } catch (Exception e){
+                e.printStackTrace();
+                return true;
+            }
         }
 
 

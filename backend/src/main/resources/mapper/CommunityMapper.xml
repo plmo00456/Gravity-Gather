@@ -112,6 +112,35 @@
             seq = #{seq}
     </update>
 
+    <select id="getComment">
+        SELECT
+        A.seq,
+        A.article_seq,
+        A.parent_comment_seq,
+        A.content,
+        A.user_seq,
+        IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+        <if test="user_seq != null">
+            (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+        </if>
+        A.is_delete,
+        A.created_at,
+        A.updated_at,
+        B.photo,
+        IFNULL(B.nickname, '탈퇴유저') as nickname,
+        A.seq AS root_seq
+        FROM gravitygather.comment A
+        LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
+        <where>
+            <if test="seq != null">
+                AND A.seq = #{seq}
+            </if>
+            <if test="article_seq != null">
+                AND A.article_seq = #{article_seq}
+            </if>
+        </where>
+    </select>
+
     <select id="getComments">
         WITH RECURSIVE comment_hierarchy AS (
             SELECT

@@ -28,7 +28,8 @@ public class CommonService {
 
     public void sendAlarm(int receive_seq, int sender_seq, String msg, String code){
         try{
-            commonMapper.sendAlarm(receive_seq, sender_seq, msg, code);
+            if(receive_seq != sender_seq)
+                commonMapper.sendAlarm(receive_seq, sender_seq, msg, code);
         }catch (Exception e){}
     }
 

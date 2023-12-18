@@ -92,14 +92,14 @@ public class CommunityService {
     }
 
     public Comment getComment(int seq){
-        Comment comment = new Comment();
-        comment.setSeq(seq);
+        Comment tmp = new Comment();
+        tmp.setSeq(seq);
 
-        List<Comment> comments = getComments(comment);
-        if(comments == null || comments.size() == 0)
+        Comment comment = communityMapper.getComment(tmp);
+        if(comment == null)
             throw new BusinessLogicException(HttpStatus.valueOf(500), "존재하지 않는 댓글 입니다.");
 
-        return comments.get(0);
+        return comment;
     }
 
     public List<Like> getLikes(Like like){
@@ -117,14 +117,11 @@ public class CommunityService {
 
         if(like.getMode().equals("article")){
             Article article = getArticle(like.getContent_seq());
-            if(article.getUser_seq().equals(like.getUser_seq()+"")) return;
             commonService.sendAlarm(Integer.parseInt(article.getUser_seq()), like.getUser_seq(), userInfo.getNickname() + "님께서 \"" + article.getTitle() + "\"게시글에 좋아요를 눌렀습니다.", "01");
         }else if(like.getMode().equals("comment")){
             Comment comment = getComment(like.getContent_seq());
-            if(comment.getUser_seq().equals(like.getUser_seq()+"")) return ;
             commonService.sendAlarm(Integer.parseInt(comment.getUser_seq()), like.getUser_seq(), userInfo.getNickname() + "님께서 댓글에 좋아요를 눌렀습니다.", "02");
         }
-
         communityMapper.addLike(like);
     }
 
@@ -152,6 +149,7 @@ public class CommunityService {
 
         like.setMode("comment");
         Like tmp = getLike(like);
+
         if(tmp != null){
             deleteLike(like);
             if(tmp.getIs_up() != like.getIs_up()){

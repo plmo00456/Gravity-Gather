@@ -24,6 +24,8 @@ public interface CommunityMapper {
 
     List<Comment> getComments(Comment comment);
 
+    Comment getComment(Comment comment);
+
     int addComment(Comment comment);
 
     int updateArticle(Article article);
