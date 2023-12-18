@@ -184,22 +184,22 @@ async function init(){
             option.title = title;
         }
         await Eggy(option)
-        .then(() => {
-            // .closest(".eggy.top").style.zIndex = 99999;
+        .then((el) => {
+            el.closest(".eggy").style.zIndex = 99999;
         });
     }
     app.config.globalProperties.utils.notify.error = async (message, title) => {
         const option = {
             message: message,
             type: 'error',
-            position: 'bottom-left',
+            position: 'top-left',
         };
         if(title){
             option.title = title;
         }
         await Eggy(option)
-        .then(() => {
-            // .closest(".eggy.top").style.zIndex = 99999;
+        .then((el) => {
+            el.closest(".eggy").style.zIndex = 99999;
         });
     }
 

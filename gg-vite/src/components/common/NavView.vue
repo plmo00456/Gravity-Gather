@@ -344,6 +344,9 @@ export default {
         alarmContextOption: {
           zIndex: 10,
           minWidth: 400,
+          mouseScroll: false,
+          closeWhenScroll: false,
+          updownButtonSpaceholder: true,
         },
         isProfileClick: false,
         profileContextOption: {

@@ -192,7 +192,7 @@ export default {
                 return;
             }
             if(this.setting.emailDuplIsShow){
-                this.utils.msgError("중복된 이메일 입니다.");
+                this.utils.msgError(this.setting.emailDuplIsShow);
                 return;
             }
 
@@ -200,21 +200,25 @@ export default {
                 this.utils.msgError("아이디를 입력하세요.");
                 return;
             }
-            if(!this.value.nickname){
-                this.utils.msgError("닉네임을 입력하세요.");
-                return;
-            }
-            if(!this.value.name){
-                this.utils.msgError("이름을 입력하세요.");
+            if(this.setting.idDuplIsShow){
+                this.utils.msgError(this.setting.idDuplIsShow)
                 return;
             }
             if(!this.value.password || !this.value.passwordVali){
-                this.utils.msgError("비밀번호를 입력하세요.");
-                return;
+              this.utils.msgError("비밀번호를 입력하세요.");
+              return;
             }
 
             if(!this.setting.passwordOne || !this.setting.passwordTwo || !this.setting.passwordValiOne){
-                this.utils.msgError("비밀번호 형식을 확인하세요.");
+              this.utils.msgError("비밀번호 형식을 확인하세요.");
+              return;
+            }
+            if(!this.value.name){
+              this.utils.msgError("이름을 입력하세요.");
+              return;
+            }
+            if(!this.value.nickname){
+                this.utils.msgError("닉네임을 입력하세요.");
                 return;
             }
 

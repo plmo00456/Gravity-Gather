@@ -52,26 +52,30 @@
                 {{ roomInfo.title }}
             </div>
             <div id="main-window" class="main-window w-5/6 relative">
+
                 <div v-bind:style="{'left': `${participant.x}px`, 'bottom' : `${participant.y}px`}"
                      class="character select-none  absolute flex flex-col justify-center items-center w-[30rem]"
                      v-bind:class="`animation-move-astronaut${characterRandomNum1}`"
                      v-for="participant in participants" :key="participant.seq">
-                    <div :id="`character-chat-${participant.seq}`"
-                         class="shadow-hard w-fit absolute bottom-[100%] hidden chat-text break-words  bg-gray-100 text-black px-3 py-1 rounded-xl mb-3 border border-gray-500 z-10">
-                        <span class="w-full max-w-[30rem]"></span>
-                    </div>
-                    <div class="character-img">
-                        <img class="w-36"
-                             v-bind:class="`animation-rotate-astronaut${characterRandomNum2}`"
-                             :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
-                    </div>
-                    <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-3 text-sm">
-                        <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
-                                           icon="fa-solid fa-crown"/>
-                        {{ participant.nickname }}
-                        <b :id="`character-nickname-${participant.seq}`" v-if="participant.status === 'leave'" class="text-red-500"> [자리비움]</b>
-                    </span>
+                    <VueDragResize :isResizable="false" :w="180" :h="150">
+                        <div :id="`character-chat-${participant.seq}`"
+                             class="shadow-hard w-fit absolute bottom-[100%] hidden chat-text break-words  bg-gray-100 text-black px-3 py-1 rounded-xl mb-3 border border-gray-500 z-10">
+                            <span class="w-full max-w-[30rem]"></span>
+                        </div>
+                        <div class="character-img cursor-grab active:cursor-grabbing w-36">
+                            <img class="w-36"
+                                 v-bind:class="`animation-rotate-astronaut${characterRandomNum2}`"
+                                 :src="getCharacterImage(participant.roomCharacter)" alt="캐릭터">
+                        </div>
+                        <span class="rounded-3xl bg-gray-800 bg-opacity-60 px-3 py-0.5 mt-3 text-sm">
+                            <font-awesome-icon v-if="roomInfo.ownerSeq === participant.seq" class=" text-yellow-300 mr-1"
+                                               icon="fa-solid fa-crown"/>
+                            {{ participant.nickname }}
+                            <b :id="`character-nickname-${participant.seq}`" v-show="participant.status === 'leave'" class="text-red-500"> [자리비움]</b>
+                        </span>
+                    </VueDragResize>
                 </div>
+
             </div>
         </div>
         <div class="right-window absolute right-5 flex items-center justify-end w-2/5 h-full transition-transform"
@@ -123,8 +127,13 @@
                     </template>
                     <form @submit.prevent="chatSend">
                         <div class="absolute w-full left-0 bottom-12">
+                            <font-awesome-icon
+                                @click="isChatEmoji = !isChatEmoji"
+                                class="absolute text-lg select-none left-[3rem] bottom-2.5 text-gray-500 cursor-pointer hover:text-blue-400 active:text-blue-500"
+                                icon="fa-regular fa-face-smile"/>
+                            <EmojiPicker class="absolute left-2 bottom-10" v-if="isChatEmoji" :native="true" @select="onSelectEmoji"/>
                             <input type="text" v-model.trim="chatMsg"
-                                   class="w-5/6 py-2 pl-3 pr-9 text-black rounded-3xl" maxlength="500"
+                                   class="w-5/6 py-2 pl-8 pr-9 text-black rounded-3xl" maxlength="500"
                                    placeholder="채팅을 입력하세요.">
                             <font-awesome-icon
                                 class="absolute select-none right-[4rem] bottom-3 text-blue-300 cursor-pointer hover:text-blue-400 active:text-blue-500"
@@ -170,7 +179,7 @@
                             <button v-else-if="roomInfo.ownerSeq === user.seq"
                                     type="button"
                                     class="flex items-center px-3 py-1 bg-red-500 rounded text-sm hover:bg-red-400 ml-2"
-                                    @click="kick(participant.seq)">
+                                    @click.stop="kick(participant.seq, participant.nickname)">
                                 <font-awesome-icon class="text-sm mr-2" icon="arrow-right-from-bracket"/>
                                 추방하기
                             </button>
@@ -380,13 +389,13 @@ import writeEditor from "@/components/article/WriteEditor.vue";
 import PopupWindow from "@/components/common/PopupWindow.vue";
 import Multiselect from "vue-multiselect";
 import {useTodoStore} from "@/stores/todo.js";
+import EmojiPicker from "vue3-emoji-picker";
+import VueDragResize from 'vue-drag-resize/src/components/vue-drag-resize.vue';
 
 export default {
     name: "MeetRoomView",
     components: {
-        Multiselect,
-        PopupWindow,
-        writeEditor,
+        VueDragResize, EmojiPicker, Multiselect, PopupWindow, writeEditor,
         ToggleSwitch, FontAwesomeIcon, ContextMenuSeparator, ContextMenuItem, ContextMenu},
     data() {
         return {
@@ -411,6 +420,7 @@ export default {
             },
             isRightSlide: true,
             rightCurrentTab: 'chat',
+            isChatEmoji: false,
             chatMsg: '',
             characterRandomNum1: 1,
             characterRandomNum2: 1,
@@ -466,7 +476,6 @@ export default {
                     });
 
                     const sortArr = roomStore.currentRoomParticipants;
-                    console.log(sortArr);
                     sortArr.forEach(data => {
                         if (participants.value.every(participant => participant.seq !== data.seq)) {
                             const xy = randomCharacterLocation();
@@ -510,7 +519,6 @@ export default {
         }
 
         const getTodos = async () => {
-            console.log("실행");
             instance.data.isLoading = true;
             todoStore.getTodos(roomInfo.seq)
             .then(data => {
@@ -578,27 +586,22 @@ export default {
                     }
                     if (data.type2 === 'enter' || data.type2 === 'leave' || data.type2 === 'out') {
                         const seq = "seq" + data.senderSeq;
-                        const nickElement = document.querySelector("#character-nickname-" + data.senderSeq);
-                        const participantElement = document.querySelector("#participant-nickname-" + data.senderSeq);
                         if (data.type2 === 'leave') {
-                            if(nickElement)
-                                nickElement.innerText = " [자리비움]";
-                            if(participantElement) {
-                                participantElement.classList.add("text-red-500");
-                                participantElement.classList.remove("text-green-500");
-                                participantElement.innerHTML = " [자리비움]";
-                            }
+                            participants.value.forEach(participant => {
+                                if(data.senderSeq == participant.seq){
+                                    participant.status = data.type2;
+                                }
+                            })
                         } else if(data.type2 === 'out'){
                             participants.value = participants.value.filter(participant => participant.seq != data.senderSeq);
                             delete (participantsCharacter[seq]);
-                        } else {
-                            if(participantElement) {
-                                participantElement.classList.remove("text-red-500");
-                                participantElement.classList.add("text-green-500");
-                                participantElement.innerHTML = " [접속중]";
-                            }
-                            if(nickElement)
-                                nickElement.innerText = "";
+                        } else if(data.type2 === 'enter'){
+                            participants.value.forEach(participant => {
+                              if(data.senderSeq == participant.seq){
+                                participant.status = data.type2;
+                              }
+                            })
+
                             const chatElement = document.querySelector("#character-chat-" + data.senderSeq);
                             participantsCharacter[seq] = {
                                 text: data.content,
@@ -646,6 +649,7 @@ export default {
                         router.push({
                             name: 'MainView',
                         });
+                        instance.appContext.config.globalProperties.utils.msg(`[${roomInfo.title}] 방에서 추방 당하였습니다.`);
                     }else{
                         getRoomParticipants();
                         instance.appContext.config.globalProperties.utils.notify.success(`${data.receiveNickname}님이 추방 당하였습니다.`, '추방 안내');
@@ -726,7 +730,6 @@ export default {
         const randomCharacterLocation = () => {
             const minus = 200;
             const box = mainWindowElement.value;
-            console.log(box);
             const range = {
                 x_st: 0,
                 x_ed: box.clientWidth-100,
@@ -797,6 +800,7 @@ export default {
             if (this.chatMsg !== '') {
                 this.chatSocketSend('chat', this.chatMsg);
                 this.chatMsg = '';
+                this.isChatEmoji = false;
             }
         },
         participantTab() {
@@ -809,12 +813,10 @@ export default {
             await userStore.getFriends();
             this.friend.list = userStore.friendList;
 
-            console.log(this.friend.list);
             this.friend.list.forEach(fr => {
                 const containsKeyValuePair = this.participants.some(
                         obj => obj['seq'] === fr.friend_seq
                 );
-                console.log(containsKeyValuePair);
                 if(containsKeyValuePair) fr.isCurrentRoom = true;
             })
         },
@@ -894,12 +896,23 @@ export default {
                 this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
             }
         },
-        kick(userSeq){
-            const roomStore = useRoomStore();
-            roomStore.kick({
-                userSeq: userSeq,
-                seq: this.roomInfo.seq
-            })
+        kick(userSeq, nickname){
+            this.$swal.fire({
+              title: '추방하기',
+              html: `<b>[${nickname?nickname:''}]</b>님을 추방 하시겠습니까?`,
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "삭제",
+              cancelButtonText: "취소"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const roomStore = useRoomStore();
+                  roomStore.kick({
+                    userSeq: userSeq,
+                    seq: this.roomInfo.seq
+                  })
+                }
+            });
         },
         async outRoom(){
             const roomStore = useRoomStore();
@@ -912,7 +925,6 @@ export default {
             })
         },
         toggleTodoContent(event, content){
-          console.log(content);
           if(content && content.replaceAll(' ', '') !== '<p></p>'){
             const item = event.target.closest(".item").querySelector(".content");
             if(!item.classList.contains('open')) {
@@ -984,25 +996,27 @@ export default {
         },
         deleteTodo(seq, title){
             this.$swal.fire({
-                title: '일정 삭제',
+                title: '할일 삭제',
                 html: `<b>[${title?title:''}]</b> 할 일을 삭제 하시겠습니까?`,
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "삭제",
                 cancelButtonText: "취소"
-            }).then(async () => {
-                const todoStore = useTodoStore();
-                todoStore.deleteTodo({
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const todoStore = useTodoStore();
+                  todoStore.deleteTodo({
                     seq: seq
-                }).then(result => {
+                  }).then(result => {
                     if(result){
-                        this.utils.notify.success("삭제 되었습니다.", "삭제 완료!");
+                      this.utils.notify.success("삭제 되었습니다.", "삭제 완료!");
                     }else{
                       this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
                     }
-                }).catch(() => {
-                  this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
-                });
+                  }).catch(() => {
+                    this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
+                  });
+                }
             }).catch(() => {
               this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
             });
@@ -1037,6 +1051,9 @@ export default {
             }).catch(() => {
               this.utils.notify.error(this.utils.normalErrorMsg, "오류!");
             })
+        },
+        onSelectEmoji(emoji){
+            this.chatMsg += emoji.i;
         },
     },
 }

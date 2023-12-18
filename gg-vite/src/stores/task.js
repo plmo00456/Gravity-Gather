@@ -66,8 +66,6 @@ export const useTaskStore = defineStore({
                             content += categotyNM + '<div class="font-bold">' + task.title + '</div>'
                         }
                         const tmp = task.title;
-                        console.log(task.user_seq);
-                        console.log(data.user_seq);
                         if(task.user_seq !== data.user_seq){
                             task.startEditable = false;
                             task.is_share = true;

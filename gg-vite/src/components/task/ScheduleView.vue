@@ -138,7 +138,6 @@ export default {
 
         }.bind(this),
         eventDrop: function (info) {
-          console.log(info);
           const oriStart = info.event._def.extendedProps.start_date_time;
           const oriEnd = info.event._def.extendedProps.end_date_time;
           const start = new Date(info.event.start.toISOString());
@@ -353,7 +352,9 @@ export default {
     },
     handleDatePicker() {
       let calendarApi = this.$refs.fullCalendar.getApi()
-      calendarApi.gotoDate(this.mainDatePicker.date);
+      let date = this.mainDatePicker.date;
+      date.setMonth(date.getMonth() + 1);
+      calendarApi.gotoDate(date);
 
       this.getTasks();
     },

@@ -42,10 +42,10 @@ api.interceptors.response.use((response) => {
       confirmButtonColor: '#3c82f6',
       text: '로그인이 만료되었습니다.',
     };
-    Swal.fire(option);
+    await Swal.fire(option);
     const userStore = useUserStore();
     await userStore.logout();
-    router.push('/user/login');
+    await router.push('/user/login');
   }
   return Promise.reject(error);
 });

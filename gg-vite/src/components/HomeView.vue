@@ -299,7 +299,7 @@ export default {
     };
 
     socket.onclose = () => {
-      console.log('웹소켓 연결 종료');
+      // console.log('웹소켓 연결 종료');
     };
 
     const toggleState = ref(false);
@@ -344,7 +344,6 @@ export default {
     });
 
     onMounted(() => {
-      console.log(document.querySelectorAll(".tooltip"));
       instance.appContext.config.globalProperties.utils.tooltips('tooltip');
     });
 
@@ -354,7 +353,6 @@ export default {
               const newRoomInfo = Object.assign({}, roomInfo);
               newRoomInfo.user_seq = user.seq;
 
-              console.log(newRoomInfo);
               await roomStore.enterRoom(newRoomInfo);
 
               if (roomStore.dataResponse?.status !== 200) {
@@ -410,7 +408,6 @@ export default {
           }
           roomStore.createRoom(roomInfo)
           .then(result => {
-            console.log(result);
             this.utils.notify.success("미팅 룸이 생성되었습니다.", "생성 완료!");
             this.$router.push({
               name: 'room',
