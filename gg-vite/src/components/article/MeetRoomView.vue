@@ -1,6 +1,6 @@
 <template>
     <div id="main-room-view" class="flex justify-center bg-right-top bg-cover text-white relative"
-         v-bind:style="{ backgroundImage: `url(${getImageUrl('/src/assets/background/room_bg_' + user.roomMap + '.jpg')})` }">
+         v-bind:style="{ backgroundImage: `url(${getImageUrl(user.roomMap)})` }">
         <div class="left-window absolute left-[1%] flex items-center justify-start w-[30rem] h-full transition-transform z-10"
              :class="{'translate-x-[-97%]': isLeftSlide}">
             <div class="flex-col w-full h-5/6 text-black glass">
@@ -451,7 +451,7 @@ export default {
         const todoStore = useTodoStore();
         const user = userStore.userInfo;
         const roomInfo = JSON.parse(history.state.roomInfo);
-        const socket = new WebSocket('ws://' + import.meta.env.VITE_SERVER_IP + ':8080/gg');
+        const socket = new WebSocket('ws://' + import.meta.env.VITE_SERVER_IP + ':' + import.meta.env.VITE_PORT + '/gg');
         const instance = getCurrentInstance();
         let chats = ref([]);
         let participants = ref([]);
@@ -831,6 +831,7 @@ export default {
         },
         getCharacterImage(roomCharacter) {
             const images = import.meta.glob('/src/assets/image/character/*.png');
+            console.log(new URL(`/src/assets/image/character/c${roomCharacter}.png`, import.meta.url).href);
             return new URL(`/src/assets/image/character/c${roomCharacter}.png`, import.meta.url).href;
         },
         randomNumber: function (st, ed) {
@@ -953,7 +954,8 @@ export default {
             }
         },
         getImageUrl(imgUrl) {
-            return new URL(`${imgUrl}`, import.meta.url).href;
+            const images = import.meta.glob('/src/assets/background/*.jpg');
+            return new URL(`/src/assets/background/room_bg_${imgUrl}.jpg`, import.meta.url).href;
         },
         cancelTodo(){
           this.todo.receiveSeq = {};

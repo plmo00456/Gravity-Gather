@@ -548,19 +548,22 @@ export default {
             formData.append("roomCharacter", this.roomCharacterValue.roomCharacter);
             formData.append("roomMap", this.roomMapValue.roomMap);
 
-            await userStore.userInfoUpdate(formData);
-            if (userStore?.dataResponse.status === 200) {
-              await userStore.userInfoStateUpdate();
-              this.utils.notify.success("내 정보가 변경되었습니다.", "변경 완료!");
-              this.myInfoShow = false;
-            } else {
-              this.utils.msgError(this.dataResponse.data.custom ? this.dataResponse.data.message : this.utils.normalErrorMsg);
-            }
+            await userStore.userInfoUpdate(formData)
+            .then(updateResult => {
+              if (userStore?.dataResponse.status === 200) {
+                userStore.userInfoStateUpdate();
+                this.utils.notify.success("내 정보가 변경되었습니다.", "변경 완료!");
+                this.myInfoShow = false;
+              } else {
+                this.utils.msgError(updateResult.custom ? updateResult.message : this.utils.normalErrorMsg);
+              }
+            })
           } catch (error) {
-            this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
+            this.utils.msgError(updateResult.custom ? updateResult.message : this.utils.normalErrorMsg);
           }
         }
       }).catch((error) => {
+        alert(3);
         this.utils.msgError((error?.response?.data) || this.utils.normalErrorMsg);
       });
     },

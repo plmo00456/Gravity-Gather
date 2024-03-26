@@ -230,7 +230,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const user = userStore.userInfo;
-    const socket = new WebSocket('ws://' + import.meta.env.VITE_SERVER_IP + ':8080/gg');
+    const socket = new WebSocket('ws://' + import.meta.env.VITE_SERVER_IP + ':' + import.meta.env.VITE_PORT + '/gg');
     const instance = getCurrentInstance();
     const roomStore = useRoomStore();
     let rooms = ref([]);

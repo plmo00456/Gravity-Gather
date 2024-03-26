@@ -7,8 +7,8 @@
             <div class="flex items-center relative w-full h-[2rem] mt-10">
               <div class="absolute left-0 top-4 border-b border-gray-300 w-full"></div>
               <div class="bg-white px-4 ml-7 text-sm font-thin z-10">
-                <span class="text-gray-600">커뮤니티 / </span>
-                <span class="text-blue-500">Q&A</span>
+                <span class="text-gray-600 hover:text-gray-700 cursor-pointer" @click="$router.go(-1)">커뮤니티 / </span>
+                <span class="text-blue-500 hover:text-blue-600 cursor-pointer" @click="$router.go(-1)">{{ article.master_title }}</span>
               </div>
             </div>
             <div class="flex text-start justify-start text-xl w-full font-bold mt-[2rem] mb-5">
@@ -148,7 +148,6 @@
                 </div>
               </div>
               <div class="flex flex-col w-full">
-
                 <div v-for="item in comments" :key="item.seq"
                      :class="{'w-[95%] self-end border-l pl-5 bg-gray-50': item.parent_comment_seq !== null, 'w-full': item.parent_comment_seq === null }"
                      class="flex flex-col py-5 relative">
@@ -248,6 +247,14 @@
                   </div>
                 </div>
 
+              </div>
+              <div class="flex self-start">
+                <button
+                    @click="$router.go(-1)"
+                    class="text-white px-5 py-2 bg-blue-600 rounded text-sm hover:bg-blue-500 mt-3 mr-3"
+                    type="button">
+                  <span class="">목록</span>
+                </button>
               </div>
             </div>
           </div>

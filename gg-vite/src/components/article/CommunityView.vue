@@ -193,7 +193,7 @@ export default {
                         <span class="mr-4">작성하기</span>
                         <font-awesome-icon class="fa-md font-bold" icon="fa-pen"></font-awesome-icon>
                     </button>
-                    <div class="text-lg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div class="text-lg absolute w-2/3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <button
                                 @click="clickArticleTab(0)"
                                 :class="{'bg-gray-200 text-blue-400 font-bold': articleCondition.master_seq === 0}"

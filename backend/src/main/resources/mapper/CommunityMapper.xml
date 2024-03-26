@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wooreal.gravitygather.mapper.CommunityMapper">
     <select id="getArticleMasters">
@@ -16,8 +16,8 @@
 
     <select id="getArticlesAllCnt">
         SELECT
-            count(*) as allCnt,
-            TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1 as lastPage
+        count(*) as allCnt,
+        IF(count(*) % #{viewPageCnt}  = 0, TRUNCATE(count(*) / #{viewPageCnt}, 0), TRUNCATE(count(*) / #{viewPageCnt}, 0) + 1) as lastPage
         from
         article A
         <where>
@@ -36,24 +36,24 @@
 
     <select id="getArticles">
         SELECT
-            A.seq,
-            A.master_seq,
-            (select AA.title from articlemaster AA where AA.seq = A.master_seq) as master_title,
-            A.title,
-            A.content,
-            A.user_seq,
-            A.view_count,
-            IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'article' and AA.content_seq = A.seq), 0) as likes,
-            A.created_at,
-            A.updated_at,
-            IFNULL(B.nickname, '탈퇴유저') as nickname,
-            B.photo,
-            (select count(*) from comment AA where AA.article_seq = A.seq and AA.is_delete = false) as comment_count
-            <if test="user_seq != null">
-                , IFNULL((select true from scrap AA where AA.article_seq = A.seq and AA.user_seq = #{user_seq}), false) as scrap
-            </if>
+        A.seq,
+        A.master_seq,
+        (select AA.title from articlemaster AA where AA.seq = A.master_seq) as master_title,
+        A.title,
+        A.content,
+        A.user_seq,
+        A.view_count,
+        IFNULL((select SUM(IF(AA.is_up, 1, -1)) from likes AA where AA.mode = 'article' and AA.content_seq = A.seq), 0) as likes,
+        A.created_at,
+        A.updated_at,
+        IFNULL(B.nickname, '탈퇴유저') as nickname,
+        B.photo,
+        (select count(*) from comment AA where AA.article_seq = A.seq and AA.is_delete = false) as comment_count
+        <if test="user_seq != null">
+            , IFNULL((select true from scrap AA where AA.article_seq = A.seq and AA.user_seq = #{user_seq}), false) as scrap
+        </if>
         from
-            article A
+        article A
         LEFT JOIN users B
         ON A.user_seq = B.seq
         <where>
@@ -98,11 +98,11 @@
             content,
             user_seq
         ) VALUES (
-            #{master_seq},
-            #{title},
-            #{content},
-            #{user_seq}
-        )
+                     #{master_seq},
+                     #{title},
+                     #{content},
+                     #{user_seq}
+                 )
     </insert>
 
     <update id="articleGoUpViewCount">
@@ -132,6 +132,7 @@
         FROM gravitygather.comment A
         LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
         <where>
+            A.is_delete = false
             <if test="seq != null">
                 AND A.seq = #{seq}
             </if>
@@ -143,61 +144,63 @@
 
     <select id="getComments">
         WITH RECURSIVE comment_hierarchy AS (
-            SELECT
-                A.seq,
-                A.article_seq,
-                A.parent_comment_seq,
-                A.content,
-                A.user_seq,
-                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
-                <if test="user_seq != null">
-                    (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
-                </if>
-                A.is_delete,
-                A.created_at,
-                A.updated_at,
-                B.photo,
-                IFNULL(B.nickname, '탈퇴유저') as nickname,
-                A.seq AS root_seq
-            FROM gravitygather.comment A
-                 LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
-            <where>
-                A.parent_comment_seq IS NULL
-                <if test="seq != null">
-                    AND A.seq = #{seq}
-                </if>
-                <if test="article_seq != null">
-                    AND A.article_seq = #{article_seq}
-                </if>
-            </where>
-            UNION ALL
-            SELECT
-                A.seq,
-                A.article_seq,
-                A.parent_comment_seq,
-                A.content,
-                A.user_seq,
-                IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
-                <if test="user_seq != null">
-                    (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
-                </if>
-                A.is_delete,
-                A.created_at,
-                A.updated_at,
-                B.photo,
-                IFNULL(B.nickname, '탈퇴유저') as nickname,
-                CH.root_seq
-            FROM gravitygather.comment A
-                 LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
-                 JOIN comment_hierarchy CH ON A.parent_comment_seq = CH.seq
-            <where>
-                <if test="seq != null">
-                    A.seq = #{seq}
-                </if>
-                <if test="article_seq != null">
-                    A.article_seq = #{article_seq}
-                </if>
-            </where>
+        SELECT
+        A.seq,
+        A.article_seq,
+        A.parent_comment_seq,
+        A.content,
+        A.user_seq,
+        IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+        <if test="user_seq != null">
+            (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+        </if>
+        A.is_delete,
+        A.created_at,
+        A.updated_at,
+        B.photo,
+        IFNULL(B.nickname, '탈퇴유저') as nickname,
+        A.seq AS root_seq
+        FROM gravitygather.comment A
+        LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
+        <where>
+            A.parent_comment_seq IS NULL
+            AND A.is_delete = false
+            <if test="seq != null">
+                AND A.seq = #{seq}
+            </if>
+            <if test="article_seq != null">
+                AND A.article_seq = #{article_seq}
+            </if>
+        </where>
+        UNION ALL
+        SELECT
+        A.seq,
+        A.article_seq,
+        A.parent_comment_seq,
+        A.content,
+        A.user_seq,
+        IFNULL((select SUM(IF(AA.is_up, 1, -1)) from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq), 0) as likes,
+        <if test="user_seq != null">
+            (select AA.is_up from gravitygather.likes AA where AA.mode = 'comment' and AA.content_seq = A.seq and AA.user_seq = #{user_seq}) as is_up,
+        </if>
+        A.is_delete,
+        A.created_at,
+        A.updated_at,
+        B.photo,
+        IFNULL(B.nickname, '탈퇴유저') as nickname,
+        CH.root_seq
+        FROM gravitygather.comment A
+        LEFT JOIN gravitygather.users B ON A.user_seq = B.seq
+        JOIN comment_hierarchy CH ON A.parent_comment_seq = CH.seq
+        <where>
+            A.is_delete = false
+            <if test="seq != null">
+                AND A.seq = #{seq}
+            </if>
+            <if test="article_seq != null">
+                AND A.article_seq = #{article_seq}
+            </if>
+        </where>
         )
         SELECT * FROM comment_hierarchy ORDER BY root_seq, seq
     </select>
@@ -210,18 +213,18 @@
             content,
             user_seq
         ) values (
-            #{article_seq},
-            #{parent_comment_seq},
-            #{content},
-            #{user_seq}
-        )
+                     #{article_seq},
+                     #{parent_comment_seq},
+                     #{content},
+                     #{user_seq}
+                 )
     </insert>
 
     <update id="updateArticle">
         update article set
-           master_seq = #{master_seq},
-           title = #{title},
-           content = #{content}
+                           master_seq = #{master_seq},
+                           title = #{title},
+                           content = #{content}
         where
             seq = #{seq}
     </update>
@@ -235,11 +238,11 @@
 
     <select id="getLikes">
         SELECT
-            mode,
-            content_seq,
-            user_seq,
-            is_up,
-            created_at
+        mode,
+        content_seq,
+        user_seq,
+        is_up,
+        created_at
         from Likes
         <where>
             <if test="mode">
@@ -261,26 +264,26 @@
             user_seq,
             is_up
         ) VALUES (
-            #{mode},
-            #{content_seq},
-            #{user_seq},
-            #{is_up}
-        )
+                     #{mode},
+                     #{content_seq},
+                     #{user_seq},
+                     #{is_up}
+                 )
     </insert>
 
     <delete id="deleteLike">
         delete from likes
         where
             mode = #{mode}
-        and user_seq = #{user_seq}
-        and content_seq = #{content_seq}
+          and user_seq = #{user_seq}
+          and content_seq = #{content_seq}
     </delete>
 
     <delete id="deleteScrap">
         delete from scrap
         where
             article_seq = #{seq}
-        and user_seq = #{user_seq}
+          and user_seq = #{user_seq}
     </delete>
 
     <insert id="addScrap">
@@ -288,9 +291,9 @@
             article_seq,
             user_seq
         ) values (
-            #{seq},
-            #{user_seq}
-        )
+                     #{seq},
+                     #{user_seq}
+                 )
     </insert>
 
 </mapper>

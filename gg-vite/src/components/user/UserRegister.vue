@@ -7,7 +7,7 @@
                         <img class="w-4/6" src="../../assets/image/logo.png" alt="로고">
                     </div>
                     <div class="relative">
-                        <input type="email" v-model.trim.lazy="value.email" placeholder="이메일"
+                        <input type="email" v-model.trim.lazy="value.email" placeholder="이메일" autofocus
                                @input="updateEmail"
                                class="text-sm pl-10 pr-4 py-2 rounded-md border w-full focus:outline-none"
                                maxlength="40">

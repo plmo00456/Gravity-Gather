@@ -140,9 +140,11 @@ export const useUserStore = defineStore({
                 if (response.status === 200) {
                     this.dataResponse = response;
                 }
+                return response.data;
             })
             .catch(error => {
                 this.dataResponse = error.response;
+                return error.response.data;
             });
         },
 
